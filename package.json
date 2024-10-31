@@ -1,0 +1,22 @@
+{
+  "name": "search-pro",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test"
+  },
+  "devDependencies": {
+    "turbo": "^2.2.3"
+  },
+  "resolutions": {
+    "glob": "^11.0.0",
+    "inflight": "^1.0.7"
+  },
+  "packageManager": "pnpm@9.12.3"
+}

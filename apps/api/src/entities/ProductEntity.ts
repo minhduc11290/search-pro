@@ -8,13 +8,9 @@ import {
   types,
   Unique,
 } from '@mikro-orm/core';
-import {
-  BaseEntity,
-  LocationEntity,
-  ProductLocationEntity,
-  StoreEntity,
-} from './index';
-import { ProductStatus, StoreStatus } from 'src/const/enums';
+import { ProductStatus } from 'src/const/enums';
+import { ProductLocationEntity, StoreEntity } from './index';
+import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'products' })
 export class ProductEntity extends BaseEntity<ProductEntity> {

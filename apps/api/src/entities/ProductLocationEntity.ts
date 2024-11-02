@@ -1,5 +1,6 @@
 import { Entity, ManyToOne, Property, types } from '@mikro-orm/core';
-import { BaseEntity, LocationEntity, ProductEntity } from './index';
+import { LocationEntity, ProductEntity } from './index';
+import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'product_locations' })
 export class ProductLocationEntity extends BaseEntity<ProductLocationEntity> {

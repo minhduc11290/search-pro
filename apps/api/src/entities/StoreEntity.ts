@@ -8,7 +8,8 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { StoreStatus } from 'src/const/enums';
-import { BaseEntity, LocationEntity, UserEntity } from './index';
+import { LocationEntity, UserEntity } from './index';
+import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'stores' })
 export class StoreEntity extends BaseEntity<StoreEntity> {
@@ -39,6 +40,6 @@ export class StoreEntity extends BaseEntity<StoreEntity> {
   @OneToMany(() => LocationEntity, 'store')
   locations = new Collection<LocationEntity>(this);
 
-  @ManyToMany(() => UserEntity, 'stores')
+  @ManyToMany(() => UserEntity, 'stores', { owner: true })
   owners = new Collection<UserEntity>(this);
 }

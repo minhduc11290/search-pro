@@ -1,23 +1,11 @@
-// import { defineConfig } from '@mikro-orm/postgresql';
-// import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { defineConfig } from '@mikro-orm/postgresql';
+import { Logger } from '@nestjs/common';
+import * as entities from '../src/entities';
 
-// export default defineConfig({
-//   dbName: 'search_pro',
-//   entities: ['dist/**/*.entity.js'],
-//   entitiesTs: ['src/**/*.entity.ts'],
-//   metadataProvider: TsMorphMetadataProvider,
-//   debug: true,
-// });
-
-// import { defineConfig, ReflectMetadataProvider } from '@mikro-orm/core';
-import { defineConfig, PostgreSqlDriver } from '@mikro-orm/postgresql';
-import dotenv from 'dotenv';
-
-// dotenv.config();
+const logger = new Logger('MikroORM');
 
 export default defineConfig({
-  entities: ['dist/**/*.entity.js'],
-  entitiesTs: ['src/**/*.entity.ts'],
+  entities: Object.values(entities),
   discovery: { disableDynamicFileAccess: true },
   dbName: process.env.DATABASE_NAME || 'search_pro',
   user: process.env.DATABASE_USER || 'postgres',
@@ -27,4 +15,6 @@ export default defineConfig({
   driverOptions: {
     connection: { ssl: process.env.DATABASE_SSL === 'true' },
   },
+  debug: false,
+  logger: logger.log.bind(logger),
 });

@@ -1,0 +1,61 @@
+version: "3.9"
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - postgres
+  pgadmin:
+    image: dpage/pgadmin4
+    depends_on:
+      - db
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${PGADMIN_PORT:-5050}:80"
+    networks:
+      - postgres
+    restart: unless-stopped
+  api:
+    build: ./apps/api
+    environment:
+      - PORT=5000
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_TYPE=postgresql
+      - DATABASE_SSL=false
+    depends_on:
+      - db
+    ports:
+      - "5000:5000"
+  # web:
+  #   build: ./apps/web
+  #   environment:
+  #     - VITE_API_ENDPOINT=http://localhost:5000
+  #     - VITE_DEFAULT_LOCALE=en-US
+  #   depends_on:
+  #     - api
+  #   ports:
+  #     - "5173:5173"
+networks:
+  postgres:
+    driver: bridge
+volumes:
+  db:
+    driver: local
+  pgadmin:
+    driver: local

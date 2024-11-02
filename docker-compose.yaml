@@ -15,21 +15,6 @@ services:
       - db:/var/lib/postgresql/data
     networks:
       - postgres
-  pgadmin:
-    image: dpage/pgadmin4
-    depends_on:
-      - db
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-postgres}
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-    volumes:
-      - pgadmin:/var/lib/pgadmin
-    ports:
-      - "${PGADMIN_PORT:-5050}:80"
-    networks:
-      - postgres
-    restart: unless-stopped
   api:
     build: ./apps/api
     environment:
@@ -47,15 +32,6 @@ services:
       - "5000:5000"
     networks:
       - postgres
-  # web:
-  #   build: ./apps/web
-  #   environment:
-  #     - VITE_API_ENDPOINT=http://localhost:5000
-  #     - VITE_DEFAULT_LOCALE=en-US
-  #   depends_on:
-  #     - api
-  #   ports:
-  #     - "5173:5173"
 networks:
   postgres:
     driver: bridge

@@ -7,7 +7,7 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { LocationStatus } from 'src/const/enums';
-import { CountryEntity, StoreEntity } from './index';
+import { CountryEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'locations' })

@@ -9,7 +9,7 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { ProductStatus } from 'src/const/enums';
-import { ProductLocationEntity, StoreEntity } from './index';
+import { ProductLocationEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'products' })

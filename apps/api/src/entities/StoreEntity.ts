@@ -3,13 +3,12 @@ import {
   Entity,
   Enum,
   ManyToMany,
-  ManyToOne,
   OneToMany,
   Property,
 } from '@mikro-orm/core';
 import { StoreStatus } from 'src/const/enums';
-import { LocationEntity, UserEntity } from './index';
 import { BaseEntity } from './BaseEntity';
+import { LocationEntity, UserEntity } from '.';
 
 @Entity({ tableName: 'stores' })
 export class StoreEntity extends BaseEntity<StoreEntity> {

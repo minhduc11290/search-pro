@@ -1,4 +1,4 @@
-import { Entity, OneToOne, Property, types } from '@mikro-orm/core';
+import { Entity, Property, types } from '@mikro-orm/core';
 import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'countries' })

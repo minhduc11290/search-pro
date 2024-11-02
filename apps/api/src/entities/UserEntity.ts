@@ -12,8 +12,7 @@ import {
 import { IsEmail } from 'class-validator';
 import { UserStatus } from 'src/const/enums';
 import { BaseEntity } from './BaseEntity';
-import { RoleEntity } from './RoleEntity';
-import { StoreEntity } from './StoreEntity';
+import { RoleEntity, StoreEntity } from '.';
 
 @Entity({ tableName: 'users' })
 export class UserEntity extends BaseEntity<UserEntity> {

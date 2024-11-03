@@ -1,8 +1,10 @@
 import { defineConfig } from '@mikro-orm/postgresql';
 import { Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as entities from '../src/entities';
 
 const logger = new Logger('MikroORM');
+const config = new ConfigService();
 
 export default defineConfig({
   entities: Object.values(entities),

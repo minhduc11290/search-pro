@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Enum,
-  ManyToOne,
-  OneToOne,
-  Property,
-  Unique,
-} from '@mikro-orm/core';
+import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
 import { LocationStatus } from 'src/const/enums';
 import { CountryEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
@@ -13,7 +6,6 @@ import { BaseEntity } from './BaseEntity';
 @Entity({ tableName: 'locations' })
 export class LocationEntity extends BaseEntity<LocationEntity> {
   @Property({ length: 255 })
-  @Unique()
   name!: string;
 
   @Property({ length: 1000 })
@@ -25,7 +17,7 @@ export class LocationEntity extends BaseEntity<LocationEntity> {
   @Property({ length: 100, nullable: true })
   state?: string;
 
-  @OneToOne(() => CountryEntity, { nullable: true })
+  @ManyToOne(() => CountryEntity, { nullable: true })
   country?: CountryEntity;
 
   @Property({ length: 25, nullable: true })

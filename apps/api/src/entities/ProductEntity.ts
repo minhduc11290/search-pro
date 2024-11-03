@@ -13,6 +13,7 @@ import { ProductLocationEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'products' })
+@Unique({ properties: ['sku', 'store'] })
 export class ProductEntity extends BaseEntity<ProductEntity> {
   @Property({ length: 100 })
   @Unique()

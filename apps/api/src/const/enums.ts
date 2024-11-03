@@ -19,6 +19,14 @@ export enum ProductStatus {
   INACTIVE = 'INACTIVE',
 }
 
+export enum QuoteStatus {
+  WAITING = 'WAITING',
+  RESPONDED = 'RESPONDED',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+  CLOSED = 'CLOSED',
+}
+
 export enum UserRole {
   ADMIN = 'ADMIN',
   USER = 'USER',

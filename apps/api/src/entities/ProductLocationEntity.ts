@@ -1,9 +1,20 @@
-import { Entity, ManyToOne, Property, types } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+  types,
+  Unique,
+} from '@mikro-orm/core';
 import { LocationEntity, ProductEntity } from './index';
-import { BaseEntity } from './BaseEntity';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ tableName: 'product_locations' })
-export class ProductLocationEntity extends BaseEntity<ProductLocationEntity> {
+@Unique({ properties: ['product', 'location'] })
+export class ProductLocationEntity {
+  @PrimaryKey({ type: types.uuid })
+  id: string = uuidv4();
+
   @Property({ type: types.float, nullable: false })
   price!: number;
 

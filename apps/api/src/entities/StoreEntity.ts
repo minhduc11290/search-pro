@@ -8,7 +8,7 @@ import {
 } from '@mikro-orm/core';
 import { StoreStatus } from 'src/const/enums';
 import { BaseEntity } from './BaseEntity';
-import { LocationEntity, UserEntity } from '.';
+import { UserEntity, LocationEntity } from '.';
 
 @Entity({ tableName: 'stores' })
 export class StoreEntity extends BaseEntity<StoreEntity> {

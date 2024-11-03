@@ -13,11 +13,11 @@ export abstract class BaseEntity<
   @PrimaryKey({ type: types.uuid })
   id: string = uuidv4();
 
-  @Property({ type: types.uuid, nullable: false })
-  createdBy!: string;
+  @Property({ type: types.uuid, nullable: true })
+  createdBy?: string;
 
-  @Property({ type: types.uuid, nullable: false })
-  updatedBy!: string;
+  @Property({ type: types.uuid, nullable: true })
+  updatedBy?: string;
 
   @Property()
   createdAt: Date & Opt = new Date();

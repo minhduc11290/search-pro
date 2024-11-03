@@ -15,6 +15,13 @@ export default defineConfig({
   driverOptions: {
     connection: { ssl: process.env.DATABASE_SSL === 'true' },
   },
+  pool: {
+    min: 0,
+    max: 100,
+    acquireTimeoutMillis: 60000,
+    log: (message, logLevel) => console.log(`${logLevel}: ${message}`),
+    idleTimeoutMillis: 120000,
+  },
   debug: false,
   logger: logger.log.bind(logger),
 });

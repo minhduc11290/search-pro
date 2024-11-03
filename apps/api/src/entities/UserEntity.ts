@@ -1,18 +1,16 @@
 import {
-  Cascade,
   Collection,
   Entity,
   Enum,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   Property,
   Unique,
 } from '@mikro-orm/core';
 import { IsEmail } from 'class-validator';
 import { UserStatus } from 'src/const/enums';
-import { BaseEntity } from './BaseEntity';
 import { RoleEntity, StoreEntity } from '.';
+import { BaseEntity } from './BaseEntity';
 
 @Entity({ tableName: 'users' })
 export class UserEntity extends BaseEntity<UserEntity> {
@@ -34,14 +32,14 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @Unique()
   email!: string;
 
-  @Property({ default: true })
+  @Property({ default: false })
   emailVerified: boolean = false;
 
-  @OneToMany(() => RoleEntity, (role) => role.user, { cascade: [Cascade.ALL] })
-  roles = new Collection<RoleEntity>(this);
+  @Property({ nullable: true })
+  verifyToken?: string;
 
-  @ManyToOne(() => StoreEntity)
-  store!: StoreEntity;
+  @ManyToOne(() => RoleEntity)
+  role!: RoleEntity;
 
   @ManyToMany(() => StoreEntity, 'owners')
   stores = new Collection<StoreEntity>(this);

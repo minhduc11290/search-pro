@@ -8,6 +8,9 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2021",
     "sourceMap": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
     "outDir": "./dist",
     "baseUrl": "./",
     "incremental": true,
@@ -17,6 +20,9 @@
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node"]
+    "types": ["node"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
   }
 }

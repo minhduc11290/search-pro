@@ -1,0 +1,32 @@
+[
+  {
+    "userName": "superadmin",
+    "firstName": "Super",
+    "lastName": "Admin",
+    "email": "superadmin@searchpro.com",
+    "password": "superadmin",
+    "emailVerified": true,
+    "role": "SUPER_ADMIN",
+    "status": "ACTIVE"
+  },
+  {
+    "userName": "admin",
+    "firstName": "Admin",
+    "lastName": "Admin",
+    "email": "admin@searchpro.com",
+    "password": "admin",
+    "emailVerified": true,
+    "role": "ADMIN",
+    "status": "ACTIVE"
+  },
+  {
+    "userName": "user",
+    "firstName": "User",
+    "lastName": "User",
+    "email": "user@searchpro.com",
+    "password": "user",
+    "emailVerified": true,
+    "role": "USER",
+    "status": "ACTIVE"
+  }
+]

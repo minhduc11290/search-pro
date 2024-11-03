@@ -6,3 +6,6 @@ export * from './RoleEntity';
 export * from './CountryEntity';
 export * from './ProductLocationEntity';
 export * from './AttachmentEntity';
+export * from './QuoteEntity';
+export * from './ContactEntity';
+export * from './CommentEntity';

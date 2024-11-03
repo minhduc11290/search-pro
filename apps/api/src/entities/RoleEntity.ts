@@ -1,15 +1,14 @@
-import { Entity, Enum, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, Enum, PrimaryKey, Property, types } from '@mikro-orm/core';
 import { UserRole } from 'src/const/enums';
-import { BaseEntity } from './BaseEntity';
-import { UserEntity } from '.';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ tableName: 'roles' })
-export class RoleEntity extends BaseEntity<RoleEntity> {
+export class RoleEntity {
+  @PrimaryKey({ type: types.uuid })
+  id: string = uuidv4();
+
   @Enum({ items: () => UserRole, nullable: false })
   role: UserRole = UserRole.USER;
-
-  @ManyToOne(() => UserEntity)
-  user!: UserEntity;
 
   @Property({ length: 1000, nullable: true })
   description?: string;

@@ -1,8 +1,11 @@
-import { Entity, Property, types } from '@mikro-orm/core';
-import { BaseEntity } from './BaseEntity';
+import { Entity, PrimaryKey, Property, types } from '@mikro-orm/core';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ tableName: 'countries' })
-export class CountryEntity extends BaseEntity<CountryEntity> {
+export class CountryEntity {
+  @PrimaryKey({ type: types.uuid })
+  id: string = uuidv4();
+
   @Property({ length: 255 })
   country!: string;
 

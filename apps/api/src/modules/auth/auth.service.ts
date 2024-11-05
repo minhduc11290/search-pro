@@ -33,6 +33,7 @@ export default class AuthService {
     const password = await argon.hash(userCreationDto.password);
     const role = await this.userService.findRole(UserRole.USER);
     const requiredData: RequiredEntityData<UserEntity> = {
+      ...userCreationDto,
       email: userCreationDto.email,
       password,
       role,

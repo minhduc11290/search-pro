@@ -11,30 +11,38 @@ import { IsEmail } from 'class-validator';
 import { UserStatus } from 'src/const/enums';
 import { RoleEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity({ tableName: 'users' })
 export class UserEntity extends BaseEntity<UserEntity> {
+  @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
   @Property({ length: 100 })
   @Unique()
   userName!: string;
 
+  @ApiProperty({ required: false, maxLength: 100 })
   @Property({ length: 100, nullable: true })
   firstName?: string;
 
+  @ApiProperty({ required: false, maxLength: 100 })
   @Property({ length: 100, nullable: true })
   lastName?: string;
 
+  @ApiProperty({ required: false, maxLength: 100 })
   @Property({ length: 100, nullable: true })
   password?: string;
 
+  @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
   @Property({ length: 100 })
   @IsEmail()
   @Unique()
   email!: string;
 
+  @ApiProperty({ required: true, maxLength: 100 })
   @Property({ default: false })
   emailVerified: boolean = false;
 
+  @ApiProperty({ required: false, maxLength: 100 })
   @Property({ nullable: true })
   verifyToken?: string;
 
@@ -44,6 +52,7 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @ManyToMany(() => StoreEntity, 'owners')
   stores = new Collection<StoreEntity>(this);
 
+  @ApiProperty({ required: false })
   @Enum({ items: () => UserStatus, nullable: false })
   status?: UserStatus = UserStatus.PENDING;
 

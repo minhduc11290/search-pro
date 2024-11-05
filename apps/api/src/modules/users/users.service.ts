@@ -3,7 +3,8 @@ import {
   EntityRepository,
   RequiredEntityData,
 } from '@mikro-orm/core';
-import { InjectRepository } from '@mikro-orm/nestjs';
+import { InjectEntityManager, InjectRepository } from '@mikro-orm/nestjs';
+import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
 import { UserRole } from '~/const/enums';
 import { RoleEntity, UserEntity } from '~/entities';
@@ -20,7 +21,9 @@ export class UsersService {
   ) {}
 
   async createUser(data: RequiredEntityData<UserEntity>): Promise<UserEntity> {
-    return this.userRepository.create(data);
+    const user = this.userRepository.create(data);
+    await this.userRepository.insert(user);
+    return user;
   }
 
   async findByEmail(email: string, populate?: string[]) {

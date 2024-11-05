@@ -1,6 +1,8 @@
 import { RequiredEntityData } from '@mikro-orm/core';
 import {
+  ConflictException,
   ForbiddenException,
+  GoneException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -25,7 +27,7 @@ export default class AuthService {
       userCreationDto.email,
     );
     if (existedUser) {
-      throw new ForbiddenException('User already exists!');
+      throw new ConflictException('User already exists!');
     }
 
     const password = await argon.hash(userCreationDto.password);
@@ -42,13 +44,13 @@ export default class AuthService {
     const user = await this.userService.findByEmail(userLoginDto.email);
 
     if (!user) {
-      throw new NotFoundException('User not found!');
+      throw new GoneException('User not found!');
     }
 
     const isVerified = await argon.verify(user.password, userLoginDto.password);
 
     if (!isVerified) {
-      throw new NotFoundException('Password incorrect!');
+      throw new GoneException('Password incorrect!');
     }
     delete user.password;
     console.log(user);

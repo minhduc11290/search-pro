@@ -8,7 +8,7 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { IsEmail } from 'class-validator';
-import { UserStatus } from 'src/const/enums';
+import { UserStatus } from '~/consts/enums';
 import { RoleEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 import { ApiProperty } from '@nestjs/swagger';

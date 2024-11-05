@@ -11,7 +11,7 @@ export interface IMapper<
   mapArray(source: Source[], options?: Options): Destination[];
 }
 
-export abstract class Mapper<
+export abstract class BaseMapper<
   Source,
   Destination,
   Options extends IMapperOptions = object,

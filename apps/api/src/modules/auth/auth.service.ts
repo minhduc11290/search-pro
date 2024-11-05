@@ -9,7 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { UserRole } from '~/const/enums';
+import { UserRole } from '~/consts/enums';
 import { UserEntity } from '~/entities';
 import { UsersService } from '../users/users.service';
 import { UserCreationDto, UserLoginDto } from './dto';

@@ -1,5 +1,5 @@
 import type { EntityManager } from '@mikro-orm/core';
-import { UserRole } from 'src/const/enums';
+import { UserRole } from '~/consts/enums';
 import { RoleEntity } from 'src/entities';
 import roleData from '../resources/roles.json';
 import { BaseSeeder } from './BaseSeeder';

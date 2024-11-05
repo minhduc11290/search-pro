@@ -1,5 +1,5 @@
 import { Entity, Enum, PrimaryKey, Property, types } from '@mikro-orm/core';
-import { UserRole } from 'src/const/enums';
+import { UserRole } from '~/consts/enums';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity({ tableName: 'roles' })

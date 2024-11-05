@@ -8,7 +8,7 @@ import {
   types,
   Unique,
 } from '@mikro-orm/core';
-import { ProductStatus } from 'src/const/enums';
+import { ProductStatus } from '~/consts/enums';
 import { ProductLocationEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 

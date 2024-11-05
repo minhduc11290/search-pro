@@ -1,5 +1,5 @@
 import { Entity, Enum, ManyToOne, Property, Unique } from '@mikro-orm/core';
-import { LocationStatus } from 'src/const/enums';
+import { LocationStatus } from '~/consts/enums';
 import { CountryEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 

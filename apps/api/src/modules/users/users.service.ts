@@ -6,7 +6,7 @@ import {
 import { InjectEntityManager, InjectRepository } from '@mikro-orm/nestjs';
 import { EntityManager } from '@mikro-orm/postgresql';
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '~/const/enums';
+import { UserRole } from '~/consts/enums';
 import { RoleEntity, UserEntity } from '~/entities';
 
 @Injectable()

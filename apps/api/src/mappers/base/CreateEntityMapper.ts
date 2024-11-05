@@ -1,6 +1,6 @@
 import { RequiredEntityData } from '@mikro-orm/core';
 import { BaseEntity } from '~/entities/BaseEntity';
-import { Mapper } from './Mapper';
+import { BaseMapper } from './BaseMapper';
 
 export interface IEntityMapperOptions {
   full?: boolean;
@@ -12,4 +12,4 @@ export abstract class CreateEntityMapper<
   Options extends IEntityMapperOptions = {
     full?: boolean;
   },
-> extends Mapper<Source, RequiredEntityData<Entity>, Options> {}
+> extends BaseMapper<Source, RequiredEntityData<Entity>, Options> {}

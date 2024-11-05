@@ -1,6 +1,6 @@
 import type { EntityManager } from '@mikro-orm/core';
 import * as argon from 'argon2';
-import { UserStatus } from 'src/const/enums';
+import { UserStatus } from '~/consts/enums';
 import { RoleEntity, UserEntity } from 'src/entities';
 import usersData from '../resources/users.json';
 import { BaseSeeder } from './BaseSeeder';

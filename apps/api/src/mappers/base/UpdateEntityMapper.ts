@@ -1,6 +1,6 @@
 import { EntityData, Loaded } from '@mikro-orm/core';
 import { BaseEntity } from '~/entities/BaseEntity';
-import { Mapper } from './Mapper';
+import { BaseMapper } from './BaseMapper';
 
 export interface IEntityMapperOptions {
   full?: boolean;
@@ -13,4 +13,4 @@ export abstract class UpdateEntityMapper<
   Options extends IEntityMapperOptions = {
     full?: boolean;
   },
-> extends Mapper<Source, EntityData<Loaded<Entity, never>>, Options> {}
+> extends BaseMapper<Source, EntityData<Loaded<Entity, never>>, Options> {}

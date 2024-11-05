@@ -1,8 +1,8 @@
 import { UserEntity } from '~/entities';
-import { Mapper } from './base/Mapper';
+import { BaseMapper } from './base/BaseMapper';
 import { UserCreationResponseDto } from '~/modules/auth/dto';
 
-export class UserResponseMapper extends Mapper<
+export class UserResponseMapper extends BaseMapper<
   UserEntity,
   UserCreationResponseDto
 > {

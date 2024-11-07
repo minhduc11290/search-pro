@@ -1,8 +1,9 @@
 import { Body, Controller, HttpCode, Post } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UserResponseMapper } from '~/mappers/UserResponseMapper';
+import { UserResponseDto } from '../users/dto/user-response.dto';
 import AuthService from './auth.service';
-import { UserCreationDto, UserCreationResponseDto, UserLoginDto } from './dto';
+import { UserCreationDto, UserLoginDto } from './dto';
 import { UserLoginResponseDto } from './dto/user-login-response.dto';
 
 @ApiTags('auth')
@@ -15,11 +16,11 @@ export class AuthController {
   @ApiResponse({
     status: 201,
     description: 'User created',
-    type: UserCreationResponseDto,
+    type: UserResponseDto,
   })
   async register(
     @Body() userCreationDto: UserCreationDto,
-  ): Promise<UserCreationResponseDto> {
+  ): Promise<UserResponseDto> {
     const user = await this.authService.register(userCreationDto);
     return new UserResponseMapper().map(user);
   }

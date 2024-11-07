@@ -1,18 +1,26 @@
 import { UserEntity } from '~/entities';
+import { UserResponseDto } from '~/modules/users/dto/user-response.dto';
 import { BaseMapper } from './base/BaseMapper';
-import { UserCreationResponseDto } from '~/modules/auth/dto';
 
 export class UserResponseMapper extends BaseMapper<
   UserEntity,
-  UserCreationResponseDto
+  UserResponseDto
 > {
-  map(source: UserEntity): UserCreationResponseDto {
-    const userDto: UserCreationResponseDto = {
+  map(source: UserEntity): UserResponseDto {
+    const userDto: UserResponseDto = {
       id: source.id,
       email: source.email,
       userName: source.userName,
       firstName: source.firstName,
       lastName: source.lastName,
+      role: {
+        id: source.role.id,
+        value: source.role.role,
+      },
+      stores: source.stores.map((store) => ({
+        id: store.id,
+        value: store.name,
+      })),
     };
     return userDto;
   }

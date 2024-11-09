@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import Redis from 'ioredis';
 @Injectable()
-export default class TokenBlacklistService {
+export default class TokenService {
   private redis: Redis;
   private ttl: number = 3600;
 

@@ -1,23 +1,14 @@
-/** @type {import('eslint').Linter.Config} */
-const config = {
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json',
-    sourceType: 'module',
-  },
-  plugins: ['@typescript-eslint'],
+/* eslint-env node */
+module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
+    'plugin:@typescript-eslint/strict',
+    'plugin:@typescript-eslint/stylistic',
   ],
-  rules: {
-    // Add your custom rules here
+  languageOptions: {
+    parser: "@babel/eslint-parser"
   },
-  env: {
-    node: true,
-    jest: true,
-  },
+  plugins: ['@typescript-eslint'],
+  root: true,
 };
-
-module.exports = config;

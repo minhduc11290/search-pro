@@ -35,10 +35,10 @@ export class UserResponseDto {
   email!: string;
 
   @ApiProperty({ example: 'John' })
-  firstName: string;
+  firstName?: string;
 
   @ApiProperty({ example: 'Doe' })
-  lastName: string;
+  lastName?: string;
 
   @ApiProperty({ required: true, type: MinRoleDto })
   role!: MinDto<UserRole>;

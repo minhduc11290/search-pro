@@ -19,8 +19,8 @@ export class ProductEntity extends BaseEntity<ProductEntity> {
   @Unique()
   sku!: string;
 
-  @Property({ length: 255 })
-  name: string;
+  @Property({ length: 255, nullable: true })
+  name?: string;
 
   @Property({ type: types.json })
   keywords!: string[];

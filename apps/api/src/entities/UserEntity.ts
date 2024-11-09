@@ -40,7 +40,7 @@ export class UserEntity extends BaseEntity<UserEntity> {
 
   @ApiProperty({ required: true, maxLength: 100 })
   @Property({ default: false })
-  emailVerified: boolean = false;
+  emailVerified?: boolean = false;
 
   @ApiProperty({ required: false, maxLength: 100 })
   @Property({ nullable: true })

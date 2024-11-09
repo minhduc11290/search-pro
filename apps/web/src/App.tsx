@@ -1,5 +1,4 @@
 import { Button } from "@mantine/core";
-
 function App() {
   return (
     <div className="p-4">

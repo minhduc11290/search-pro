@@ -12,7 +12,7 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
-    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "lint": "eslint --config eslint.config.js 'src/**/*.{js,ts}' --fix",
     "db:create": "pnpm mikro-orm schema:create --run",
     "db:clear": "pnpm mikro-orm schema:drop --run",
     "db:seed": "pnpm mikro-orm seeder:run --class=MultipleSeeder",

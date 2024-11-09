@@ -24,7 +24,7 @@ export class QuoteEntity extends BaseEntity<QuoteEntity> {
   store!: StoreEntity;
 
   @ManyToOne(() => UserEntity)
-  requestor: UserEntity;
+  requestor!: UserEntity;
 
   @ManyToOne(() => ContactEntity)
   contact!: ContactEntity;

@@ -13,6 +13,7 @@ import { UserRole } from '~/consts/enums';
 import { UserEntity } from '~/entities';
 import { UsersService } from '../users/users.service';
 import { UserCreationDto, UserLoginDto } from './dto';
+import TokenService from './token.service';
 
 @Injectable()
 export default class AuthService {
@@ -20,6 +21,7 @@ export default class AuthService {
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async register(userCreationDto: UserCreationDto) {
@@ -32,11 +34,14 @@ export default class AuthService {
 
     const password = await argon.hash(userCreationDto.password);
     const role = await this.userService.findRole(UserRole.USER);
+    if (!role) {
+      throw new NotFoundException('Role not found!');
+    }
     const requiredData: RequiredEntityData<UserEntity> = {
       ...userCreationDto,
       email: userCreationDto.email,
       password,
-      role,
+      role: role.id,
     };
     return this.userService.createUser(requiredData);
   }
@@ -48,7 +53,10 @@ export default class AuthService {
       throw new GoneException('User not found!');
     }
 
-    const isVerified = await argon.verify(user.password, userLoginDto.password);
+    const isVerified = await argon.verify(
+      user.password ?? '',
+      userLoginDto.password,
+    );
 
     if (!isVerified) {
       throw new GoneException('Password incorrect!');
@@ -56,7 +64,10 @@ export default class AuthService {
     delete user.password;
     console.log(user);
 
-    return await this.signJwtToken(user);
+    const tokenData = await this.signJwtToken(user);
+    await this.tokenService.blacklistPreviousToken(user.id);
+    await this.tokenService.toInuse(user.id, tokenData.accessToken);
+    return tokenData;
   }
 
   async signJwtToken(user: UserEntity): Promise<{ accessToken: string }> {

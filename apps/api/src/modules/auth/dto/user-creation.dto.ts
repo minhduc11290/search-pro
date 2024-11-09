@@ -15,7 +15,7 @@ export class UserCreationDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()
-  lastName: string;
+  lastName!: string;
 
   @ApiProperty({ required: true, type: 'string', format: 'email' })
   @IsEmail()
@@ -25,5 +25,5 @@ export class UserCreationDto {
   @ApiProperty({ required: true })
   @IsNotEmpty()
   @IsString()
-  password: string;
+  password!: string;
 }

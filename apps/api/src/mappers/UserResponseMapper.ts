@@ -11,8 +11,8 @@ export class UserResponseMapper extends BaseMapper<
       id: source.id,
       email: source.email,
       userName: source.userName,
-      firstName: source.firstName,
-      lastName: source.lastName,
+      firstName: source.firstName ?? '',
+      lastName: source.lastName ?? '',
       role: {
         id: source.role.id,
         value: source.role.role,

@@ -1,15 +1,34 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  Post,
+  UseGuards,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UserResponseMapper } from '~/mappers/UserResponseMapper';
 import { UserResponseDto } from '../users/dto/user-response.dto';
 import AuthService from './auth.service';
 import { UserCreationDto, UserLoginDto } from './dto';
 import { UserLoginResponseDto } from './dto/user-login-response.dto';
+import { JwtGuard } from './guard/jwt.guard';
+import { Request } from 'express';
+import TokenService from './token.service';
 
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly tokenService: TokenService,
+  ) {}
 
   @Post('register')
   @ApiOperation({ summary: 'User registration' })
@@ -37,5 +56,20 @@ export class AuthController {
     @Body() userLoginDto: UserLoginDto,
   ): Promise<UserLoginResponseDto> {
     return this.authService.login(userLoginDto);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('logout')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  async logout(@Req() req: Request): Promise<void> {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      throw new UnauthorizedException('Authorization header is missing');
+    }
+    const token = authHeader.split(' ')[1];
+    await this.tokenService.toBlacklist(token);
   }
 }

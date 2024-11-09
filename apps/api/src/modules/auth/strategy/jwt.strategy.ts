@@ -1,11 +1,11 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
+import { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UsersService } from '~/modules/users/users.service';
+import { JwtPayload } from '../interfaces/jwt-payload.interface';
 import TokenService from '../token.service';
-import { UserLoginDto } from '../dto';
-import { Request } from 'express';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -16,13 +16,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get('TOKEN_SECRET_KEY'),
+      secretOrKey: String(configService.get('TOKEN_SECRET_KEY')),
       passReqToCallback: true,
     });
   }
 
-  //FIXME: remove type unknown
-  async validate(req: Request, payload: any) {
+  async validate(req: Request, payload: JwtPayload) {
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       throw new UnauthorizedException('Authorization header is missing');

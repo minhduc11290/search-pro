@@ -1,7 +1,6 @@
 import { RequiredEntityData } from '@mikro-orm/core';
 import {
   ConflictException,
-  ForbiddenException,
   GoneException,
   Injectable,
   NotFoundException,
@@ -14,6 +13,7 @@ import { UserEntity } from '~/entities';
 import { UsersService } from '../users/users.service';
 import { UserCreationDto, UserLoginDto } from './dto';
 import TokenService from './token.service';
+import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
 export default class AuthService {
@@ -61,17 +61,17 @@ export default class AuthService {
     if (!isVerified) {
       throw new GoneException('Password incorrect!');
     }
-    delete user.password;
-    console.log(user);
 
     const tokenData = await this.signJwtToken(user);
     await this.tokenService.blacklistPreviousToken(user.id);
     await this.tokenService.toInuse(user.id, tokenData.accessToken);
+
+    delete user.password;
     return tokenData;
   }
 
   async signJwtToken(user: UserEntity): Promise<{ accessToken: string }> {
-    const payload = {
+    const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
       role: user.role.role,

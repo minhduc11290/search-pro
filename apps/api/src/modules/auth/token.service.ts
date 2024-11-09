@@ -18,7 +18,7 @@ export default class TokenService {
   }
 
   async toInuse(userId: string, token: string, ttl: number = this.ttl) {
-    this.redis.set(userId, token, 'EX', ttl);
+    await this.redis.set(userId, token, 'EX', ttl);
   }
 
   async blacklistPreviousToken(userId: string, ttl: number = this.ttl) {

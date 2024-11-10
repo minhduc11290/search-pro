@@ -5,12 +5,8 @@ export default class TokenService {
   private redis: Redis;
   private ttl: number = 3600;
 
-  //FIXME: configurable
   constructor() {
-    this.redis = new Redis({
-      host: 'localhost',
-      port: 6379,
-    });
+    this.redis = new Redis(String(process.env.REDIS_CONNECTION));
   }
 
   async toBlacklist(token: string, ttl: number = this.ttl) {

@@ -8,12 +8,12 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
-import { UserRole } from '~/consts/enums';
 import { UserEntity } from '~/entities';
+import { UserRole } from '~/shares/consts/enums';
+import { UserCreationDto, UserLoginDto } from '../../shares/dtos';
 import { UsersService } from '../users/users.service';
-import { UserCreationDto, UserLoginDto } from './dto';
-import TokenService from './token.service';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+import TokenService from './token.service';
 
 @Injectable()
 export default class AuthService {
@@ -49,7 +49,7 @@ export default class AuthService {
   async login(userLoginDto: UserLoginDto) {
     const user = await this.userService.findByEmail(userLoginDto.email);
 
-    if (!user) {
+    if (!user?.isActive()) {
       throw new GoneException('User not found!');
     }
 

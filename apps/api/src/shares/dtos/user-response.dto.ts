@@ -1,7 +1,6 @@
-import { Enum } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '~/consts/enums';
-import { MinDto } from '~/shares/min.dto';
+import { UserRole } from '~/shares/consts/enums';
+import { MinDto } from '~/shares/dtos/min.dto';
 
 export class MinRoleDto extends MinDto<UserRole> {}
 

@@ -6,12 +6,14 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
+import { StoresModule } from './modules/stores/stores.module';
 
 @Module({
   imports: [
     OrmModule,
     AuthModule,
     UsersModule,
+    StoresModule,
     ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],

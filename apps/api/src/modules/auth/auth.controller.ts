@@ -3,23 +3,23 @@ import {
   Controller,
   HttpCode,
   Post,
-  UseGuards,
   Req,
   UnauthorizedException,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiOperation,
   ApiResponse,
   ApiTags,
-  ApiBearerAuth,
 } from '@nestjs/swagger';
-import { UserResponseMapper } from '~/mappers/UserResponseMapper';
-import { UserResponseDto } from '../users/dto/user-response.dto';
-import AuthService from './auth.service';
-import { UserCreationDto, UserLoginDto } from './dto';
-import { UserLoginResponseDto } from './dto/user-login-response.dto';
-import { JwtGuard } from './guard/jwt.guard';
 import { Request } from 'express';
+import { UserResponseMapper } from '~/mappers/responses/UserResponseMapper';
+import { UserCreationDto, UserLoginDto } from '../../shares/dtos';
+import { UserLoginResponseDto } from '../../shares/dtos/user-login-response.dto';
+import { UserResponseDto } from '../../shares/dtos/user-response.dto';
+import AuthService from './auth.service';
+import { JwtGuard } from './guard/jwt.guard';
 import TokenService from './token.service';
 
 @ApiTags('auth')

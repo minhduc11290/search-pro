@@ -1,14 +1,13 @@
 import type { EntityManager } from '@mikro-orm/core';
-import { UserRole } from '~/consts/enums';
-import { RoleEntity } from 'src/entities';
 import roleData from '../resources/roles.json';
 import { BaseSeeder } from './BaseSeeder';
+import { RoleEntity } from '../src/entities/RoleEntity';
+import { UserRole } from '../src/shares/consts/enums'; // Ensure the path is correct
 
 export class RoleSeeder extends BaseSeeder {
   async run(em: EntityManager): Promise<void> {
     const roleEntities: RoleEntity[] = [];
-    for (const index in roleData) {
-      const item = roleData[Number(index)];
+    for (const item of roleData) {
       const role = em.create(RoleEntity, {
         ...item,
         role: item.role as UserRole,

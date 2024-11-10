@@ -7,7 +7,7 @@ const seeds = [RoleSeeder, UserSeeder];
 
 export class MultipleSeeder extends Seeder {
   async run(en: EntityManager): Promise<void> {
-    for await (const seed of seeds) {
+    for (const seed of seeds) {
       console.log(`\x1B[34m ${seed.name} running...`);
       const s = new seed();
       await s.run(en);

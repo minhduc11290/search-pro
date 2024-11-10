@@ -2,10 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { MikroORM } from '@mikro-orm/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.use('/api-docs', new BasicAuthMiddleware().use);
   const config = new DocumentBuilder()
     .setTitle('Search Pro API')
     .setDescription('The API description')

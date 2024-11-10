@@ -8,7 +8,7 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { IsEmail } from 'class-validator';
-import { UserStatus } from '~/consts/enums';
+import { UserStatus } from '~/shares/consts/enums';
 import { RoleEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -56,8 +56,11 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @Enum({ items: () => UserStatus, nullable: false })
   status?: UserStatus = UserStatus.PENDING;
 
-  @Property({ persist: false, nullable: true, name: 'fullName' })
   public getFullName() {
     return `${this.firstName} ${this.lastName}`;
+  }
+
+  public isActive() {
+    return !!this.emailVerified && this.status === UserStatus.ACTIVE;
   }
 }

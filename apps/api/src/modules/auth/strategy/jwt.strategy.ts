@@ -31,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       throw new UnauthorizedException('Token has been blacklisted');
     }
     const user = await this.userService.findByEmail(payload.email);
-    if (!user) {
+    if (!user?.isActive()) {
       throw new UnauthorizedException('User not found');
     }
     delete user.password;

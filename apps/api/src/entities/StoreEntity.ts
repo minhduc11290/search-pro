@@ -6,7 +6,7 @@ import {
   OneToMany,
   Property,
 } from '@mikro-orm/core';
-import { StoreStatus } from '~/consts/enums';
+import { StoreStatus } from '~/shares/consts/enums';
 import { BaseEntity } from './BaseEntity';
 import { UserEntity, LocationEntity } from '.';
 
@@ -27,9 +27,6 @@ export class StoreEntity extends BaseEntity<StoreEntity> {
   @Property({ length: 100, nullable: true })
   email?: string;
 
-  @Property({ length: 20, nullable: true })
-  phone?: string;
-
   @Property({ length: 255, nullable: true })
   website?: string;
 
@@ -39,6 +36,10 @@ export class StoreEntity extends BaseEntity<StoreEntity> {
   @OneToMany(() => LocationEntity, 'store')
   locations = new Collection<LocationEntity>(this);
 
-  @ManyToMany(() => UserEntity, 'stores', { owner: true })
+  @ManyToMany(() => UserEntity, 'stores', {
+    owner: true,
+    joinColumn: 'store_id',
+    inverseJoinColumn: 'user_id',
+  })
   owners = new Collection<UserEntity>(this);
 }

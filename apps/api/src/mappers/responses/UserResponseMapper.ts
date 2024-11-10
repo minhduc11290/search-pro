@@ -1,6 +1,6 @@
 import { UserEntity } from '~/entities';
-import { UserResponseDto } from '~/modules/users/dto/user-response.dto';
-import { BaseMapper } from './base/BaseMapper';
+import { UserResponseDto } from '~/shares/dtos/user-response.dto';
+import { BaseMapper } from '../base/BaseMapper';
 
 export class UserResponseMapper extends BaseMapper<
   UserEntity,

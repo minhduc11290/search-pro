@@ -3,10 +3,9 @@ import {
   EntityRepository,
   RequiredEntityData,
 } from '@mikro-orm/core';
-import { InjectEntityManager, InjectRepository } from '@mikro-orm/nestjs';
-import { EntityManager } from '@mikro-orm/postgresql';
+import { InjectRepository } from '@mikro-orm/nestjs';
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '~/consts/enums';
+import { UserRole } from '~/shares/consts/enums';
 import { RoleEntity, UserEntity } from '~/entities';
 
 @Injectable()
@@ -29,7 +28,7 @@ export class UsersService {
   async findByEmail(email: string, populate?: string[]) {
     return this.userRepository.findOne(
       { email },
-      { populate: populate ? populate : this.defaultPopulate },
+      { populate: (populate ? populate : this.defaultPopulate) as never[] },
     );
   }
 

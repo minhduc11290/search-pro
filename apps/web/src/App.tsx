@@ -1,7 +1,6 @@
 // import { Button } from "@mantine/core";
 import '@mantine/core/styles.css';
 
-import { MantineProvider } from '@mantine/core';
 import { RouterProvider } from 'react-router-dom';
 import router from './routes/routes';
 function App() {
@@ -12,9 +11,7 @@ function App() {
     //   </h1>
     //   <Button className="mt-4">Mantine Button</Button>
     // </div>
-    <MantineProvider>
-      <RouterProvider router={router} />
-    </MantineProvider>
+    <RouterProvider router={router} />
   );
 }
 

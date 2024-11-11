@@ -33,7 +33,7 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
 
                     }}
                 >
-                    <Title ta="center" className={`${classes.title} mb-4`} >
+                    <Title order={2} ta="center" className={`${classes.title} ml-4`} >
                         {title}
                     </Title>
                 </a>

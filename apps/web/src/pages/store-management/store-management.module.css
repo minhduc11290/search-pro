@@ -1,8 +1,19 @@
+.table {
+  border-radius: 8px 8px 0px 0px;
+  border: 1px solid #0000000F;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
 .header {
   position: sticky;
   top: 0;
   background-color: var(--mantine-color-body);
   transition: box-shadow 150ms ease;
+  background-color: #E2EAF8;
+  border-radius: 8px 8px 0px 0px;
+  overflow: hidden;
 
   &::after {
     content: '';
@@ -10,8 +21,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    border-bottom: rem(1px) solid
-      light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
+    border-bottom: rem(1px) solid light-dark(var(--mantine-color-gray-2), var(--mantine-color-dark-3));
   }
 }
 

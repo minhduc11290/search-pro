@@ -1,37 +1,55 @@
-import { Container, rem, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Container, rem, TextInput } from "@mantine/core";
 import { AuthLayout } from "../../components/auth-layout";
 import { PATH } from "../../constants/paths";
 import { useState } from 'react';
-import { Table, ScrollArea } from '@mantine/core';
+import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './store-management.module.css';
 import { Header } from "../../components/header";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
+import { Status, Store } from "../../@types/store-props";
 
 const StoreManagementPage = () => {
-    const data = [
-        {
-            name: 'Athena Weissnat',
-            company: 'Little - Rippin',
-            email: 'Elouise.Prohaska@yahoo.com',
-        },
-        {
-            name: 'Deangelo Runolfsson',
-            company: 'Greenfelder - Krajcik',
-            email: 'Kadin_Trantow87@yahoo.com',
-        },
-        {
-            name: 'Danny Carter',
-            company: 'Kohler and Sons',
-            email: 'Marina3@hotmail.com',
-        }];
+    const data: Store[] = [{
+        no: 1,
+        ownerstore: 'Brian Huynh',
+        userName: 'brianhuynh',
+        phone: '0968656985632',
+        email: 'brianhuynh3265@gmail.com',
+        status: Status.Active,
+    }, {
+        no: 2,
+        ownerstore: 'Brian Huynh',
+        userName: 'brianhuynh',
+        phone: '0968656985632',
+        email: 'brianhuynh3265@gmail.com',
+        status: Status.Deactive,
+    }];
     const [scrolled, setScrolled] = useState(false);
 
     const rows = data.map((row) => (
-        <Table.Tr key={row.name}>
-            <Table.Td>{row.name}</Table.Td>
+        <Table.Tr key={row.no}>
+            <Table.Td>{row.no}</Table.Td>
+            <Table.Td>{row.ownerstore}</Table.Td>
+            <Table.Td>{row.userName}</Table.Td>
+            <Table.Td>{row.phone}</Table.Td>
             <Table.Td>{row.email}</Table.Td>
-            <Table.Td>{row.company}</Table.Td>
+            <Table.Td>{row.status}</Table.Td>
+            <Table.Td><a>Show address list </a></Table.Td>
+            <Table.Td><a>Show product list </a></Table.Td>
+            <Table.Td>
+                <Container className="flex flex-row items-center">
+                    <Tooltip label="Deactive account" refProp="rootRef">
+                        <Switch />
+                    </Tooltip>
+                    <ActionIcon variant="transparent" aria-label="Settings" className="mx-1" size="sm">
+                        <IconEdit style={{ width: '100%', height: '100%' }} stroke={1.5} />
+                    </ActionIcon>
+                    <ActionIcon variant="transparent" aria-label="Settings" size="sm">
+                        <IconLock style={{ width: '100%', height: '100%' }} stroke={1.5} />
+                    </ActionIcon>
+                </Container>
+            </Table.Td>
         </Table.Tr>
     ));
 
@@ -43,24 +61,30 @@ const StoreManagementPage = () => {
     };
 
     return <AuthLayout currentLink={PATH.STOREMANAGEMENT}>
-        <Header title="Location list"></Header>
-        <div className="px-2 flex flex-1 w-full">
+        <Header title="Store management"></Header>
+        <Container fluid className="flex flex-1 mx-2">
             <div className="flex flex-1 flex-col justify-start">
-                <div className="py-2">
+                <div className="py-2 flex justify-between">
                     <TextInput
                         placeholder="Search by any field"
-                        mb="md"
                         rightSection={<IconSearch style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
                         value={search}
                         onChange={handleSearchChange}
-                        className="max-w-80"
+                        className="max-w-md"
                     />
+
+                    <Container className="flex flex-row items-center flex-1 flex-grow justify-end mr-0 px-0">
+                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey">
+                            <IconRefresh style={{ width: '70%', height: '70%' }} stroke={1.5} />
+                        </ActionIcon>
+                        <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm">Add new store owner</Button>
+
+                    </Container>
                 </div>
                 <div>
                     <ScrollArea h={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-                        <Table miw={700} className="w-fit">
+                        <Table miw={700} className={classes.table} withTableBorder={true}>
                             <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-
                                 <Table.Tr>
                                     <Table.Th>No</Table.Th>
                                     <Table.Th>Owner's Store</Table.Th>
@@ -78,7 +102,7 @@ const StoreManagementPage = () => {
                     </ScrollArea>
                 </div>
             </div>
-        </div>
+        </Container>
     </AuthLayout>
 }
 

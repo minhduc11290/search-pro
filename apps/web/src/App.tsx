@@ -3,6 +3,7 @@ import '@mantine/core/styles.css';
 
 import { RouterProvider } from 'react-router-dom';
 import router from './routes/routes';
+import { ModalsProvider } from '@mantine/modals';
 function App() {
   return (
     // <div className="p-4">
@@ -11,7 +12,9 @@ function App() {
     //   </h1>
     //   <Button className="mt-4">Mantine Button</Button>
     // </div>
-    <RouterProvider router={router} />
+    <ModalsProvider>
+      <RouterProvider router={router} />
+    </ModalsProvider>
   );
 }
 

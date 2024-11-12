@@ -1,30 +1,35 @@
-import { ActionIcon, Button, Container, rem, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Container, Pagination, rem, TextInput, Text } from "@mantine/core";
 import { AuthLayout } from "../../components/auth-layout";
 import { PATH } from "../../constants/paths";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './store-management.module.css';
 import { Header } from "../../components/header";
 import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
 import { Status, Store } from "../../@types/store-props";
+import { modals } from '@mantine/modals';
 
 const StoreManagementPage = () => {
-    const data: Store[] = [{
-        no: 1,
-        ownerstore: 'Brian Huynh',
-        userName: 'brianhuynh',
-        phone: '0968656985632',
-        email: 'brianhuynh3265@gmail.com',
-        status: Status.Active,
-    }, {
-        no: 2,
-        ownerstore: 'Brian Huynh',
-        userName: 'brianhuynh',
-        phone: '0968656985632',
-        email: 'brianhuynh3265@gmail.com',
-        status: Status.Deactive,
-    }];
+    const [data, setData] = useState<Store[]>([]);
+    useEffect(() => {
+        setData([{
+            no: 1,
+            ownerstore: 'Brian Huynh',
+            userName: 'brianhuynh',
+            phone: '0968656985632',
+            email: 'brianhuynh3265@gmail.com',
+            status: Status.Active,
+        }, {
+            no: 2,
+            ownerstore: 'Brian Huynh',
+            userName: 'brianhuynh',
+            phone: '0968656985632',
+            email: 'brianhuynh3265@gmail.com',
+            status: Status.Deactive,
+        }]);
+    }, []);
+
     const [scrolled, setScrolled] = useState(false);
 
     const rows = data.map((row) => (
@@ -34,13 +39,26 @@ const StoreManagementPage = () => {
             <Table.Td>{row.userName}</Table.Td>
             <Table.Td>{row.phone}</Table.Td>
             <Table.Td>{row.email}</Table.Td>
-            <Table.Td>{row.status}</Table.Td>
+            <Table.Td>
+                <Container className={row.status == Status.Active ? classes.active : classes.deactive}>
+                    {row.status == Status.Active ? 'Active' : 'Deactive'}
+                </Container>
+            </Table.Td>
             <Table.Td><a>Show address list </a></Table.Td>
             <Table.Td><a>Show product list </a></Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">
-                    <Tooltip label="Deactive account" refProp="rootRef">
-                        <Switch />
+                    <Tooltip label={row.status == Status.Active ? 'Deactive account' : 'Active account'} refProp="rootRef">
+                        <Switch checked={row.status == Status.Active} onChange={(event) => {
+                            let title = row.status == Status.Active ? 'Deactive account' : 'Active account';
+                            let checked = event.currentTarget.checked;
+                            openModal(title, () => {
+                                console.log("event.currentTarget", checked);
+                                row.status = (checked ? Status.Active : Status.Deactive);
+                                setData([...data]);
+                            });
+
+                        }} />
                     </Tooltip>
                     <ActionIcon variant="transparent" aria-label="Settings" className="mx-1" size="sm">
                         <IconEdit style={{ width: '100%', height: '100%' }} stroke={1.5} />
@@ -52,6 +70,26 @@ const StoreManagementPage = () => {
             </Table.Td>
         </Table.Tr>
     ));
+
+    const openModal = (title: string, onOk: () => void) => modals.openConfirmModal({
+        title: title,
+        children: (
+            <>
+                <Text size="sm">
+                    Please confirm before proceed
+                </Text>
+                <Text size="sm">
+                    Do you want to continue?
+                </Text>
+            </>
+        ),
+        labels: { confirm: 'Yes', cancel: 'Cancel' },
+        onCancel: () => console.log('Cancel'),
+        onConfirm: onOk,
+        centered: true,
+        withCloseButton: false,
+        
+    });
 
     const [search, setSearch] = useState('');
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,7 +120,7 @@ const StoreManagementPage = () => {
                     </Container>
                 </div>
                 <div>
-                    <ScrollArea h={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+                    <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
                         <Table miw={700} className={classes.table} withTableBorder={true}>
                             <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                                 <Table.Tr>
@@ -101,6 +139,9 @@ const StoreManagementPage = () => {
                         </Table>
                     </ScrollArea>
                 </div>
+                <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
+                    <Pagination total={2} />
+                </Container>
             </div>
         </Container>
     </AuthLayout>

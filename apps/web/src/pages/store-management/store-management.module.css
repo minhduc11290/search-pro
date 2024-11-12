@@ -25,6 +25,37 @@
   }
 }
 
+.active {
+  border: 1px solid #B7EB8F;
+  color: #B7EB8F;
+  padding: 1px 8px 1px 8px;
+  gap: 3px;
+  border-radius: 2px;
+
+  background: #F6FFED;
+
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+
+}
+
+.deactive {
+  border: 1px solid #FFA39E;
+  color: #FFA39E;
+  padding: 1px 8px 1px 8px;
+  gap: 3px;
+  border-radius: 2px;
+  background: #FFF1F0;
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
 .scrolled {
   box-shadow: var(--mantine-shadow-sm);
 }

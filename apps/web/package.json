@@ -17,6 +17,7 @@
     "@mantine/dropzone": "^7.13.5",
     "@mantine/form": "^7.13.5",
     "@mantine/hooks": "^7.13.4",
+    "@mantine/modals": "^7.13.5",
     "@mantine/notifications": "^7.13.4",
     "@tabler/icons-react": "^3.21.0",
     "autoprefixer": "^10.4.20",

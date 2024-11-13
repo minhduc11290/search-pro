@@ -5,6 +5,7 @@ import { PATH } from "../constants/paths";
 import StoreManagementPage from "../pages/store-management";
 import AddressListPage from "../pages/address-list";
 import ProductsPage from "../pages/products";
+import HomePage from "../pages/home";
 
 const router = createBrowserRouter([
     {
@@ -13,10 +14,7 @@ const router = createBrowserRouter([
     },
     {
         path: PATH.HOME,
-        element:
-            <ProtectedRoute>
-                <div></div>
-            </ProtectedRoute >
+        element: <HomePage></HomePage>
 
     },
     {

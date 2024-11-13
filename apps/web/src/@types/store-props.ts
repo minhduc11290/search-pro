@@ -1,3 +1,5 @@
+import { Status } from "./enum/status";
+
 export interface Store {
     no: number;
     ownerstore: string;
@@ -5,10 +7,7 @@ export interface Store {
     phone: string;
     email: string;
     status: Status,
-    
+
 
 }
 
-export enum Status {
-    Active, Deactive
-}

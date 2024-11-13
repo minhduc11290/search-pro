@@ -5,9 +5,11 @@ import {
     Text,
     rem,
     Title,
+    ActionIcon,
 } from '@mantine/core';
 import {
     IconLogout,
+    IconArrowBack
 } from '@tabler/icons-react';
 import classes from './header.module.css';
 import { HeaderProps } from '../@types/header-props';
@@ -24,7 +26,7 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
     return (
         <div className={classes.header}>
             <div className={`${classes.mainSection} flex flex-1 justify-between w-fit mx-2`}>
-                <a
+                {/* <a
                     onClick={(event) => {
                         event.preventDefault();
                         if (isBack && onBackPress) {
@@ -33,10 +35,14 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
 
                     }}
                 >
-                    <Title order={2} ta="center" className={`${classes.title} ml-4`} >
-                        {title}
-                    </Title>
-                </a>
+                    </a> */}
+                {isBack && <ActionIcon onClick={onBackPress}>
+                    <IconArrowBack style={{ width: rem(24), height: rem(24) }} stroke={1.5}></IconArrowBack>
+                </ActionIcon>}
+                <Title order={2} ta="center" className={`${classes.title} ml-4`} >
+                    {title}
+                </Title>
+
                 <Group justify="space-between">
 
                     <Group gap={7}>

@@ -7,8 +7,11 @@ import cx from 'clsx';
 import classes from './store-management.module.css';
 import { Header } from "../../components/header";
 import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
-import { Status, Store } from "../../@types/store-props";
+import { Store } from "../../@types/store-props";
 import { modals } from '@mantine/modals';
+import EditStorePage from "./components/edit";
+import CreateStorePage from "./components/create";
+import { Status } from "../../@types/enum/status";
 
 const StoreManagementPage = () => {
     const [data, setData] = useState<Store[]>([]);
@@ -32,6 +35,10 @@ const StoreManagementPage = () => {
 
     const [scrolled, setScrolled] = useState(false);
 
+    const moveToEdit = (store: Store) => {
+        setShowEdit(true);
+        setStoreSelected(store);
+    }
     const rows = data.map((row) => (
         <Table.Tr key={row.no}>
             <Table.Td>{row.no}</Table.Td>
@@ -60,7 +67,7 @@ const StoreManagementPage = () => {
 
                         }} />
                     </Tooltip>
-                    <ActionIcon variant="transparent" aria-label="Settings" className="mx-1" size="sm">
+                    <ActionIcon variant="transparent" aria-label="Settings" className="mx-1" size="sm" onClick={() => moveToEdit(row)}>
                         <IconEdit style={{ width: '100%', height: '100%' }} stroke={1.5} />
                     </ActionIcon>
                     <ActionIcon variant="transparent" aria-label="Settings" size="sm">
@@ -88,15 +95,34 @@ const StoreManagementPage = () => {
         onConfirm: onOk,
         centered: true,
         withCloseButton: false,
-        
+
     });
 
     const [search, setSearch] = useState('');
+    const [showEdit, setShowEdit] = useState(false);
+    const [showCreate, setShowCreate] = useState(false);
+
+    const [storeSelected, setStoreSelected] = useState<Store>({
+        no: 0,
+        ownerstore: '',
+        userName: '',
+        phone: '',
+        email: '',
+        status: Status.Deactive
+    });
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
 
     };
+
+    const hideEdit = () => {
+        setShowEdit(false)
+    }
+
+    const hideCreate = () => {
+        setShowCreate(false)
+    }
 
     return <AuthLayout currentLink={PATH.STOREMANAGEMENT}>
         <Header title="Store management"></Header>
@@ -115,8 +141,9 @@ const StoreManagementPage = () => {
                         <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey">
                             <IconRefresh style={{ width: '70%', height: '70%' }} stroke={1.5} />
                         </ActionIcon>
-                        <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm">Add new store owner</Button>
-
+                        <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm" onClick={() => {
+                            setShowCreate(true);
+                        }} >Add new store owner</Button>
                     </Container>
                 </div>
                 <div>
@@ -144,6 +171,8 @@ const StoreManagementPage = () => {
                 </Container>
             </div>
         </Container>
+        <CreateStorePage opened={showCreate} close={hideCreate} ></CreateStorePage>
+        <EditStorePage opened={showEdit} storeInfo={storeSelected} close={hideEdit}></EditStorePage>
     </AuthLayout>
 }
 

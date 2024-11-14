@@ -131,7 +131,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                         </Table.Thead>
                         <Table.Tbody>
                             {
-                                form.getValues().locations.map((locationProduct, index) => {
+                                form.getValues().locations.map((_, index) => {
                                     return (
                                         <Table.Tr>
                                             <Table.Td>

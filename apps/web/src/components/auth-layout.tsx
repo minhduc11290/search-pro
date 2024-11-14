@@ -11,6 +11,7 @@ import { MainLayoutProps } from '../@types/main-layout-props';
 import logo from '../assets/logo.png';
 import { Image } from '@mantine/core';
 import { PATH } from '../constants/paths';
+import { useNavigate } from 'react-router-dom';
 
 const data = [
     { link: PATH.STOREMANAGEMENT, label: 'Store management', icon: IconShoppingCart },
@@ -19,15 +20,18 @@ const data = [
 ];
 
 export function AuthLayout({ children, currentLink }: MainLayoutProps) {
+    const navigate = useNavigate();
     const [active, setActive] = useState(currentLink);
 
     const links = data.map((item) => (
         <a
             className={classes.link}
             data-active={item.link === active || undefined}
-            href={item.link}
+            // href={item.link}
             key={item.label}
-            onClick={() => {
+            onClick={(event) => {
+                navigate(item.link);
+                event.preventDefault();
                 setActive(item.label);
             }}
         >

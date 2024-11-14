@@ -51,8 +51,8 @@ const StoreManagementPage = () => {
                     {row.status == Status.Active ? 'Active' : 'Deactive'}
                 </Container>
             </Table.Td>
-            <Table.Td><a>Show address list </a></Table.Td>
-            <Table.Td><a>Show product list </a></Table.Td>
+            <Table.Td><a className="text-blue-500">Show address list </a></Table.Td>
+            <Table.Td><a className="text-blue-500">Show product list </a></Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive account' : 'Active account'} refProp="rootRef">

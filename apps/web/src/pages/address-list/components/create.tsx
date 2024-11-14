@@ -35,7 +35,7 @@ const CreateAddressPage = ({ opened, close }: CreateStoreProps) => {
 
 
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
-        <Title className="font-bold text-xl"> Edit location </Title>
+        <Title className="font-bold text-xl"> Create new location </Title>
         <Grid grow>
             <Grid.Col span={12} >
                 <TextInput

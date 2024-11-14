@@ -5,7 +5,9 @@
   border-spacing: 0;
   overflow: hidden;
 }
-
+.footer {
+  border-radius: 0px 0px 8px 8px;
+}
 .header {
   position: sticky;
   top: 0;

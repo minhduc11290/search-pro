@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, PasswordInput } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, PasswordInput } from "@mantine/core";
 import { CreateStoreProps } from "../../../@types/create-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
@@ -109,7 +109,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
         <Group mt="xl" className="flex justify-end">
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
-                var result = form.validate();
+                const result = form.validate();
                 if (!result.hasErrors) {
                     close();
                 }

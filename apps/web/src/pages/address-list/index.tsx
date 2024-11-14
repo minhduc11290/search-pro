@@ -6,7 +6,7 @@ import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './address-list.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
+import { IconSearch, IconRefresh, IconPlus, IconEdit } from "@tabler/icons-react";
 
 import { modals } from '@mantine/modals';
 import EditAddressPage from "./components/edit"
@@ -55,8 +55,8 @@ const AddressListPage = () => {
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive location' : 'Active account'} refProp="rootRef">
                         <Switch checked={row.status == Status.Active} onChange={(event) => {
-                            let title = row.status == Status.Active ? 'Deactive account' : 'Active account';
-                            let checked = event.currentTarget.checked;
+                            const title = row.status == Status.Active ? 'Deactive account' : 'Active account';
+                            const checked = event.currentTarget.checked;
                             openModal(title, () => {
                                 console.log("event.currentTarget", checked);
                                 row.status = (checked ? Status.Active : Status.Deactive);

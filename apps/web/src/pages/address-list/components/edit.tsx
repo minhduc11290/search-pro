@@ -1,13 +1,11 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, ActionIcon, rem, Container } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
-import { phoneRegex } from '../../../utils/regex';
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Status } from "../../../@types/enum/status";
 import { EditLocationProps } from "../../../@types/edit-location-props";
 import { TimeInput } from '@mantine/dates';
-import { IconClock } from "@tabler/icons-react";
 
 const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => {
     const schema = z.object({
@@ -45,13 +43,6 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
     }, [locationInfo])
 
 
-    const ref = useRef<HTMLInputElement>(null);
-
-    const pickerControl = (
-        <ActionIcon variant="subtle" color="gray" onClick={() => ref.current?.showPicker()}>
-            <IconClock style={{ width: rem(16), height: rem(16) }} stroke={1.5} />
-        </ActionIcon>
-    );
 
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Edit location </Title>
@@ -117,7 +108,7 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
         <Group mt="xl" className="flex justify-end">
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
-                var result = form.validate();
+                const result = form.validate();
                 console.log(form.getValues());
                 if (!result.hasErrors) {
                     close();

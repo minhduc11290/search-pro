@@ -40,7 +40,6 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
             phone: storeInfo.phone,
             status: storeInfo.status
         })
-        console.log(form.getInputProps('email'));
     }, [storeInfo])
 
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
@@ -84,7 +83,7 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
         <Group mt="xl" className="flex justify-end">
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
-                var result = form.validate();
+                const result = form.validate();
                 if (!result.hasErrors) {
                     close();
                 }

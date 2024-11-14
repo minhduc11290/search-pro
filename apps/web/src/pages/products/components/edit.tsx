@@ -231,7 +231,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                     multiple
                     onDrop={(files) => {
 
-                        let _files = form.getValues().images;
+                        const _files = form.getValues().images;
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
                     onReject={(files) => console.log('rejected files', files)}
@@ -268,7 +268,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         <Group mt="xl" className="flex justify-end">
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
-                var result = form.validate();
+                const result = form.validate();
                 if (!result.hasErrors) {
                     console.log("data", form.getValues())
                     close();

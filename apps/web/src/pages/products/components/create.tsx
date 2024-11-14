@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, PasswordInput, Select, TagsInput, ScrollArea, Table, ComboboxItem, rem, Image, ActionIcon } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, Select, TagsInput, ScrollArea, Table, ComboboxItem, rem, Image, ActionIcon } from "@mantine/core";
 import { CreateStoreProps } from "../../../@types/create-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
@@ -8,7 +8,7 @@ import classes from '../product-list.module.css';
 import { useEffect, useState } from "react";
 import cx from 'clsx';
 import { IconPlus, IconX } from "@tabler/icons-react";
-import { Dropzone, DropzoneProps, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { LocationPrice } from "../../../@types/product-props";
 
 const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
@@ -219,7 +219,7 @@ const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
                     multiple
                     onDrop={(files) => {
 
-                        let _files = form.getValues().images;
+                        const _files = form.getValues().images;
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
                     onReject={(files) => console.log('rejected files', files)}
@@ -254,7 +254,7 @@ const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
         <Group mt="xl" className="flex justify-end">
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
-                var result = form.validate();
+                const result = form.validate();
                 if (!result.hasErrors) {
                     console.log("data", form.getValues())
                     close();

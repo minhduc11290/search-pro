@@ -6,7 +6,7 @@ import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './product-list.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconDownload, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
+import { IconSearch, IconDownload, IconPlus, IconEdit } from "@tabler/icons-react";
 
 import { modals } from '@mantine/modals';
 import EditProductPage from "./components/edit"
@@ -114,8 +114,8 @@ const ProductsPage = () => {
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive location' : 'Active account'} refProp="rootRef">
                         <Switch checked={row.status == Status.Active} onChange={(event) => {
-                            let title = row.status == Status.Active ? 'Deactive account' : 'Active account';
-                            let checked = event.currentTarget.checked;
+                            const title = row.status == Status.Active ? 'Deactive account' : 'Active account';
+                            const checked = event.currentTarget.checked;
                             openModal(title, () => {
                                 console.log("event.currentTarget", checked);
                                 row.status = (checked ? Status.Active : Status.Deactive);

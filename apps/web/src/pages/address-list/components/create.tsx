@@ -100,7 +100,6 @@ const CreateAddressPage = ({ opened, close }: CreateStoreProps) => {
             <Button onClick={() => {
                 const result = form.validate();
                 if (!result.hasErrors) {
-                    console.log("data", form.getValues())
                     close();
                 }
             }}>Save</Button>

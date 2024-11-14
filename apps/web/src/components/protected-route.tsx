@@ -8,7 +8,6 @@ import { LoadingOverlay } from '@mantine/core';
 const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { isLoading, isAuthenticated } = useAuth();
 
-    console.log(isAuthenticated);
     // Nếu người dùng đã đăng nhập, chuyển hướng đến `redirectTo`
     return !isLoading && !isAuthenticated ? <Navigate to={PATH.LOGIN} /> : (isLoading ? <LoadingOverlay></LoadingOverlay> :
         children);

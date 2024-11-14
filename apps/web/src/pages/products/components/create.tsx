@@ -222,7 +222,7 @@ const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
                         const _files = form.getValues().images;
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
-                    onReject={(files) => console.log('rejected files', files)}
+                    onReject={(files) => {}}
                     maxSize={5 * 1024 ** 2}
                     accept={IMAGE_MIME_TYPE}
                 >
@@ -256,7 +256,6 @@ const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
             <Button onClick={() => {
                 const result = form.validate();
                 if (!result.hasErrors) {
-                    console.log("data", form.getValues())
                     close();
                 }
             }}>Save</Button>

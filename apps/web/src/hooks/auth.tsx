@@ -8,14 +8,12 @@ const useAuth = () => {
     useEffect(() => {
 
         const token = localStorage.getItem('authToken');
-        console.log("getToken", !!token);
         setIsAuthenticated(!!token); // Xác thực nếu có token
         setIsLoading(false);
     }, []);
 
     // Hàm login để đặt token và cập nhật trạng thái
     const login = useCallback((token: string) => {
-        console.log("login");
         localStorage.setItem('authToken', token);
         setIsAuthenticated(true);
     }, []);

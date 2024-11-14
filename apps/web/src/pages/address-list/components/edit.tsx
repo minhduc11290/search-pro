@@ -109,7 +109,6 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
             <Button variant="default" onClick={close}>Close</Button>
             <Button onClick={() => {
                 const result = form.validate();
-                console.log(form.getValues());
                 if (!result.hasErrors) {
                     close();
 

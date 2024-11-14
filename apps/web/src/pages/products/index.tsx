@@ -117,7 +117,6 @@ const ProductsPage = () => {
                             const title = row.status == Status.Active ? 'Deactive account' : 'Active account';
                             const checked = event.currentTarget.checked;
                             openModal(title, () => {
-                                console.log("event.currentTarget", checked);
                                 row.status = (checked ? Status.Active : Status.Deactive);
                                 setData([...data]);
                             });
@@ -145,7 +144,7 @@ const ProductsPage = () => {
             </>
         ),
         labels: { confirm: 'Yes', cancel: 'Cancel' },
-        onCancel: () => console.log('Cancel'),
+        onCancel: () => {},
         onConfirm: onOk,
         centered: true,
         withCloseButton: false,

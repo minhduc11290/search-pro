@@ -234,7 +234,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                         const _files = form.getValues().images;
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
-                    onReject={(files) => console.log('rejected files', files)}
+                    onReject={(files) => {}}
                     maxSize={5 * 1024 ** 2}
                     accept={IMAGE_MIME_TYPE}
                 >
@@ -270,7 +270,6 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
             <Button onClick={() => {
                 const result = form.validate();
                 if (!result.hasErrors) {
-                    console.log("data", form.getValues())
                     close();
                 }
             }}>Save</Button>

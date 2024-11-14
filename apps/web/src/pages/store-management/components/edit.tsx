@@ -31,8 +31,6 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
     });
 
     useEffect(() => {
-        console.log("vo day", storeInfo);
-        console.log(storeInfo.ownerstore);
 
         form.setValues({
             name: storeInfo.ownerstore,

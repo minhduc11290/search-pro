@@ -16,7 +16,7 @@ export default function LoginPage() {
     const navigate = useNavigate();
     function handleLogin() {
         login("demo");
-        navigate(PATH.STOREMANAGEMENT);
+        navigate(PATH.PRODUCT);
     }
     return (
         <Container size={420} className='w-screen h-screen flex items-center flex-1 flex-grow flex-row align-middle justify-center' >

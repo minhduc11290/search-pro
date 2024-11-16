@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Group } from '@mantine/core';
 import {
     IconShoppingCart,
-    IconHeartHandshake,
     IconUser
 } from '@tabler/icons-react';
 

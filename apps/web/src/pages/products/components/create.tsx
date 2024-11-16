@@ -222,7 +222,6 @@ const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
                         const _files = form.getValues().images;
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
-                    onReject={(files) => {}}
                     maxSize={5 * 1024 ** 2}
                     accept={IMAGE_MIME_TYPE}
                 >

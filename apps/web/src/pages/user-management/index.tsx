@@ -8,13 +8,11 @@ import classes from './user-management.module.css';
 import { Header } from "../../components/header";
 import { IconSearch, IconRefresh, } from "@tabler/icons-react";
 import { Status } from "../../@types/enum/status";
-import { useNavigate } from "react-router-dom";
 import { modals } from '@mantine/modals';
 import { UserInfo } from "../../@types/user-props";
 
 
 const UserManagementPage = () => {
-    const navigate = useNavigate();
     const [data, setData] = useState<UserInfo[]>([]);
     useEffect(() => {
         setData([{

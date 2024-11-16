@@ -14,7 +14,10 @@ import CreateProductPage from "./components/create";
 import { Status } from "../../@types/enum/status";
 import { Product } from "../../@types/product-props";
 import ListLocationPage from "./components/list-location";
+import { useNavigate } from "react-router-dom";
 const ProductsPage = () => {
+    const navigate = useNavigate();
+
     const [data, setData] = useState<Product[]>([]);
     const [locations, setLocations] = useState<ComboboxItem[]>([]);
 
@@ -101,7 +104,7 @@ const ProductsPage = () => {
             <Table.Td>{row.productName}</Table.Td>
             <Table.Td>{row.keysword}</Table.Td>
             <Table.Td>{row.description}</Table.Td>
-            <Table.Td><a className="text-blue-500" onClick={(event) => {
+            <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
                 event.preventDefault();
                 setShowList(true);
             }}>Show location list</a></Table.Td>
@@ -144,7 +147,7 @@ const ProductsPage = () => {
             </>
         ),
         labels: { confirm: 'Yes', cancel: 'Cancel' },
-        onCancel: () => {},
+        onCancel: () => { },
         onConfirm: onOk,
         centered: true,
         withCloseButton: false,
@@ -169,8 +172,10 @@ const ProductsPage = () => {
         setShowList(false)
     }
 
-    return <AuthLayout currentLink={PATH.PRODUCT} >
-        <Header title="Location list"></Header>
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} >
+        <Header title="Location list" isBack={true} onBackPress={() => {
+            navigate(PATH.STOREMANAGEMENT)
+        }}></Header>
         <div className="py-2 px-6 flex flex-row items-center">
             <Title order={4} className="text-base"> Owner's Store </Title>
             <Text className="px-4 text-base">Brian Huynh</Text>

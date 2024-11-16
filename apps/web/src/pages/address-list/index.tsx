@@ -13,8 +13,10 @@ import EditAddressPage from "./components/edit"
 import CreateAddressPage from "./components/create";
 import { LocationInfo } from "../../@types/location-props";
 import { Status } from "../../@types/enum/status";
+import { useNavigate } from "react-router-dom";
 
 const AddressListPage = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState<LocationInfo[]>([]);
     useEffect(() => {
         setData([{
@@ -85,7 +87,7 @@ const AddressListPage = () => {
             </>
         ),
         labels: { confirm: 'Yes', cancel: 'Cancel' },
-        onCancel: () => {},
+        onCancel: () => { },
         onConfirm: onOk,
         centered: true,
         withCloseButton: false,
@@ -120,8 +122,10 @@ const AddressListPage = () => {
         setShowCreate(false)
     }
 
-    return <AuthLayout currentLink={PATH.ADDRESSLIST} >
-        <Header title="Location list"></Header>
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} >
+        <Header title="Location list" isBack={true} onBackPress={() => {
+            navigate(PATH.STOREMANAGEMENT)
+        }}></Header>
         <div className="py-2 px-6 flex flex-row items-center">
             <Title order={4} className="text-base"> Owner's Store </Title>
             <Text className="px-4 text-base">Brian Huynh</Text>

@@ -12,8 +12,10 @@ import { modals } from '@mantine/modals';
 import EditStorePage from "./components/edit";
 import CreateStorePage from "./components/create";
 import { Status } from "../../@types/enum/status";
+import { useNavigate } from "react-router-dom";
 
 const StoreManagementPage = () => {
+    const navigate = useNavigate();
     const [data, setData] = useState<Store[]>([]);
     useEffect(() => {
         setData([{
@@ -51,8 +53,14 @@ const StoreManagementPage = () => {
                     {row.status == Status.Active ? 'Active' : 'Deactive'}
                 </Container>
             </Table.Td>
-            <Table.Td><a className="text-blue-500">Show address list </a></Table.Td>
-            <Table.Td><a className="text-blue-500">Show product list </a></Table.Td>
+            <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
+                event.preventDefault();
+                navigate(PATH.ADDRESSLIST);
+            }}>Show address list </a></Table.Td>
+            <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
+                event.preventDefault();
+                navigate(PATH.PRODUCT);
+            }}>Show product list </a></Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive account' : 'Active account'} refProp="rootRef">

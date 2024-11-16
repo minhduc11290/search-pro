@@ -9,10 +9,13 @@ import {
 } from '@mantine/core';
 import {
     IconLogout,
-    IconArrowBack
+    IconChevronLeft
 } from '@tabler/icons-react';
 import classes from './header.module.css';
 import { HeaderProps } from '../@types/header-props';
+import useAuth from '../hooks/auth';
+import { useNavigate } from 'react-router-dom';
+import { PATH } from '../constants/paths';
 
 const user = {
     name: 'Jane Spoonfighter',
@@ -22,26 +25,20 @@ const user = {
 };
 
 export function Header({ title, isBack, onBackPress }: HeaderProps) {
-
+    const { logout } = useAuth();
+    const navigate = useNavigate();
     return (
         <div className={classes.header}>
             <div className={`${classes.mainSection} flex flex-1 justify-between w-fit mx-2`}>
-                {/* <a
-                    onClick={(event) => {
-                        event.preventDefault();
-                        if (isBack && onBackPress) {
-                            onBackPress
-                        }
 
-                    }}
-                >
-                    </a> */}
-                {isBack && <ActionIcon onClick={onBackPress}>
-                    <IconArrowBack style={{ width: rem(24), height: rem(24) }} stroke={1.5}></IconArrowBack>
-                </ActionIcon>}
-                <Title order={2} ta="center" className={`${classes.title} ml-4`} >
-                    {title}
-                </Title>
+                <Container className='mx-0 flex flex-row justify-start items-center w-full pl-0 ml-4'>
+                    {isBack && <ActionIcon variant='transparent' onClick={onBackPress} className='mr-2'>
+                        <IconChevronLeft style={{ width: rem(24), height: rem(24) }} stroke={1.5}></IconChevronLeft>
+                    </ActionIcon>}
+                    <Title order={3} ta="center" className={`${classes.title}`} >
+                        {title}
+                    </Title>
+                </Container>
 
                 <Group justify="space-between">
 
@@ -55,7 +52,10 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
                                 ID: {user.id}
                             </Text>
                         </Container>
-                        <IconLogout style={{ width: rem(24), height: rem(24) }} stroke={1.5} />
+                        <IconLogout style={{ width: rem(24), height: rem(24) }} stroke={1.5} onClick={() => {
+                            logout();
+                            navigate(PATH.LOGIN);
+                        }} />
                     </Group>
                 </Group>
             </div>

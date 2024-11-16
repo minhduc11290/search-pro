@@ -15,8 +15,8 @@ import { useNavigate } from 'react-router-dom';
 
 const data = [
     { link: PATH.STOREMANAGEMENT, label: 'Store management', icon: IconShoppingCart },
-    { link: PATH.PRODUCT, label: 'Product', icon: IconHeartHandshake },
-    { link: PATH.ADDRESSLIST, label: 'Address list', icon: IconUser }
+    { link: PATH.USERS, label: 'User management', icon: IconUser },
+
 ];
 
 export function AuthLayout({ children, currentLink }: MainLayoutProps) {

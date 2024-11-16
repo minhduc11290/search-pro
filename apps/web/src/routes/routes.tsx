@@ -6,6 +6,7 @@ import StoreManagementPage from "../pages/store-management";
 import AddressListPage from "../pages/address-list";
 import ProductsPage from "../pages/products";
 import HomePage from "../pages/home";
+import UserManagementPage from "../pages/user-management";
 
 const router = createBrowserRouter([
     {
@@ -40,6 +41,14 @@ const router = createBrowserRouter([
                 <StoreManagementPage></StoreManagementPage>
             </ProtectedRoute >
 
-    }
+    },
+    {
+        path: PATH.USERS,
+        element:
+            <ProtectedRoute>
+                <UserManagementPage></UserManagementPage>
+            </ProtectedRoute >
+
+    },
 ]);
 export default router;

@@ -45,7 +45,7 @@ const StoreManagementPage = () => {
         <Table.Tr key={row.no}>
             <Table.Td>{row.no}</Table.Td>
             <Table.Td>{row.ownerstore}</Table.Td>
-            <Table.Td>{row.userName}</Table.Td>
+            {/* <Table.Td>{row.userName}</Table.Td> */}
             <Table.Td>{row.phone}</Table.Td>
             <Table.Td>{row.email}</Table.Td>
             <Table.Td>
@@ -160,7 +160,7 @@ const StoreManagementPage = () => {
                                 <Table.Tr>
                                     <Table.Th>No</Table.Th>
                                     <Table.Th>Owner's Store</Table.Th>
-                                    <Table.Th>Username</Table.Th>
+                                    {/* <Table.Th>Username</Table.Th> */}
                                     <Table.Th>Phone</Table.Th>
                                     <Table.Th>Email</Table.Th>
                                     <Table.Th>Status</Table.Th>

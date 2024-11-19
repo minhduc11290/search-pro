@@ -14,7 +14,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
             .min(1, { message: 'Required information' }),
         email: z.string().trim().email({ message: 'Invalid email' }).min(1, { message: 'Required information' }),
         phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' }),
-        userName: z.string().trim().min(4).min(1, { message: 'Required information' }),
+        // userName: z.string().trim().min(4).min(1, { message: 'Required information' }),
         password: z.string().min(4),
         confirmPassword: z.string().min(4),
     }).refine((data) => data.password === data.confirmPassword, {
@@ -68,7 +68,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
                     {...form.getInputProps('email')}
                 />
             </Grid.Col>
-            <Grid.Col span={12} >
+            {/* <Grid.Col span={12} >
                 <TextInput
                     label="Username"
                     placeholder="Enter username"
@@ -76,7 +76,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
                     key={form.key('userName')}
                     {...form.getInputProps('userName')}
                 />
-            </Grid.Col>
+            </Grid.Col> */}
             <Grid.Col span={6} >
 
 

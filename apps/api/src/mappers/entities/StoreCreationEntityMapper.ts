@@ -1,8 +1,8 @@
-import { StoreCreationDto } from '~/shares/dtos';
+import { StoreCreationDto } from '~/share/dtos';
 import { CreateEntityMapper } from '../base/CreateEntityMapper';
 import { StoreEntity } from '~/entities';
 import { RequiredEntityData } from '@mikro-orm/core';
-import { StoreStatus } from '~/shares/consts/enums';
+import { StoreStatus } from '~/share/consts/enums';
 
 interface StoreCreationOptions {
   owner: string;
@@ -15,7 +15,7 @@ export class StoreCreationEntityMapper extends CreateEntityMapper<
 > {
   map(
     source: StoreCreationDto,
-    options: StoreCreationOptions,
+    options?: StoreCreationOptions,
   ): RequiredEntityData<StoreEntity> {
     return {
       name: source.name,
@@ -24,10 +24,11 @@ export class StoreCreationEntityMapper extends CreateEntityMapper<
       secondaryPhone: source.secondaryPhone,
       email: source.email,
       website: source.website,
-      status: StoreStatus.ACTIVE,
+      // status: StoreStatus.ACTIVE,
+      status: source.isActive ? StoreStatus.ACTIVE : StoreStatus.INACTIVE,
       locations: [],
-      owners: [options.owner],
-      createdBy: options.owner,
+      owners: options ? [options.owner] : [],
+      createdBy: options?.owner,
     };
   }
 }

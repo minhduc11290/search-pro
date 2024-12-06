@@ -1,24 +1,34 @@
 import { Module, ValidationPipe } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { OrmModule } from './modules/orm/orm.module';
-import { AuthModule } from './modules/auth/auth.module';
-import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_PIPE } from '@nestjs/core';
-import { StoresModule } from './modules/stores/stores.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join as pathJoin } from 'path';
+import { AdminModule } from './modules/admin/admin.module';
+import { FileController } from './modules/file/file.controller';
+import { FileModule } from './modules/file/file.module';
+import { ProductModule } from './modules/product/product.module';
+import { QuoteModule } from './modules/quote/quote.module';
+import { GeoRefModule } from './modules/share/geo-ref/geo-ref.module';
+import { OrmModule } from './modules/share/orm/orm.module';
+import { UserModule } from './modules/user/user.module';
 
 @Module({
   imports: [
     OrmModule,
-    AuthModule,
-    UsersModule,
-    StoresModule,
+    GeoRefModule,
+    AdminModule,
+    UserModule,
+    ProductModule,
+    QuoteModule,
+    // StoreModule,
+    FileModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+    }),
   ],
-  controllers: [AppController],
+  controllers: [FileController],
   providers: [
-    AppService,
     {
       provide: APP_PIPE,
       useFactory: () =>
@@ -34,3 +44,6 @@ import { StoresModule } from './modules/stores/stores.module';
   ],
 })
 export class AppModule {}
+function join(__dirname: string, arg1: string, arg2: string): string {
+  return pathJoin(__dirname, arg1, arg2);
+}

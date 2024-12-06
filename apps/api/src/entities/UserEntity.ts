@@ -8,7 +8,7 @@ import {
   Unique,
 } from '@mikro-orm/core';
 import { IsEmail } from 'class-validator';
-import { UserStatus } from '~/shares/consts/enums';
+import { UserRole, UserStatus } from '~/share/consts/enums';
 import { RoleEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 import { ApiProperty } from '@nestjs/swagger';
@@ -19,6 +19,10 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @Property({ length: 100 })
   @Unique()
   userName!: string;
+
+  @ApiProperty({ maxLength: 255, required: false })
+  @Property({ length: 255, nullable: true })
+  description?: string;
 
   @ApiProperty({ required: false, maxLength: 100 })
   @Property({ length: 100, nullable: true })
@@ -33,10 +37,14 @@ export class UserEntity extends BaseEntity<UserEntity> {
   password?: string;
 
   @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
-  @Property({ length: 100 })
+  @Property({ length: 100, nullable: false })
   @IsEmail()
   @Unique()
   email!: string;
+
+  @ApiProperty({ maxLength: 25, required: false })
+  @Property({ length: 100, nullable: true })
+  phone?: string;
 
   @ApiProperty({ required: true, maxLength: 100 })
   @Property({ default: false })
@@ -54,7 +62,7 @@ export class UserEntity extends BaseEntity<UserEntity> {
 
   @ApiProperty({ required: false })
   @Enum({ items: () => UserStatus, nullable: false })
-  status?: UserStatus = UserStatus.PENDING;
+  status?: UserStatus = UserStatus.ACTIVE;
 
   public getFullName() {
     return `${this.firstName} ${this.lastName}`;
@@ -62,5 +70,17 @@ export class UserEntity extends BaseEntity<UserEntity> {
 
   public isActive() {
     return !!this.emailVerified && this.status === UserStatus.ACTIVE;
+  }
+
+  public isSuperAdmin() {
+    return this.role.role === UserRole.SUPER_ADMIN;
+  }
+
+  public isAppUser() {
+    return this.role.role === UserRole.APP_USER;
+  }
+
+  public isStoreOwner() {
+    return this.role.role === UserRole.STORE_OWNER;
   }
 }

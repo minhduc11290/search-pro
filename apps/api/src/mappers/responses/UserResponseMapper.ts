@@ -1,5 +1,5 @@
 import { UserEntity } from '~/entities';
-import { UserResponseDto } from '~/shares/dtos/user-response.dto';
+import { UserResponseDto } from '~/share/dtos/user-response.dto';
 import { BaseMapper } from '../base/BaseMapper';
 
 export class UserResponseMapper extends BaseMapper<
@@ -14,14 +14,16 @@ export class UserResponseMapper extends BaseMapper<
       firstName: source.firstName ?? '',
       lastName: source.lastName ?? '',
       role: {
-        id: source.role.id,
-        value: source.role.role,
+        id: source?.role.id,
+        value: source?.role.role,
       },
-      stores: source.stores.map((store) => ({
+      stores: source?.stores?.map((store) => ({
         id: store.id,
         value: store.name,
       })),
     };
     return userDto;
   }
+
+  
 }

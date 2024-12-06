@@ -5,7 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { cors: true });
   app.use('/api-docs', new BasicAuthMiddleware().use);
   const config = new DocumentBuilder()
     .setTitle('Search Pro API')

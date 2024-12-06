@@ -94,10 +94,7 @@ const UserManagementPage = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
-
     };
-
-
 
     return <AuthLayout currentLink={PATH.USERS}>
         <Header title="User management"></Header>

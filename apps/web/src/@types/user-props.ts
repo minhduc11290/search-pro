@@ -10,3 +10,8 @@ export interface UserInfo {
     state: string;
     status: Status;
 }
+
+export interface UserLogin {
+    email: string;
+    password: string;
+}

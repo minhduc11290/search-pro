@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, rem } from "@mantine/core";
 import { EditStoreProps } from "../../../@types/edit-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
@@ -6,6 +6,9 @@ import { z } from 'zod';
 import { phoneRegex } from '../../../utils/regex';
 import { useEffect } from "react";
 import { Status } from "../../../@types/enum/status";
+import useStore from "../../../hooks/stores";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
     const schema = z.object({
         name: z
@@ -39,6 +42,44 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
             status: storeInfo.status
         })
     }, [storeInfo])
+
+    const { updateStore } = useStore();
+
+    const handleSubmit = async () => {
+        const result = form.validate();
+        if (!result.hasErrors) {
+            let data = form.getValues()
+            let { result, errorMessage } = await updateStore(storeInfo.id, {
+                // ...data,
+                isActive: data.status == Status.Active ? true : false,
+                // userName: data.email,
+                email: data.email,
+                name: data.name,
+                primaryPhone: data.phone,
+
+            });
+            if (result) {
+                notifications.show({
+                    title: `Success`,
+                    message: `Store have been updated successfully`,
+                    color: 'teal',
+                    icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                    position: 'top-right'
+                });
+                close(true);
+            } else {
+                console.log("errorMessage", errorMessage);
+                notifications.show({
+                    title: `Error`,
+                    message: errorMessage,
+                    color: 'red',
+                    icon: <IconX />,
+                    position: 'top-right'
+                });
+            }
+            // close(true);
+        }
+    }
 
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Edit store owner </Title>
@@ -79,13 +120,8 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
         </Grid>
 
         <Group mt="xl" className="flex justify-end">
-            <Button variant="default" onClick={close}>Close</Button>
-            <Button onClick={() => {
-                const result = form.validate();
-                if (!result.hasErrors) {
-                    close();
-                }
-            }}>Save</Button>
+            <Button variant="default" onClick={() => close(false)}>Close</Button>
+            <Button onClick={handleSubmit}>Save</Button>
         </Group>
 
     </Modal>

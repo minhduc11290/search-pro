@@ -21,6 +21,7 @@
     "@mantine/notifications": "^7.13.4",
     "@tabler/icons-react": "^3.21.0",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.8",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "mantine-form-zod-resolver": "^1.1.0",

@@ -1,4 +1,4 @@
 export interface CreateStoreProps {
     opened: boolean;
-    close: () => void;
+    close: (isReload: boolean) => void;
 }

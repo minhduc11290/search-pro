@@ -6,34 +6,64 @@ import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './store-management.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock } from "@tabler/icons-react";
+import { IconSearch, IconRefresh, IconPlus, IconEdit, IconLock, IconCheck, IconX } from "@tabler/icons-react";
 import { Store } from "../../@types/store-props";
 import { modals } from '@mantine/modals';
 import EditStorePage from "./components/edit";
 import CreateStorePage from "./components/create";
 import { Status } from "../../@types/enum/status";
 import { useNavigate } from "react-router-dom";
+import useStore from "../../hooks/stores";
+import { PAGINATION } from "../../constants/pagination";
+import { notifications } from "@mantine/notifications";
 
 const StoreManagementPage = () => {
     const navigate = useNavigate();
     const [data, setData] = useState<Store[]>([]);
+    const [dataFiltered, setDataFiltered] = useState<Store[]>([]);
+    const [dataDisplay, setDataDisplay] = useState<Store[]>([]);
+    const { isLoading, getStores, updateStore } = useStore();
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+
     useEffect(() => {
-        setData([{
-            no: 1,
-            ownerstore: 'Brian Huynh',
-            userName: 'brianhuynh',
-            phone: '0968656985632',
-            email: 'brianhuynh3265@gmail.com',
-            status: Status.Active,
-        }, {
-            no: 2,
-            ownerstore: 'Brian Huynh',
-            userName: 'brianhuynh',
-            phone: '0968656985632',
-            email: 'brianhuynh3265@gmail.com',
-            status: Status.Deactive,
-        }]);
+        getData();
     }, []);
+
+
+    useEffect(() => {
+        if (dataFiltered && dataFiltered.length > 0) {
+
+            // console.log("start", start);
+            // console.log("end", start + PAGINATION.ITEMPERPAGE - 1);
+            setTotalPage(Math.ceil(dataFiltered.length / PAGINATION.ITEMPERPAGE));
+            getDataDisplay();
+
+        }
+    }, [dataFiltered]);
+
+    const getDataDisplay = () => {
+        console.log("currentPage", currentPage);
+        if (dataFiltered && dataFiltered.length > 0) {
+            let start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
+
+            let end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
+            let _data = [...dataFiltered];
+            setDataDisplay(_data.splice(start, end));
+        }
+    }
+
+    useEffect(() => {
+        getDataDisplay();
+    }, [currentPage]);
+
+
+
+    const getData = async () => {
+        let stores = await getStores();
+        setData(stores);
+        setDataFiltered(stores);
+    }
 
     const [scrolled, setScrolled] = useState(false);
 
@@ -41,9 +71,9 @@ const StoreManagementPage = () => {
         setShowEdit(true);
         setStoreSelected(store);
     }
-    const rows = data.map((row) => (
+    const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
-            <Table.Td>{row.no}</Table.Td>
+            <Table.Td>{index + 1}</Table.Td>
             <Table.Td>{row.ownerstore}</Table.Td>
             {/* <Table.Td>{row.userName}</Table.Td> */}
             <Table.Td>{row.phone}</Table.Td>
@@ -67,9 +97,30 @@ const StoreManagementPage = () => {
                         <Switch checked={row.status == Status.Active} onChange={(event) => {
                             const title = row.status == Status.Active ? 'Deactive account' : 'Active account';
                             const checked = event.currentTarget.checked;
-                            openModal(title, () => {
+                            openModal(title, async () => {
                                 row.status = (checked ? Status.Active : Status.Deactive);
                                 setData([...data]);
+                                let { result, errorMessage } = await updateStore(row.id, {
+                                    isActive: checked,
+                                });
+                                if (result) {
+                                    notifications.show({
+                                        title: `Success`,
+                                        message: `Store have been updated successfully`,
+                                        color: 'teal',
+                                        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                                        position: 'top-right'
+                                    });
+                                } else {
+                                    console.log("errorMessage", errorMessage);
+                                    notifications.show({
+                                        title: `Error`,
+                                        message: errorMessage,
+                                        color: 'red',
+                                        icon: <IconX />,
+                                        position: 'top-right'
+                                    });
+                                }
                             });
 
                         }} />
@@ -111,6 +162,7 @@ const StoreManagementPage = () => {
 
     const [storeSelected, setStoreSelected] = useState<Store>({
         no: 0,
+        id: '',
         ownerstore: '',
         userName: '',
         phone: '',
@@ -120,18 +172,33 @@ const StoreManagementPage = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
+        const dataFilter = data.filter(function (el) {
+            return el.ownerstore.includes(value)
+                || el.email.includes(value)
+                || el.phone.includes(value);
+        });
 
+        setDataFiltered(dataFilter);
     };
 
-    const hideEdit = () => {
+    const hideEdit = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowEdit(false)
     }
 
-    const hideCreate = () => {
+    const hideCreate = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowCreate(false)
     }
 
-    return <AuthLayout currentLink={PATH.STOREMANAGEMENT}>
+
+
+
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} isLoading={isLoading}>
         <Header title="Store management"></Header>
         <Container fluid className="flex flex-1 mx-2">
             <div className="flex flex-1 flex-col justify-start">
@@ -145,7 +212,9 @@ const StoreManagementPage = () => {
                     />
 
                     <Container className="flex flex-row items-center flex-1 flex-grow justify-end mr-0 px-0">
-                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey">
+                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey" onClick={() => {
+                            getData();
+                        }}>
                             <IconRefresh style={{ width: '70%', height: '70%' }} stroke={1.5} />
                         </ActionIcon>
                         <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm" onClick={() => {
@@ -174,7 +243,7 @@ const StoreManagementPage = () => {
                     </ScrollArea>
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
-                    <Pagination total={2} />
+                    <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />
                 </Container>
             </div>
         </Container>

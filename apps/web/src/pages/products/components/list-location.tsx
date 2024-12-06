@@ -1,11 +1,11 @@
 import { Button, Group, Modal, ScrollArea, Table, Title } from "@mantine/core";
-import { CreateStoreProps } from "../../../@types/create-store-props";
 import classes from '../product-list.module.css';
 import cx from 'clsx';
 import { useState } from "react";
 import { LocationPrice } from "../../../@types/product-props";
+import { CreateProductProps } from "../../../@types/create-product-props";
 
-const ListLocationPage = ({ opened, close }: CreateStoreProps) => {
+const ListLocationPage = ({ opened, close }: CreateProductProps) => {
     const [scrolled, setScrolled] = useState(false);
     const data: LocationPrice[] = [{
         locationID: 'store001',

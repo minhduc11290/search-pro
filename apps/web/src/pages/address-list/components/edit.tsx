@@ -106,7 +106,7 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
         </Grid>
 
         <Group mt="xl" className="flex justify-end">
-            <Button variant="default" onClick={close}>Close</Button>
+            <Button variant="default" onClick={()=>close()}>Close</Button>
             <Button onClick={() => {
                 const result = form.validate();
                 if (!result.hasErrors) {

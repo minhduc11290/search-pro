@@ -1,5 +1,4 @@
 import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, Select, TagsInput, ScrollArea, Table, ComboboxItem, rem, Image, ActionIcon } from "@mantine/core";
-import { CreateStoreProps } from "../../../@types/create-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -10,8 +9,9 @@ import cx from 'clsx';
 import { IconPlus, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { LocationPrice } from "../../../@types/product-props";
+import { CreateProductProps } from "../../../@types/create-product-props";
 
-const CreateProductPage = ({ opened, close }: CreateStoreProps) => {
+const CreateProductPage = ({ opened, close }: CreateProductProps) => {
     const schema = z.object({
         sku: z
             .string().trim()

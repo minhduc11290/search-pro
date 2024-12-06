@@ -122,7 +122,7 @@ const AddressListPage = () => {
         setShowCreate(false)
     }
 
-    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} >
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT}  >
         <Header title="Location list" isBack={true} onBackPress={() => {
             navigate(PATH.STOREMANAGEMENT)
         }}></Header>

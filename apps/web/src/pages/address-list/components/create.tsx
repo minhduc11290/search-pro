@@ -1,11 +1,11 @@
 import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select } from "@mantine/core";
-import { CreateStoreProps } from "../../../@types/create-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import { Status } from "../../../@types/enum/status";
 import { TimeInput } from "@mantine/dates";
-const CreateAddressPage = ({ opened, close }: CreateStoreProps) => {
+import { CreateLocationProps } from "../../../@types/create-location-props";
+const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
     const schema = z.object({
         address: z
             .string().trim()

@@ -48,8 +48,8 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
     const handleSubmit = async () => {
         const result = form.validate();
         if (!result.hasErrors) {
-            let data = form.getValues()
-            let { result, errorMessage } = await updateStore(storeInfo.id, {
+            const data = form.getValues()
+            const { result, errorMessage } = await updateStore(storeInfo.id, {
                 // ...data,
                 isActive: data.status == Status.Active ? true : false,
                 // userName: data.email,

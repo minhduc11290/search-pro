@@ -45,10 +45,10 @@ const StoreManagementPage = () => {
     const getDataDisplay = () => {
         console.log("currentPage", currentPage);
         if (dataFiltered && dataFiltered.length > 0) {
-            let start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
+            const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
 
-            let end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
-            let _data = [...dataFiltered];
+            const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
+            const _data = [...dataFiltered];
             setDataDisplay(_data.splice(start, end));
         }
     }
@@ -60,7 +60,7 @@ const StoreManagementPage = () => {
 
 
     const getData = async () => {
-        let stores = await getStores();
+        const stores = await getStores();
         setData(stores);
         setDataFiltered(stores);
     }
@@ -100,7 +100,7 @@ const StoreManagementPage = () => {
                             openModal(title, async () => {
                                 row.status = (checked ? Status.Active : Status.Deactive);
                                 setData([...data]);
-                                let { result, errorMessage } = await updateStore(row.id, {
+                                const { result, errorMessage } = await updateStore(row.id, {
                                     isActive: checked,
                                 });
                                 if (result) {

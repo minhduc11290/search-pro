@@ -24,7 +24,7 @@ const useStore = () => {
             // localStorage.setItem('authToken', token);
             if (Array.isArray(response.data)) {
                 return response.data.map((item, index) => {
-                    let store: Store = {
+                    const store: Store = {
                         no: index + 1,
                         id: item.id,
                         ownerstore: item.name,

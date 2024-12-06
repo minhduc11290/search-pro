@@ -46,8 +46,8 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
 
         const result = form.validate();
         if (!result.hasErrors) {
-            let data = form.getValues()
-            let { result, errorMessage } = await createStore({
+            const data = form.getValues()
+            const { result, errorMessage } = await createStore({
                 // ...data,
                 isActive: data.status == Status.Active ? true : false,
                 // userName: data.email,

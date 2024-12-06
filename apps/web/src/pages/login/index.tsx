@@ -35,7 +35,7 @@ export default function LoginPage() {
     const handleLogin = async () => {
         const result = form.validate();
         if (!result.hasErrors) {
-            var logined = await login(form.getValues());
+            const logined = await login(form.getValues());
             if (logined) {
                 navigate(PATH.STOREMANAGEMENT);
             } else {

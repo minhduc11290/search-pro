@@ -64,12 +64,10 @@ const useStore = () => {
                 result = true;
             }
         } catch (ex) {
-            if ((ex instanceof Error)) {
-                errorMessage = ex.message;
-            } else if (ex instanceof AxiosError) {
+            if (ex instanceof AxiosError) {
                 errorMessage = ex.response?.data?.message ?? ex.message;
-            } else {
-
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
             }
 
             console.log(ex);
@@ -89,10 +87,10 @@ const useStore = () => {
                 result = true;
             }
         } catch (ex) {
-            if ((ex instanceof Error)) {
-                errorMessage = ex.message;
-            } else if (ex instanceof AxiosError) {
+            if (ex instanceof AxiosError) {
                 errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
             }
 
             console.log(ex);

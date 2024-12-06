@@ -67,7 +67,9 @@ const useStore = () => {
             if ((ex instanceof Error)) {
                 errorMessage = ex.message;
             } else if (ex instanceof AxiosError) {
-                errorMessage = ex.message;
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else {
+
             }
 
             console.log(ex);
@@ -90,7 +92,7 @@ const useStore = () => {
             if ((ex instanceof Error)) {
                 errorMessage = ex.message;
             } else if (ex instanceof AxiosError) {
-                errorMessage = ex.message;
+                errorMessage = ex.response?.data?.message ?? ex.message;
             }
 
             console.log(ex);

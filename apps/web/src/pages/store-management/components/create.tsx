@@ -8,6 +8,7 @@ import { Status } from "../../../@types/enum/status";
 import useStore from "../../../hooks/stores";
 import { notifications } from '@mantine/notifications';
 import { IconX, IconCheck } from '@tabler/icons-react';
+import { useEffect } from "react";
 
 const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
     const schema = z.object({
@@ -41,6 +42,12 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
         validate: zodResolver(schema),
 
     });
+
+    useEffect(() => {
+        if (opened) {
+            form.reset();
+        }
+    }, [opened]);
 
     const handleSubmit = async () => {
 

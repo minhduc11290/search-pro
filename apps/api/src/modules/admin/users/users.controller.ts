@@ -23,6 +23,7 @@ import UsersService from './users.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { UsersResponseDto } from '~/share/dtos/users-response.dto';
 import { UserResponseMapper } from '~/mappers/responses/UserResponseMapper';
+import { UserRole } from '~/share/consts/enums';
 
 @ApiTags('Admin - Users')
 @Controller('admin/user-management')
@@ -45,8 +46,13 @@ export class UsersController {
   })
   async getUsers(
   ) {
-    let users = await this.userService.findAll();
+    let users = await this.userService.findByCondition({
+      role: {
+        role: UserRole.APP_USER
+      }
+    });
 
+    console.log("users", users);
     return new UserResponseMapper().mapArray(users);
   }
 

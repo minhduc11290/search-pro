@@ -14,9 +14,13 @@ import CreateAddressPage from "./components/create";
 import { LocationInfo } from "../../@types/location-props";
 import { Status } from "../../@types/enum/status";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const AddressListPage = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    let storeId = location.state.id;
+    console.log("storeId", storeId);
     const [data, setData] = useState<LocationInfo[]>([]);
     useEffect(() => {
         setData([{

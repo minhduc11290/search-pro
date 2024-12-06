@@ -39,6 +39,8 @@ const StoreManagementPage = () => {
             setTotalPage(Math.ceil(dataFiltered.length / PAGINATION.ITEMPERPAGE));
             getDataDisplay();
 
+        } else {
+            setDataDisplay([]);
         }
     }, [dataFiltered]);
 
@@ -49,7 +51,7 @@ const StoreManagementPage = () => {
 
             const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
             const _data = [...dataFiltered];
-            setDataDisplay(_data.splice(start, end));
+            setDataDisplay(_data.slice(start, end));
         }
     }
 
@@ -85,11 +87,11 @@ const StoreManagementPage = () => {
             </Table.Td>
             <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
                 event.preventDefault();
-                navigate(PATH.ADDRESSLIST);
+                navigate(PATH.ADDRESSLIST, { state: { id: row.id } });
             }}>Show address list </a></Table.Td>
             <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
                 event.preventDefault();
-                navigate(PATH.PRODUCT);
+                navigate(PATH.PRODUCT, { state: { id: row.id } });
             }}>Show product list </a></Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">

@@ -1,6 +1,7 @@
-import { AutoPath, EntityManager } from '@mikro-orm/core';
+import { AutoPath, EntityManager, FilterQuery } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { UserEntity } from '~/entities';
+
 
 @Injectable()
 export default class UsersService {
@@ -19,9 +20,9 @@ export default class UsersService {
     return this.defaultPopulate as never[];
   }
 
-  async findAll(populate?: string[]): Promise<UserEntity[]> {
+  async findByCondition(condition: FilterQuery<UserEntity>, populate?: string[]): Promise<UserEntity[]> {
     return this.em.find(
-      UserEntity, {},
+      UserEntity, condition,
       { populate: this.getPopulates(populate) },
     );
   }

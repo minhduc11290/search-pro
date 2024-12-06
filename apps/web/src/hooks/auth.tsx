@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { postlogin } from '../api/users';
-import { UserLogin } from '../@types/user-props';
+import { apiGetProfile, postlogin } from '../api/users';
+import { UserInfo, UserLogin } from '../@types/user-props';
 
 // Hàm này trả về một object chứa các hàm và trạng thái xác thực
 const useAuth = () => {
@@ -38,7 +38,34 @@ const useAuth = () => {
         setIsAuthenticated(false);
     }, []);
 
-    return { isLoading, isAuthenticated, login, logout };
+
+    const getProfile = useCallback(async (): Promise<UserInfo | null> => {
+        try {
+            const response = await apiGetProfile();
+            if (response.status == 200) {
+                const user: UserInfo = {
+                    no: 0,
+                    userID: response.data.userName,
+                    userName: response.data.userName,
+                    fullName: response.data.firstName + " " + response.data.lastName,
+                    phone: response.data.phone,
+                    email: response.data.email,
+                    state: '',
+                    status: response.data.status
+                }
+                return user;
+            }
+            // localStorage.setItem('authToken', token);
+
+            // setIsAuthenticated(true);
+        } catch (ex) {
+            console.log(ex);
+        }
+        return null;
+    }, []);
+
+
+    return { isLoading, isAuthenticated, login, logout, getProfile };
 };
 
 export default useAuth;

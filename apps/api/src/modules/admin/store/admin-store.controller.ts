@@ -91,6 +91,11 @@ export class AdminStoreController {
     //   password: storeCreationDto.password,
     //   phone: storeCreationDto.primaryPhone
     // });
+    const exsistEmail = await this.adminUserService.findByEmail(storeCreationDto.email);
+    if (exsistEmail) {
+      throw new ConflictException('User with provided email already exists');
+    }
+
     const creationData = new StoreCreationEntityMapper().map(storeCreationDto);
     const store = await this.adminStoreService.create({
       ...creationData,

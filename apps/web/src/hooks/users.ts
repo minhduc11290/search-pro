@@ -1,72 +1,55 @@
-// import useSWR from "swr";
-// import { getUser, postCreateUser, login, logout } from "@/api/users";
-// import { useState } from "react";
+import { useState, useEffect, useCallback } from 'react';
+import { apiGetUsers } from '../api/users';
+import { UserInfo } from '../@types/user-props';
+import { Status } from '../@types/enum/status';
 
-// export const useGetUser = (params = {}) => {
-//     const endpoint = "/users/me";
-
-
-//     // Gắn params vào endpoint hoặc fetcher
-//     const { data, error, isLoading, mutate } = useSWR(
-//         [endpoint, params], // Key gồm endpoint và params
-//         ([url, params]) => getUser(url) // Gọi fetcher với params
-//     );
-
-//     return {
-//         data,
-//         error,
-//         isLoading,
-//         mutate,
-//     };
-// };
+const useUsers = () => {
 
 
-// export const useRegistration = (params = {}) => {
-//     const endpoint = "/users";
+    const [isLoading, setIsLoading] = useState(true);
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
 
-//     // Gắn params vào endpoint hoặc fetcher
-//     const { data, error, isLoading, mutate } = useSWR(
-//         [endpoint, params], // Key gồm endpoint và params
-//         ([url, params]) => postCreateUser(url, params) // Gọi fetcher với params
-//     );
-//     return {
-//         data,
-//         error,
-//         isLoading,
-//         mutate,
-//     };
-// };
+    // Hàm login để đặt token và cập nhật trạng thái
+    const getUsers = useCallback(async (): Promise<UserInfo[]> => {
+        try {
+            setIsLoading(true);
+            const response = await apiGetUsers();
 
-// export const useLogin = (params = {}) => {
-//     const endpoint = "/users";
+            // localStorage.setItem('authToken', token);
+            if (Array.isArray(response.data)) {
+                return response.data.map((item, index) => {
+                    const user: UserInfo = {
+                        no: index + 1,
+                        userID: item.userID,
+                        // ownerstore: item.name,
+                        // userName: '',
+                        // phone: item.primaryPhone,
+                        // email: item.email,
+                        // status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                        userName: item.userName,
+                        fullName: item.firstName + " " + item.lastName,
+                        phone: item.phone,
+                        email: item.email,
+                        state: "",
+                        status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive
+                    }
+                    return user;
+                });
+            }
+            // setIsAuthenticated(true);
+            return [];
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return [];
+    }, []);
 
-//     // Gắn params vào endpoint hoặc fetcher
-//     const { data, error, isLoading, mutate } = useSWR(
-//         [endpoint, params], // Key gồm endpoint và params
-//         ([url, params]) => login(url, params) // Gọi fetcher với params
-//     );
-//     return {
-//         data,
-//         error,
-//         isLoading,
-//         mutate,
-//     };
-// };
 
+    return { isLoading, getUsers };
+};
 
-// export const useLogout = (params = {}, shouldFetchApi = false ) => {
-//     const endpoint = "/users";
-   
-//     // Gắn params vào endpoint hoặc fetcher
-//     const { data, error, isLoading, mutate } = useSWR(
-//         shouldFetchApi ? endpoint: null, // Key gồm endpoint và params
-//         ([url, params]) => logout(url, params) // Gọi fetcher với params
-//     );
-
-//     return {
-//         data,
-//         error,
-//         isLoading,
-//         mutate,
-//     };
-// };
+export default useUsers;

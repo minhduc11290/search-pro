@@ -10,31 +10,56 @@ import { IconSearch, IconRefresh, } from "@tabler/icons-react";
 import { Status } from "../../@types/enum/status";
 import { modals } from '@mantine/modals';
 import { UserInfo } from "../../@types/user-props";
+import useUsers from "../../hooks/users";
+import { PAGINATION } from "../../constants/pagination";
 
 
 const UserManagementPage = () => {
     const [data, setData] = useState<UserInfo[]>([]);
+    const [dataFiltered, setDataFiltered] = useState<UserInfo[]>([]);
+    const [dataDisplay, setDataDisplay] = useState<UserInfo[]>([]);
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+
     useEffect(() => {
-        setData([{
-            no: 1,
-            userID: 'usr001',
-            userName: 'henry6868',
-            fullName: 'john henry',
-            phone: '0653 2565 48579',
-            email: 'john_henry6868@gmail.com',
-            state: 'NJ 08234',
-            status: Status.Active
-        }, {
-            no: 2,
-            userID: 'usr001',
-            userName: 'henry6868',
-            fullName: 'john henry',
-            phone: '0653 2565 48579',
-            email: 'john_henry6868@gmail.com',
-            state: 'NJ 08234',
-            status: Status.Deactive
-        }]);
+        if (dataFiltered && dataFiltered.length > 0) {
+
+            // console.log("start", start);
+            // console.log("end", start + PAGINATION.ITEMPERPAGE - 1);
+            setTotalPage(Math.ceil(dataFiltered.length / PAGINATION.ITEMPERPAGE));
+            getDataDisplay();
+
+        } else {
+            setDataDisplay([]);
+        }
+    }, [dataFiltered]);
+
+    const getDataDisplay = () => {
+        console.log("currentPage", currentPage);
+        if (dataFiltered && dataFiltered.length > 0) {
+            const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
+
+            const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
+            const _data = [...dataFiltered];
+            setDataDisplay(_data.slice(start, end));
+        }
+    }
+
+    useEffect(() => {
+        getDataDisplay();
+    }, [currentPage]);
+
+    useEffect(() => {
+        getData();
     }, []);
+
+    const getData = async () => {
+        const users = await getUsers();
+        setData(users);
+        setDataFiltered(users);
+    }
+
+    const { isLoading, getUsers } = useUsers();
 
     const [scrolled, setScrolled] = useState(false);
     const openModal = (title: string, onOk: () => void) => modals.openConfirmModal({
@@ -58,9 +83,9 @@ const UserManagementPage = () => {
     });
 
 
-    const rows = data.map((row) => (
+    const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
-            <Table.Td>{row.no}</Table.Td>
+            <Table.Td>{index + 1}</Table.Td>
             <Table.Td>{row.userID}</Table.Td>
             <Table.Td>{row.userName}</Table.Td>
             <Table.Td>{row.fullName}</Table.Td>
@@ -94,9 +119,19 @@ const UserManagementPage = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
+
+        const dataFilter = data.filter(function (el) {
+            return el.fullName.includes(value)
+                || el.email.includes(value)
+                || el.phone.includes(value) || el.userID?.includes(value);
+        });
+
+        console.log("dataFilter", dataFilter);
+
+        setDataFiltered(dataFilter);
     };
 
-    return <AuthLayout currentLink={PATH.USERS}>
+    return <AuthLayout currentLink={PATH.USERS} isLoading={isLoading}>
         <Header title="User management"></Header>
         <Container fluid className="flex flex-1 mx-2">
             <div className="flex flex-1 flex-col justify-start">
@@ -110,7 +145,9 @@ const UserManagementPage = () => {
                     />
 
                     <Container className="flex flex-row items-center flex-1 flex-grow justify-end mr-0 px-0">
-                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey">
+                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey" onClick={() => {
+                            getData();
+                        }}>
                             <IconRefresh style={{ width: '70%', height: '70%' }} stroke={1.5} />
                         </ActionIcon>
 
@@ -136,7 +173,7 @@ const UserManagementPage = () => {
                     </ScrollArea>
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
-                    <Pagination total={2} />
+                    <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />
                 </Container>
             </div>
         </Container>

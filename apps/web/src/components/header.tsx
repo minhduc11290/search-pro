@@ -16,16 +16,30 @@ import { HeaderProps } from '../@types/header-props';
 import useAuth from '../hooks/auth';
 import { useNavigate } from 'react-router-dom';
 import { PATH } from '../constants/paths';
+import { useEffect, useState } from 'react';
+import { UserInfo } from '../@types/user-props';
 
-const user = {
-    name: 'Jane Spoonfighter',
-    email: 'janspoon@fighter.dev',
-    image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
-    id: '3265236598'
-};
+// const user = {
+//     name: 'Jane Spoonfighter',
+//     email: 'janspoon@fighter.dev',
+//     image: 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png',
+//     id: '3265236598'
+// };
 
 export function Header({ title, isBack, onBackPress }: HeaderProps) {
-    const { logout } = useAuth();
+    const [user, setUser] = useState<UserInfo | null>(null);
+
+    const { getProfile, logout } = useAuth();
+    const image = 'https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/avatars/avatar-5.png';
+
+    useEffect(() => {
+        getData();
+    }, []);
+
+    const getData = async () => {
+        setUser(await getProfile());
+    }
+
     const navigate = useNavigate();
     return (
         <div className={classes.header}>
@@ -43,13 +57,13 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
                 <Group justify="space-between">
 
                     <Group gap={7}>
-                        <Avatar src={user.image} alt={user.name} radius="xl" size={30} />
-                        <Container >
+                        <Avatar src={image} alt={user?.fullName} radius="xl" size={30} />
+                        <Container className='max-w-60 overflow-hidden'>
                             <Text fw={500} size="sm" lh={1} mr={2}>
-                                {user.name}
+                                {user?.fullName}
                             </Text>
                             <Text fw={400} size="sm" lh={1} mr={2} mt={2}>
-                                ID: {user.id}
+                                ID: {user?.userID}
                             </Text>
                         </Container>
                         <IconLogout style={{ width: rem(24), height: rem(24) }} stroke={1.5} onClick={() => {

@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { UserRole } from '~/share/consts/enums';
+import { UserRole, UserStatus } from '~/share/consts/enums';
 import { MinDto } from '~/share/dtos/min.dto';
 
-export class MinRoleDto extends MinDto<UserRole> {}
+export class MinRoleDto extends MinDto<UserRole> { }
 
 export class MinStoreDto {
   @ApiProperty({
@@ -44,4 +44,11 @@ export class UserResponseDto {
 
   @ApiProperty({ required: true, type: [MinStoreDto] })
   stores!: MinDto<string>[];
+
+  @ApiProperty({ example: '123-123-1234' })
+  phone?: string;
+
+
+  @ApiProperty({ required: true, example: 'ACTIVE' })
+  status!: UserStatus;
 }

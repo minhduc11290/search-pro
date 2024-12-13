@@ -175,7 +175,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                 //         name: _image.fileName
                 //     });
                 // }
-                let attachments: Attachment[] = images.map((image) => {
+                const attachments: Attachment[] = images.map((image) => {
                     return {
                         name: image.fileName,
                         url: image.fileName,

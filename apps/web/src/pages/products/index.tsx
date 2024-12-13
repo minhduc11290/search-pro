@@ -17,6 +17,8 @@ import ListLocationPage from "./components/list-location";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Store } from "../../@types/store-props";
 import useStoreProducts from "../../hooks/store-products";
+import { PAGINATION } from "../../constants/pagination";
+import useStoreLocations from "../../hooks/store-locations";
 const ProductsPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -27,7 +29,7 @@ const ProductsPage = () => {
     const [dataDisplay, setDataDisplay] = useState<Product[]>([]);
     const [totalPage, setTotalPage] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
-
+    const { getStoreLocations } = useStoreLocations();
     const [storeInfo, setStoreInfo] = useState<Store | null>(null);
 
     const [locations, setLocations] = useState<ComboboxItem[]>([]);
@@ -57,62 +59,55 @@ const ProductsPage = () => {
         const products = await getStoreProducts(storeId);
         setData(products);
         setDataFiltered(products);
+
+
     }
+
+
 
     useEffect(() => {
         // setData([{
-        //     no: 1,
-        //     SKU: 'pr001',
-        //     productName: 'Whiskey',
-        //     keysword: 'whis, wskey',
-        //     description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //     locationInfo: [{
-        //         locationID: 'store001',
-        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //         state: 'NJ',
-        //         zipCode: '08234',
-        //         price: "0",
-        //     }, {
-        //         locationID: 'store002',
-        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //         state: 'NJ',
-        //         zipCode: '08234',
-        //         price: "0",
-        //     }],
-        //     image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
-        //     status: Status.Active
-        // }, {
-        //     no: 2,
-        //     SKU: 'pr001',
-        //     productName: 'Whiskey',
-        //     keysword: 'whis, wskey',
-        //     description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //     locationInfo: [{
-        //         locationID: 'store001',
-        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //         state: 'NJ',
-        //         zipCode: '08234',
-        //         price: "0",
-        //     }, {
-        //         locationID: 'store002',
-        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        //         state: 'NJ',
-        //         zipCode: '08234',
-        //         price: "0",
-        //     }],
-        //     image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
-        //     status: Status.Active
-        // },]);
 
-        // setLocations([{
-        //     value: "1",
-        //     label: 'store001'
-        // }, {
-        //     value: "2",
-        //     label: 'store002'
-        // }])
         getData();
+        _getStoreLocations();
     }, []);
+
+    const _getStoreLocations = async () => {
+        const _locations = await getStoreLocations(storeId);
+        if (Array.isArray(_locations)) {
+            const _locationData: ComboboxItem[] = _locations.map(location => {
+                return {
+                    value: location.locationID,
+                    label: location.address
+                }
+            });
+            setLocations(_locationData);
+        }
+    }
+
+
+    useEffect(() => {
+        if (dataFiltered && dataFiltered.length > 0) {
+
+            // console.log("start", start);
+            // console.log("end", start + PAGINATION.ITEMPERPAGE - 1);
+            setTotalPage(Math.ceil(dataFiltered.length / PAGINATION.ITEMPERPAGE));
+            getDataDisplay();
+
+        } else {
+            setDataDisplay([]);
+        }
+    }, [dataFiltered]);
+
+    const getDataDisplay = () => {
+        if (dataFiltered && dataFiltered.length > 0) {
+            const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
+
+            const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
+            const _data = [...dataFiltered];
+            setDataDisplay(_data.slice(start, end));
+        }
+    }
 
     const [scrolled, setScrolled] = useState(false);
 
@@ -120,7 +115,7 @@ const ProductsPage = () => {
         setShowEdit(true);
         setProductSelected(product);
     }
-    const rows = data.map((row) => (
+    const rows = dataDisplay.map((row) => (
         <Table.Tr key={row.no}>
             <Table.Td>{row.no}</Table.Td>
             <Table.Td>{row.SKU}</Table.Td>
@@ -183,7 +178,13 @@ const ProductsPage = () => {
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
+        const dataFilter = data.filter(function (el) {
+            return el.SKU.includes(value)
+                || el.description.includes(value)
+                || el.keysword.join(",").includes(value);
+        });
 
+        setDataFiltered(dataFilter);
     };
 
     const hideEdit = (isReload: boolean) => {
@@ -204,7 +205,7 @@ const ProductsPage = () => {
         setShowList(false)
     }
 
-    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} >
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} isLoading={isLoading} >
         <Header title="Product list" isBack={true} onBackPress={() => {
             navigate(PATH.STOREMANAGEMENT)
         }}></Header>

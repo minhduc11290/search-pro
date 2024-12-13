@@ -1,6 +1,5 @@
 import { Attachment, ProductRequest, UpdateProductRequest } from "../@types/product-props";
 import axiosInstance from "./axiosInstance";
-import { LocationPrice } from "../@types/product-props";
 
 export const apiGetStoreProducts = (storeId: string) => axiosInstance.get(`/admin/stores/${storeId}/products`);
 export const apiPutStoreProduct = (productId: string, product: UpdateProductRequest) => axiosInstance.put(`/admin/products/${productId}`, product);

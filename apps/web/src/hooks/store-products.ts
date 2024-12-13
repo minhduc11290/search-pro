@@ -8,7 +8,6 @@ import { apiGetStoreProducts, apiPostStoreProduct, apiPutStoreProduct, apiUpdate
 import { apiPostFile } from "../api/file";
 import { FileInfo } from "../@types/file-info";
 import { getLink } from "../utils/image";
-import { FileWithPath } from "@mantine/dropzone";
 
 const useStoreProducts = () => {
 
@@ -38,7 +37,14 @@ const useStoreProducts = () => {
                         productName: item.name,
                         keysword: item.keywords,
                         description: item.description,
-                        locationInfo: Array.isArray(item.locations) ? item.locations.map((_location: any) => {
+                        locationInfo: Array.isArray(item.locations) ? item.locations.map((_location: {
+                            locationId?: string,
+                            id?: string,
+                            address?: string,
+                            steName?: string,
+                            zipCode?: string
+                            price?: string,
+                        }) => {
                             return {
                                 id: _location.id,
                                 locationID: _location.locationId,
@@ -92,7 +98,7 @@ const useStoreProducts = () => {
 
 
     const uploadFile = useCallback(async (files: File[]) => {
-        let result = false;
+        const result = false;
         let errorMessage = "";
         let data: FileInfo[] = [];
         try {

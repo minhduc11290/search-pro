@@ -45,7 +45,6 @@ const StoreManagementPage = () => {
     }, [dataFiltered]);
 
     const getDataDisplay = () => {
-        console.log("currentPage", currentPage);
         if (dataFiltered && dataFiltered.length > 0) {
             const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
 

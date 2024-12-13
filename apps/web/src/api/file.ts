@@ -1,4 +1,3 @@
-import { LocationPrice } from "../@types/product-props";
 import axiosInstance from "./axiosInstance";
 
 export const apiGetFile = (filename: string) => axiosInstance.get(`/admin/files/${filename}`);

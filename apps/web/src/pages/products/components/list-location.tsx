@@ -3,7 +3,7 @@ import classes from '../product-list.module.css';
 import cx from 'clsx';
 import { useState } from "react";
 import { ListLocationProps } from "../../../@types/list-location-products";
-import { LocationPrice } from "../../../@types/product-props";
+
 
 const ListLocationPage = ({ opened, close, locationPrice }: ListLocationProps) => {
     console.log("locationPrice", locationPrice);

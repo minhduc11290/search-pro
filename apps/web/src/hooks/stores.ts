@@ -50,6 +50,7 @@ const useStore = () => {
     const createStore = useCallback(async (store: StoreRequest) => {
         let result = false;
         let errorMessage = "";
+        let statusCode = 201;
         try {
             setIsLoading(true);
             // let storeRequest: StoreRequest = {
@@ -64,7 +65,9 @@ const useStore = () => {
                 result = true;
             }
         } catch (ex) {
+
             if (ex instanceof AxiosError) {
+                statusCode = ex.response?.status ?? 0;
                 errorMessage = ex.response?.data?.message ?? ex.message;
             } else if ((ex instanceof Error)) {
                 errorMessage = ex.message;
@@ -74,7 +77,7 @@ const useStore = () => {
         } finally {
             setIsLoading(false);
         }
-        return { result, errorMessage };
+        return { result, errorMessage, statusCode };
     }, []);
 
     const updateStore = useCallback(async (id: string, store: UpdateStoreRequest) => {

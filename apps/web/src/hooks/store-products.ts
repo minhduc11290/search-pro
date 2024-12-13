@@ -76,6 +76,7 @@ const useStoreProducts = () => {
     const createProduct = useCallback(async (storeId: string, product: ProductRequest) => {
         let result = false;
         let errorMessage = "";
+        let statusCode = 201;
         try {
             setIsLoading(true);
             const response = await apiPostStoreProduct(storeId, product);
@@ -84,6 +85,7 @@ const useStoreProducts = () => {
             }
         } catch (ex) {
             if (ex instanceof AxiosError) {
+                statusCode = ex.response?.status ?? 0;
                 errorMessage = ex.response?.data?.message ?? ex.message;
             } else if ((ex instanceof Error)) {
                 errorMessage = ex.message;
@@ -93,7 +95,7 @@ const useStoreProducts = () => {
         } finally {
             setIsLoading(false);
         }
-        return { result, errorMessage };
+        return { result, errorMessage, statusCode };
     }, []);
 
 

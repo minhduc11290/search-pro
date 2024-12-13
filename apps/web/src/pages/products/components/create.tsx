@@ -116,7 +116,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
             }
             // 
 
-            const { result, errorMessage } = await createProduct(storeId, {
+            const { result, errorMessage, statusCode } = await createProduct(storeId, {
                 sku: form.getValues().sku,
                 name: form.getValues().name,
                 keywords: form.getValues().keywords,
@@ -146,14 +146,17 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 });
                 close(true);
             } else {
-                console.log("errorMessage", errorMessage);
-                notifications.show({
-                    title: `Error`,
-                    message: errorMessage,
-                    color: 'red',
-                    icon: <IconX />,
-                    position: 'top-right'
-                });
+                if (statusCode != 409) {
+                    notifications.show({
+                        title: `Error`,
+                        message: errorMessage,
+                        color: 'red',
+                        icon: <IconX />,
+                        position: 'top-right'
+                    });
+                } else {
+                    form.setFieldValue('sku', errorMessage);
+                }
             }
 
 

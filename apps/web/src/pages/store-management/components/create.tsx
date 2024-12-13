@@ -54,7 +54,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
         const result = form.validate();
         if (!result.hasErrors) {
             const data = form.getValues()
-            const { result, errorMessage } = await createStore({
+            const { result, errorMessage, statusCode } = await createStore({
                 // ...data,
                 isActive: data.status == Status.Active ? true : false,
                 // userName: data.email,
@@ -73,14 +73,19 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
                 });
                 close(true);
             } else {
-                console.log("errorMessage", errorMessage);
-                notifications.show({
-                    title: `Error`,
-                    message: errorMessage,
-                    color: 'red',
-                    icon: <IconX />,
-                    position: 'top-right'
-                });
+                if (statusCode != 409) {
+                    console.log("errorMessage", errorMessage);
+                    notifications.show({
+                        title: `Error`,
+                        message: errorMessage,
+                        color: 'red',
+                        icon: <IconX />,
+                        position: 'top-right'
+                    });
+                } else {
+                    // Trùng store
+                    form.setFieldError('email', errorMessage);
+                }
             }
 
         }

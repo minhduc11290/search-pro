@@ -14,7 +14,7 @@ export default class TokenService {
     private readonly configService: ConfigService,
   ) {
     this.redis = new Redis(
-      String(process.env.REDIS_CONNECTION || 'redis://redis:6379'),
+      String(process.env.REDIS_CONNECTION || 'redis://search_pro_redis:6379'),
     );
   }
 

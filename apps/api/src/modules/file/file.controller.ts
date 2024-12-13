@@ -13,4 +13,6 @@ export class FileController {
     const filePath = join(__dirname, '../../../', '..', 'public', filename);
     res.sendFile(filePath);
   }
+
+  
 }

@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductStatus } from '../consts/enums';
+import { IsNumber, IsString } from 'class-validator';
 
 export class MinLocationDto {
   @ApiProperty({
@@ -14,6 +16,18 @@ export class MinLocationDto {
   steName!: string;
 
   @ApiProperty({ required: true, example: '12345' })
+  price!: number;
+}
+
+export class LocationPriceDto {
+
+  @ApiProperty({ example: '9da8b809-efdf-43ff-8ff5-03b364021fb6' })
+  @IsString()
+  id!: string;
+
+
+  @ApiProperty({ example: '9da8b809-efdf-43ff-8ff5-03b364021fb6' })
+  @IsNumber()
   price!: number;
 }
 
@@ -78,4 +92,9 @@ export class ProductLocationResponseDto {
 
   @ApiProperty({ required: false, type: [MinAttachmentDto] })
   attachments?: MinAttachmentDto[];
+
+  @ApiProperty({ required: true, example: 'ACTIVE' })
+  status!: ProductStatus;
+
+
 }

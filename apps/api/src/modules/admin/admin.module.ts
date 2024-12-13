@@ -19,6 +19,9 @@ import { AdminProductService } from './product/admin-product.service';
 import { UsersModule } from './users/users.module';
 import { UsersController } from './users/users.controller';
 import UsersService from './users/users.service';
+import { GeoRefService } from '../share/geo-ref/geo-ref.service';
+import { FileController } from './file/file.controller';
+import { FileModule } from './file/file.module';
 
 @Module({
   imports: [
@@ -29,13 +32,15 @@ import UsersService from './users/users.service';
     AdminLocationModule,
     AdminProductModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    FileModule
   ],
   controllers: [
     AdminUserController,
     AdminStoreController,
     AdminLocationController,
     AdminProductController,
-    UsersController
+    UsersController,
+    FileController
   ],
   providers: [
     TokenService,
@@ -45,7 +50,8 @@ import UsersService from './users/users.service';
     AdminStoreService,
     AdminLocationService,
     AdminProductService,
-    UsersService
+    UsersService,
+    GeoRefService
   ],
 })
-export class AdminModule {}
+export class AdminModule { }

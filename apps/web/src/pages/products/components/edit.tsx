@@ -5,13 +5,23 @@ import { z } from 'zod';
 import classes from '../product-list.module.css';
 import { useEffect, useState } from "react";
 import { Status } from "../../../@types/enum/status";
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import cx from 'clsx';
 import { EditProductProps } from "../../../@types/edit-product-props";
-import { LocationPrice } from "../../../@types/product-props";
+import { Attachment, LocationPrice } from "../../../@types/product-props";
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { useLocation } from "react-router-dom";
+import useStoreLocations from "../../../hooks/store-locations";
+import useStoreProducts from "../../../hooks/store-products";
+import { LocationInfo } from "../../../@types/location-props";
+import { getLink } from "../../../utils/image";
+import { notifications } from "@mantine/notifications";
+import { FileInfo } from "../../../@types/file-info";
 
 const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
+    const location = useLocation();
+    const storeId = location.state.id;
+
     const schema = z.object({
         sku: z
             .string().trim()
@@ -22,7 +32,10 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         locations: z.object({
             location: z
                 .string(),
-            price: z.number(),
+            price: z.preprocess(
+                (value) => (typeof value === 'string' ? Number(value) : value),
+                z.number().min(0, { message: 'Price must be a positive number' })
+            ),
         }).array(),
 
     });
@@ -34,7 +47,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         keywords: string[],
         locations: LocationPrice[],
         status: Status,
-        images: (FileWithPath | string)[]
+        images: (FileWithPath)[]
     }>({
         mode: 'uncontrolled',
         initialValues: {
@@ -50,32 +63,164 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
 
     });
 
-    useEffect(() => {
+    const [imageDelete, setImageDelete] = useState<string[]>([]);
+    const [images, setImages] = useState<Attachment[]>([]);
+
+    const { getStoreLocations } = useStoreLocations();
+    const { updateProduct, uploadFile, updateLocation, addLocation, addAttachment, deleteAttachment } = useStoreProducts();
+    const [locations, setLocations] = useState<ComboboxItem[]>([]);
+    const [locationsDB, setLocationsDB] = useState<LocationInfo[]>([]);
+
+    const init = async () => {
+        const _locations = await getStoreLocations(storeId);
+        setLocationsDB(_locations);
+        if (Array.isArray(_locations)) {
+            const _locationData: ComboboxItem[] = _locations.map(location => {
+                return {
+                    value: location.locationID,
+                    label: location.address
+                }
+            });
+            setLocations(_locationData);
+        }
+        console.log("productInfo.locationInfo", productInfo.locationInfo);
         form.setValues({
             sku: productInfo.SKU,
             name: productInfo.productName,
             description: productInfo.description,
-            keywords: [],
-            locations: productInfo.locationInfo,
+            keywords: productInfo.keysword,
+            locations: productInfo.locationInfo.map((location) => {
+
+                const _location = _locations.find((_location) => {
+                    return _location.locationID == location.locationID
+                })
+                console.log("init_location", _location);
+                return {
+                    id: location.id,
+                    location: location.locationID ?? '',
+                    locationID: location.locationID ?? '',
+                    address: _location?.address ?? '',
+                    state: _location?.state ?? '',
+                    zipCode: _location?.zipCode ?? '',
+                    price: location.price,
+                }
+            }),
             status: productInfo.status
         })
+        setImages(productInfo.attachments);
+
+        console.log("form", form.getValues());
+
+    }
+
+    useEffect(() => {
+        init();
+        console.log("productInfo", productInfo);
+
     }, [productInfo])
 
-    const [locations, setLocations] = useState<ComboboxItem[]>([]);
-    useEffect(() => {
-        setLocations([{
-            value: "1",
-            label: 'store001',
+    // useEffect(() => {
+    //     setLocations([{
+    //         value: "1",
+    //         label: 'store001',
 
-        }, {
-            value: "2",
-            label: 'store002'
-        }])
-    }, [])
+    //     }, {
+    //         value: "2",
+    //         label: 'store002'
+    //     }])
+    // }, [])
     const [scrolled, setScrolled] = useState(false);
 
+
+    const handleSubmit = async () => {
+        console.log("data", form.getValues());
+        const formData = form.validate();
+        if (!formData.hasErrors) {
+            let images: FileInfo[] = [];
+
+            // 
+            const locations = form.getValues().locations;
+            //update locations 
+            console.log("locations", locations);
+            const filterUpdateLocation = locations.filter((location) => location.status != 'ADD')
+            console.log("filterUpdateLocation", filterUpdateLocation);
+            if (filterUpdateLocation) {
+                for (const _location of filterUpdateLocation) {
+                    await updateLocation(_location);
+                }
+            }
+
+            const filterAddLocation = locations.filter((location) => location.status == 'ADD')
+            console.log("filterAddLocation", filterAddLocation);
+            if (filterAddLocation) {
+
+                for (const _location of filterAddLocation) {
+                    await addLocation(productInfo.id ?? '', _location);
+                }
+            }
+
+            if (imageDelete) {
+                for (const _image of imageDelete) {
+                    await deleteAttachment(_image);
+                }
+            }
+
+            if (form.getValues().images && form.getValues().images.length > 0) {
+                const { data } = await uploadFile(form.getValues().images);
+
+                images = [...data];
+                // for (const _image in data) {
+                //     attachments.push({
+                //         id: "",
+                //         name: _image.fileName
+                //     });
+                // }
+                let attachments: Attachment[] = images.map((image) => {
+                    return {
+                        name: image.fileName,
+                        url: image.fileName,
+                    }
+                });
+                await addAttachment(productInfo.id ?? '', attachments);
+            }
+
+
+
+            const { result, errorMessage } = await updateProduct(productInfo.id ?? '', {
+                sku: form.getValues().sku,
+                name: form.getValues().name,
+                keywords: form.getValues().keywords,
+                description: form.getValues().description,
+                isActive: form.getValues().status == Status.Active,
+            });
+
+
+
+            if (result) {
+                notifications.show({
+                    title: `Success`,
+                    message: `Location have been created successfully`,
+                    color: 'teal',
+                    icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                    position: 'top-right'
+                });
+                close(true);
+            } else {
+                console.log("errorMessage", errorMessage);
+                notifications.show({
+                    title: `Error`,
+                    message: errorMessage,
+                    color: 'red',
+                    icon: <IconX />,
+                    position: 'top-right'
+                });
+            }
+
+        }
+    }
+
     return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
-        <Title className="font-bold text-xl"> Create new product </Title>
+        <Title className="font-bold text-xl"> Edit product </Title>
         <Grid grow>
             <Grid.Col span={6} >
                 <TextInput
@@ -116,7 +261,8 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                 />
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pb-0">
-                <Text className="text-sm font-semibold">Select location</Text><Text className="ml-1 text-red-500">*</Text>
+                <Text className="text-sm font-semibold">Select location</Text>
+                {/* <Text className="ml-1 text-red-500">*</Text> */}
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pt-0">
                 <ScrollArea style={{ width: '100%' }} mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
@@ -131,9 +277,9 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                         </Table.Thead>
                         <Table.Tbody>
                             {
-                                form.getValues().locations.map((_, index) => {
+                                Array.isArray(form.getValues().locations) && form.getValues().locations.map((_, index) => {
                                     return (
-                                        <Table.Tr>
+                                        <Table.Tr key={`location_${index}`}>
                                             <Table.Td>
                                                 <Select
                                                     className="w-32"
@@ -141,10 +287,22 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                                     data={locations}
                                                     key={form.key(`locations.${index}.location`)}
                                                     {...form.getInputProps(`locations.${index}.location`)}
-                                                    onChange={() => {
+                                                    onChange={(_, option) => {
                                                         // ToDo:
-                                                        form.setFieldValue(`locations.${index}.address`, "91 ELM ST MANCHESTER CT 06040-8610 USA");
-                                                        form.setFieldValue(`locations.${index}.state`, "NJ 08234");
+                                                        // form.setFieldValue(`locations.${index}.address`, "91 ELM ST MANCHESTER CT 06040-8610 USA");
+                                                        // form.setFieldValue(`locations.${index}.state`, "NJ 08234");
+
+                                                        const location = locationsDB.find(location => location.locationID == option.value);
+
+                                                        if (location) {
+                                                            form.setFieldValue(`locations.${index}.address`, location.address);
+                                                            form.setFieldValue(`locations.${index}.state`, `${location.state} ${location.zipCode}`);
+                                                            form.setFieldValue(`locations.${index}.locationID`, option.value);
+                                                            form.setFieldValue(`locations.${index}.location`, option.value);
+                                                        }
+                                                        // if (form.getValues().locations[index].status != "ADD") {
+                                                        //     form.setFieldValue(`locations.${index}.status`, 'UPDATE');
+                                                        // }
                                                     }}
                                                 />
                                             </Table.Td>
@@ -172,6 +330,13 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                                     withAsterisk
                                                     key={form.key(`locations.${index}.price`)}
                                                     {...form.getInputProps(`locations.${index}.price`)}
+                                                // onChange={(event) => {
+                                                //     if (form.getValues().locations[index].status != "ADD") {
+                                                //         form.setFieldValue(`locations.${index}.status`, 'UPDATE');
+                                                //     }
+                                                //     form.setFieldValue(`locations.${index}.price`, event.target.value);
+                                                // }}
+
                                                 />
                                             </Table.Th>
                                         </Table.Tr>);
@@ -189,6 +354,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                             state: '',
                                             zipCode: '',
                                             price: 0,
+                                            status: 'ADD'
                                         });
 
                                         // setLocatio([...locations])
@@ -207,9 +373,33 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                 </ScrollArea>
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pb-0">
-                <Text className="text-sm font-semibold">Images</Text><Text className="ml-1 text-red-500">*</Text>
+                <Text className="text-sm font-semibold">Images</Text>
+                {/* <Text className="ml-1 text-red-500">*</Text> */}
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pt-0">
+                {
+                    images && images.map((file, index) =>
+                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={`image_${index}`}>
+
+                            <Image className="w-full h-full" radius="md" fit="contain"
+                                src={getLink(file.name)}></Image>
+                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                () => {
+                                    // form.removeListItem('images', index);
+                                    // setImageDelete([...imageDelete, file.id]);
+                                    // setImages([...images.slice(index)]);
+                                    setImageDelete([...imageDelete, file.id!]);
+                                    console.log("index", index);
+                                    images.splice(index, 1);
+                                    setImages([...images]);
+                                }
+                            }>
+                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                            </ActionIcon>
+                        </Container>
+                    )
+                }
+
                 {
                     form.getValues().images.map((file, index) =>
                         <Container className="w-20 h-20 mx-2  rounded-lg relative" key={index}>
@@ -265,16 +455,12 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         </Grid>
 
         <Group mt="xl" className="flex justify-end">
-            <Button variant="default" onClick={close}>Close</Button>
-            <Button onClick={() => {
-                const result = form.validate();
-                if (!result.hasErrors) {
-                    close();
-                }
-            }}>Save</Button>
+            <Button variant="default" onClick={() => close(false)}>Close</Button>
+            <Button onClick={handleSubmit}>Save</Button>
         </Group>
 
     </Modal >
     )
 }
 export default EditAddressPage;
+

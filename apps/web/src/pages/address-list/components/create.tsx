@@ -1,18 +1,30 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import { Status } from "../../../@types/enum/status";
 import { TimeInput } from "@mantine/dates";
 import { CreateLocationProps } from "../../../@types/create-location-props";
+import { useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import useGeoRef from "../../../hooks/georef";
+import { GeoProps } from "../../../@types/geo-props";
+import useStoreLocations from "../../../hooks/store-locations";
+import { notifications } from "@mantine/notifications";
+import { IconCheck, IconX } from "@tabler/icons-react";
 const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
+    const location = useLocation();
+    const storeId = location.state.id;
+    console.log("CreateAddressPage-storeId", storeId);
+
     const schema = z.object({
         address: z
             .string().trim()
             .min(1, { message: 'Required information' }),
-        state: z.string().trim().min(1, { message: 'Required information' }),
-        zipCode: z.string().min(5, { message: 'Required information' })
-
+        state: z.string({ required_error: "Required information" }).trim().min(1, { message: 'Required information' }),
+        zipCode: z.string({ required_error: "Required information", invalid_type_error: "Required information", }).trim().min(1, { message: 'Required information' }),
+        openAt: z.string().trim().min(1, { message: 'Required information' }),
+        closeAt: z.string().trim().min(1, { message: 'Required information' }),
     });
 
     const form = useForm({
@@ -29,8 +41,87 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
 
     });
 
+    const handleSubmit = async () => {
+        console.log("form", form.getValues());
+        const formData = form.validate();
+        if (!formData.hasErrors) {
+            // console.log(form.getValues());
+            const geoRefId = geos.find((geo) => geo.steName == form.getValues().state && geo.zipCode == form.getValues().zipCode);
+            if (geoRefId) {
+                const { result, errorMessage } = await createLocation(storeId, {
+                    name: form.getValues().address,
+                    address: form.getValues().address,
+                    openTime: form.getValues().openAt,
+                    closeTime: form.getValues().closeAt,
+                    geoRefId: geoRefId?.id ?? "",
+                    isActive: form.getValues().status == Status.Active,
+                });
+                if (result) {
+                    notifications.show({
+                        title: `Success`,
+                        message: `Location have been created successfully`,
+                        color: 'teal',
+                        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                        position: 'top-right'
+                    });
+                    close(true);
+                } else {
+                    console.log("errorMessage", errorMessage);
+                    notifications.show({
+                        title: `Error`,
+                        message: errorMessage,
+                        color: 'red',
+                        icon: <IconX />,
+                        position: 'top-right'
+                    });
+                }
 
+            } else {
+                form.setFieldError('state', "Geo donot exsist");
+            }
 
+        }
+    }
+
+    const { getGeoRef } = useGeoRef();
+
+    const { createLocation } = useStoreLocations();
+
+    const [geos, setGeos] = useState<GeoProps[]>([]);
+    const [states, setStates] = useState<string[]>([]);
+    const [zipCodes, setZipCodes] = useState<string[]>([]);
+    useEffect(() => {
+        getData();
+    }, []);
+
+    const getData = async () => {
+        const _geos = await getGeoRef();
+        setGeos(_geos);
+        const _states: string[] = [];
+        _geos.map((geo) => {
+            _states.push(geo.steName);
+        });
+
+        const uniqueStates = [...new Set(_states)];
+        setStates(uniqueStates);
+    }
+
+    const onChangeStates = (stateName: string) => {
+        form.setFieldValue('state', stateName);
+        console.log(stateName);
+        console.log(geos);
+        const geoFilter = geos.filter((geo) => geo.steName == stateName);
+
+        const _zipCodes: string[] = [];
+        console.log("geoFilter", geoFilter);
+        geoFilter.map((geo) => {
+            _zipCodes.push(geo.zipCode);
+        });
+        const uniqueZipCodes = [...new Set(_zipCodes)];
+        console.log("zip", uniqueZipCodes);
+        setZipCodes(uniqueZipCodes);
+
+    }
 
 
 
@@ -50,16 +141,25 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                 <Select
                     label="State"
                     placeholder="State"
-                    data={['HCM', 'NJ']}
+                    data={states}
+
                     key={form.key('state')}
                     {...form.getInputProps('state')}
+                    onChange={(_, option) => onChangeStates(option.value)}
                 />
             </Grid.Col>
             <Grid.Col span={4} >
-                <TextInput
+                {/* <TextInput
                     label="Zip code"
                     placeholder="Zip code"
                     withAsterisk
+                    key={form.key('zipCode')}
+                    {...form.getInputProps('zipCode')}
+                /> */}
+                <Select
+                    label="Zip code"
+                    placeholder="Zip code"
+                    data={zipCodes}
                     key={form.key('zipCode')}
                     {...form.getInputProps('zipCode')}
                 />
@@ -84,7 +184,7 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     placeholder="Opt"
                     style={{ width: '100%' }}
                     key={form.key('closeAt')}
-                    {...form.getInputProps('openAt')}
+                    {...form.getInputProps('closeAt')}
                 />
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row items-center">
@@ -96,13 +196,8 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
         </Grid>
 
         <Group mt="xl" className="flex justify-end">
-            <Button variant="default" onClick={close}>Close</Button>
-            <Button onClick={() => {
-                const result = form.validate();
-                if (!result.hasErrors) {
-                    close();
-                }
-            }}>Save</Button>
+            <Button variant="default" onClick={() => close(false)}>Close</Button>
+            <Button onClick={handleSubmit}>Save</Button>
         </Group>
 
     </Modal>

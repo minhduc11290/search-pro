@@ -1,6 +1,7 @@
 import { ProductLocationEntity } from '~/entities';
 import { ProductLocationResponseDto } from '~/share/dtos/product-location-response.dto';
 import { BaseMapper } from '../base/BaseMapper';
+import { ProductStatus } from '~/share/consts/enums';
 
 export class ProductLocationResponseMapper extends BaseMapper<
   ProductLocationEntity,
@@ -13,6 +14,7 @@ export class ProductLocationResponseMapper extends BaseMapper<
       sku: source.product.sku,
       name: source.product.name,
       keywords: source.product.keywords,
+      status: source.product.status ?? ProductStatus.INACTIVE,
       store: {
         id: source.location.store.id,
         name: source.location.store.name,

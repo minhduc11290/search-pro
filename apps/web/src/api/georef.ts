@@ -1,4 +1,4 @@
 import axiosInstance from "./axiosInstance";
 
-export const getGeoRef = (url: string) => axiosInstance.get(url);
-export const getGeoRefByID = (url: string, id: string) => axiosInstance.get(url + id);
+export const apiGetGeoRef = () => axiosInstance.get("/georefs");
+export const apiGetGeoRefByID = (id: string) => axiosInstance.get(`/georefs/${id}`);

@@ -25,7 +25,7 @@ export class ProductCreationEntityMapper extends CreateEntityMapper<
       description: source.description,
       store: options.storeId,
       createdBy: options.createdBy,
-      status: ProductStatus.ACTIVE,
+      status: source.isActive ? ProductStatus.ACTIVE : ProductStatus.INACTIVE // ProductStatus.ACTIVE
     };
   }
 }

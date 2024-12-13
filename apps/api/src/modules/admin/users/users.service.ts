@@ -23,7 +23,7 @@ export default class UsersService {
   async findByCondition(condition: FilterQuery<UserEntity>, populate?: string[]): Promise<UserEntity[]> {
     return this.em.find(
       UserEntity, condition,
-      { populate: this.getPopulates(populate) },
+      { populate: this.getPopulates(populate), orderBy: { createdAt: 'DESC' } },
     );
   }
 }

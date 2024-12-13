@@ -14,7 +14,7 @@ export class AdminLocationService {
     'store',
     'geoRef',
   ] as never[];
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager) { }
 
   private getPopulates(populate?: string[]) {
     if (populate) {
@@ -45,12 +45,14 @@ export class AdminLocationService {
   ): Promise<LocationEntity[]> {
     return this.em.find(LocationEntity, condition, {
       populate: this.getPopulates(populate),
+      orderBy: { createdAt: 'DESC' }
     });
   }
 
   async create(
     locationData: RequiredEntityData<LocationEntity>,
   ): Promise<LocationEntity> {
+
     const location = this.em.create(LocationEntity, locationData);
     await this.em.persistAndFlush(location);
     return location;

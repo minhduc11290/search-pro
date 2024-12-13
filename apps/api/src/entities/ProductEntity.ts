@@ -17,7 +17,7 @@ import { IsOptional } from 'class-validator';
 @Unique({ properties: ['sku', 'store'] })
 export class ProductEntity extends BaseEntity<ProductEntity> {
   @Property({ length: 100 })
-  @Unique()
+  // @Unique()
   sku!: string;
 
   @Property({ length: 255, nullable: true })

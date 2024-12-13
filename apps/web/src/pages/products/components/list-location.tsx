@@ -2,35 +2,40 @@ import { Button, Group, Modal, ScrollArea, Table, Title } from "@mantine/core";
 import classes from '../product-list.module.css';
 import cx from 'clsx';
 import { useState } from "react";
+import { ListLocationProps } from "../../../@types/list-location-products";
 import { LocationPrice } from "../../../@types/product-props";
-import { CreateProductProps } from "../../../@types/create-product-props";
 
-const ListLocationPage = ({ opened, close }: CreateProductProps) => {
+const ListLocationPage = ({ opened, close, locationPrice }: ListLocationProps) => {
+    console.log("locationPrice", locationPrice);
     const [scrolled, setScrolled] = useState(false);
-    const data: LocationPrice[] = [{
-        locationID: 'store001',
-        address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        state: 'NJ',
-        zipCode: '08234',
-        price: '$ 2.00',
-    }, {
-        locationID: 'store001',
-        address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-        state: 'NJ',
-        zipCode: '08234',
-        price: '$ 2.00',
-    }];
+    // const data: LocationPrice[] = [{
+    //     locationID: 'store001',
+    //     address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+    //     state: 'NJ',
+    //     zipCode: '08234',
+    //     // price: '$ 2.00',
+    //     price: 2
+    // }, {
+    //     locationID: 'store001',
+    //     address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+    //     state: 'NJ',
+    //     zipCode: '08234',
+    //     // price: '$ 2.00',
+    //     price: 2
+    // }];
 
-    const rows = data.map((row, index) => (
+    // const [data, setData] =  useState<LocationPrice[]>([]);
+
+    const rows = locationPrice.map((row, index) => (
         <Table.Tr key={index}>
-            <Table.Td>{row.locationID}</Table.Td>
+            <Table.Td style={{ maxWidth: '80' }}>{row.locationID}</Table.Td>
             <Table.Td>{row.address}</Table.Td>
-            <Table.Td>{row.state} {row.zipCode}</Table.Td>
+            <Table.Td>{row.steName} {row.zipCode}</Table.Td>
             <Table.Td>{row.price}</Table.Td>
         </Table.Tr>));
 
     return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
-        <Title className="font-bold text-xl"> Create new product </Title>
+        <Title className="font-bold text-xl"> List location </Title>
 
         <ScrollArea style={{ width: '100%' }} mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
             <Table className={classes.table} withTableBorder={true}>
@@ -50,7 +55,7 @@ const ListLocationPage = ({ opened, close }: CreateProductProps) => {
             </Table>
         </ScrollArea>
         <Group mt="xl" className="flex justify-end">
-            <Button onClick={close}>Close</Button>
+            <Button onClick={() => close(false)}>Close</Button>
         </Group>
     </Modal>)
 }

@@ -26,7 +26,7 @@ export class LocationCreationEntityMapper extends CreateEntityMapper<
       geoRef: source.geoRefId,
       store: options.storeId,
       createdBy: options.createdBy,
-      status: LocationStatus.ACTIVE,
+      status: source.isActive ? LocationStatus.ACTIVE : LocationStatus.INACTIVE,
     };
   }
 }

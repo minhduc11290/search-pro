@@ -6,12 +6,22 @@ import { Status } from "../../../@types/enum/status";
 import classes from '../product-list.module.css';
 import { useEffect, useState } from "react";
 import cx from 'clsx';
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { LocationPrice } from "../../../@types/product-props";
 import { CreateProductProps } from "../../../@types/create-product-props";
+import useStoreLocations from "../../../hooks/store-locations";
+import { useLocation } from "react-router-dom";
+import { LocationInfo } from "../../../@types/location-props";
+import useStoreProducts from "../../../hooks/store-products";
+import { FileInfo } from "../../../@types/file-info";
+import { notifications } from "@mantine/notifications";
 
 const CreateProductPage = ({ opened, close }: CreateProductProps) => {
+
+    const location = useLocation();
+    const storeId = location.state.id;
+
     const schema = z.object({
         sku: z
             .string().trim()
@@ -22,7 +32,10 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
         locations: z.object({
             location: z
                 .string(),
-            price: z.number(),
+            price: z.preprocess(
+                (value) => (typeof value === 'string' ? Number(value) : value),
+                z.number().min(0, { message: 'Price must be a positive number' })
+            ) // z.number(),
         }).array(),
 
     });
@@ -50,18 +63,106 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
 
     });
 
+    const { getStoreLocations } = useStoreLocations();
+    const { createProduct, uploadFile } = useStoreProducts();
     const [locations, setLocations] = useState<ComboboxItem[]>([]);
-    useEffect(() => {
-        setLocations([{
-            value: "1",
-            label: 'store001',
+    const [locationsDB, setLocationsDB] = useState<LocationInfo[]>([]);
 
-        }, {
-            value: "2",
-            label: 'store002'
-        }])
+    useEffect(() => {
+        // setLocations([{
+        //     value: "1",
+        //     label: 'store001',
+
+        // }, {
+        //     value: "2",
+        //     label: 'store002'
+        // }])
+
+        init();
     }, [])
+
+    useEffect(() => {
+        if (opened) {
+            form.reset();
+        }
+    }, [opened])
+
+    const init = async () => {
+        const _locations = await getStoreLocations(storeId);
+        setLocationsDB(_locations);
+        if (Array.isArray(_locations)) {
+            const _locationData: ComboboxItem[] = _locations.map(location => {
+                return {
+                    value: location.locationID,
+                    label: location.address
+                }
+            });
+            setLocations(_locationData);
+        }
+
+    }
     const [scrolled, setScrolled] = useState(false);
+
+
+    const handleSubmit = async () => {
+        console.log("data", form.getValues());
+        const formData = form.validate();
+        if (!formData.hasErrors) {
+            let images: FileInfo[] = [];
+            if (form.getValues().images) {
+                const { data } = await uploadFile(form.getValues().images);
+
+                images = [...data];
+            }
+            // 
+
+            const { result, errorMessage } = await createProduct(storeId, {
+                sku: form.getValues().sku,
+                name: form.getValues().name,
+                keywords: form.getValues().keywords,
+                description: form.getValues().description,
+                productLocations: form.getValues().locations.map((location) => {
+                    console.log("location", location);
+                    return {
+                        locationId: location.locationID,
+                        price: location.price
+                    };
+                }),
+                attachments: images.map((image) => {
+                    return {
+                        name: image.fileName,
+                        url: image.fileName,
+                    }
+                }),
+                isActive: form.getValues().status == Status.Active
+            });
+            if (result) {
+                notifications.show({
+                    title: `Success`,
+                    message: `Location have been created successfully`,
+                    color: 'teal',
+                    icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                    position: 'top-right'
+                });
+                close(true);
+            } else {
+                console.log("errorMessage", errorMessage);
+                notifications.show({
+                    title: `Error`,
+                    message: errorMessage,
+                    color: 'red',
+                    icon: <IconX />,
+                    position: 'top-right'
+                });
+            }
+
+
+            // create Product
+
+            // close();
+        }
+    }
+
     return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Create new product </Title>
         <Grid grow>
@@ -104,7 +205,8 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 />
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pb-0">
-                <Text className="text-sm font-semibold">Select location</Text><Text className="ml-1 text-red-500">*</Text>
+                <Text className="text-sm font-semibold">Select location</Text>
+                {/* <Text className="ml-1 text-red-500">*</Text> */}
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pt-0">
                 <ScrollArea style={{ width: '100%' }} mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
@@ -121,7 +223,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                             {
                                 form.getValues().locations.map((_, index) => {
                                     return (
-                                        <Table.Tr>
+                                        <Table.Tr key={index}>
                                             <Table.Td>
                                                 <Select
                                                     className="w-32"
@@ -129,10 +231,21 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                                     data={locations}
                                                     key={form.key(`locations.${index}.location`)}
                                                     {...form.getInputProps(`locations.${index}.location`)}
-                                                    onChange={() => {
+                                                    onChange={(_, option) => {
                                                         // ToDo:
-                                                        form.setFieldValue(`locations.${index}.address`, "91 ELM ST MANCHESTER CT 06040-8610 USA");
-                                                        form.setFieldValue(`locations.${index}.state`, "NJ 08234");
+                                                        // form.setFieldValue(`locations.${index}.address`, "91 ELM ST MANCHESTER CT 06040-8610 USA");
+                                                        // form.setFieldValue(`locations.${index}.state`, "NJ 08234");
+                                                        console.log("locationsDB", locationsDB);
+                                                        console.log("option.value", option.value);
+                                                        const location = locationsDB.find(location => location.locationID == option.value);
+
+                                                        if (location) {
+                                                            form.setFieldValue(`locations.${index}.address`, location.address);
+                                                            form.setFieldValue(`locations.${index}.state`, `${location.state} ${location.zipCode}`);
+                                                            form.setFieldValue(`locations.${index}.locationID`, option.value);
+                                                            form.setFieldValue(`locations.${index}.location`, option.value);
+                                                        }
+
                                                     }}
                                                 />
                                             </Table.Td>
@@ -143,6 +256,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                                     withAsterisk
                                                     key={form.key(`locations.${index}.address`)}
                                                     {...form.getInputProps(`locations.${index}.address`)}
+
                                                 />
                                             </Table.Td>
                                             <Table.Td>
@@ -156,10 +270,21 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                             </Table.Td>
                                             <Table.Th>
                                                 <TextInput
+                                                    type="number"
                                                     placeholder="Enter price"
                                                     withAsterisk
                                                     key={form.key(`locations.${index}.price`)}
+                                                    // {...form.getInputProps(`locations.${index}.price`)}
                                                     {...form.getInputProps(`locations.${index}.price`)}
+                                                // onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                                                //     console.log("vo ne");
+                                                //     form.setFieldValue(`locations.${index}.price`, Number(event.target.value));
+                                                //     console.log("data", form.getValues());
+                                                //     event.target.focus();
+                                                // }
+                                                // }
+
+
                                                 />
                                             </Table.Th>
                                         </Table.Tr>);
@@ -172,6 +297,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                     <Button leftSection={<IconPlus size={14} />} variant="transparent" className="ml-2" size="sm" onClick={() => {
 
                                         form.insertListItem('locations', {
+                                            location: '',
                                             locationID: '',
                                             address: '',
                                             state: '',
@@ -195,7 +321,8 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 </ScrollArea>
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pb-0">
-                <Text className="text-sm font-semibold">Images</Text><Text className="ml-1 text-red-500">*</Text>
+                <Text className="text-sm font-semibold">Images</Text>
+                {/* <Text className="ml-1 text-red-500">*</Text> */}
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pt-0">
                 {
@@ -218,8 +345,13 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 <Dropzone
                     multiple
                     onDrop={(files) => {
-
+                        console.log(files);
                         const _files = form.getValues().images;
+                        if (_files.length + files.length > 10) {
+                            form.setFieldError('images', 'Only upload 10 files for every product');
+                            return;
+                        }
+
                         form.setFieldValue('images', [..._files, ...files]);
                     }}
                     maxSize={5 * 1024 ** 2}
@@ -251,13 +383,8 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
         </Grid>
 
         <Group mt="xl" className="flex justify-end">
-            <Button variant="default" onClick={close}>Close</Button>
-            <Button onClick={() => {
-                const result = form.validate();
-                if (!result.hasErrors) {
-                    close();
-                }
-            }}>Save</Button>
+            <Button variant="default" onClick={() => close(false)}>Close</Button>
+            <Button onClick={handleSubmit}>Save</Button>
         </Group>
 
     </Modal >

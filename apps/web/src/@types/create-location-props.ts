@@ -1,4 +1,4 @@
 export interface CreateLocationProps {
     opened: boolean;
-    close: () => void;
+    close: (isReload: boolean) => void;
 }

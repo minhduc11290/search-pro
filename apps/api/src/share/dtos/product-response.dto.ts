@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ProductStatus } from '../consts/enums';
 
 export class MinLocationDto {
   @ApiProperty({
@@ -15,6 +16,9 @@ export class MinLocationDto {
 
   @ApiProperty({ required: true, example: '12345' })
   price!: number;
+
+  @ApiProperty({ required: true, example: '12345' })
+  locationId?: string;
 }
 
 class MinStoreDto {
@@ -72,4 +76,8 @@ export class ProductResponseDto {
 
   @ApiProperty({ required: false, type: [MinAttachmentDto] })
   attachments?: MinAttachmentDto[];
+
+  @ApiProperty({ required: true, example: 'ACTIVE' })
+  status!: ProductStatus;
+
 }

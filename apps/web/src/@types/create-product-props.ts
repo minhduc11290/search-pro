@@ -1,4 +1,4 @@
 export interface CreateProductProps {
     opened: boolean;
-    close: () => void;
+    close: (isReload: boolean) => void;
 }

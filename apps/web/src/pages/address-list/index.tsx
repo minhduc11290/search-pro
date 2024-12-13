@@ -15,34 +15,64 @@ import { LocationInfo } from "../../@types/location-props";
 import { Status } from "../../@types/enum/status";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import useStoreLocations from "../../hooks/store-locations";
+import { Store } from "../../@types/store-props";
+import { PAGINATION } from "../../constants/pagination";
+import { formatTime } from "../../utils/time";
 
 const AddressListPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    let storeId = location.state.id;
+    const storeId = location.state.id;
     console.log("storeId", storeId);
     const [data, setData] = useState<LocationInfo[]>([]);
+    const [dataFiltered, setDataFiltered] = useState<LocationInfo[]>([]);
+    const [dataDisplay, setDataDisplay] = useState<LocationInfo[]>([]);
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+
+    const [storeInfo, setStoreInfo] = useState<Store | null>(null);
+
     useEffect(() => {
-        setData([{
-            no: 1,
-            locationID: 'store001',
-            address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-            state: 'NJ',
-            zipCode: '08234',
-            openAt: '6:00am',
-            closeAt: '18:00pm',
-            status: Status.Active
-        }, {
-            no: 2,
-            locationID: 'store002',
-            address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-            state: 'NJ',
-            zipCode: '08234',
-            openAt: '6:00am',
-            closeAt: '18:00pm',
-            status: Status.Deactive
-        }]);
-    }, []);
+        if (dataFiltered && dataFiltered.length > 0) {
+
+            // console.log("start", start);
+            // console.log("end", start + PAGINATION.ITEMPERPAGE - 1);
+            setTotalPage(Math.ceil(dataFiltered.length / PAGINATION.ITEMPERPAGE));
+            getDataDisplay();
+
+        } else {
+            setDataDisplay([]);
+        }
+    }, [dataFiltered]);
+
+    const getDataDisplay = () => {
+        console.log("currentPage", currentPage);
+        if (dataFiltered && dataFiltered.length > 0) {
+            const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
+
+            const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
+            const _data = [...dataFiltered];
+            setDataDisplay(_data.slice(start, end));
+        }
+    }
+
+    useEffect(() => {
+        getDataDisplay();
+    }, [currentPage, dataFiltered]);
+
+    useEffect(() => {
+        getData();
+    }, [storeId]);
+
+    const { isLoading, getStoreLocations, getStoreInfoById } = useStoreLocations();
+    const getData = async () => {
+        const stores = await getStoreInfoById(storeId);
+        setStoreInfo(stores);
+        const locations = await getStoreLocations(storeId);
+        setData(locations);
+        setDataFiltered(locations);
+    }
 
     const [scrolled, setScrolled] = useState(false);
 
@@ -50,13 +80,13 @@ const AddressListPage = () => {
         setShowEdit(true);
         setLocationSelected(location);
     }
-    const rows = data.map((row) => (
+    const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
-            <Table.Td>{row.no}</Table.Td>
+            <Table.Td>{index + 1}</Table.Td>
             <Table.Td>{row.locationID}</Table.Td>
             <Table.Td>{row.address}</Table.Td>
             <Table.Td>{row.state} {row.zipCode}</Table.Td>
-            <Table.Td>{row.openAt} - {row.closeAt}</Table.Td>
+            <Table.Td>{formatTime(row.openAt)} - {formatTime(row.closeAt)}</Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive location' : 'Active account'} refProp="rootRef">
@@ -112,31 +142,50 @@ const AddressListPage = () => {
         closeAt: '',
         status: Status.Deactive
     });
+
+
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearch(value);
 
+        const dataFilter = data.filter(function (el) {
+            return el.address.includes(value)
+                || el.openAt.includes(value)
+                || el.closeAt.includes(value) || el.locationID?.includes(value);
+        });
+
+        console.log("dataFilter", dataFilter);
+
+        setDataFiltered(dataFilter);
     };
 
-    const hideEdit = () => {
+    const hideEdit = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowEdit(false)
     }
 
-    const hideCreate = () => {
+    const hideCreate = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowCreate(false)
     }
 
-    return <AuthLayout currentLink={PATH.STOREMANAGEMENT}  >
+
+
+    return <AuthLayout currentLink={PATH.STOREMANAGEMENT} isLoading={isLoading} >
         <Header title="Location list" isBack={true} onBackPress={() => {
             navigate(PATH.STOREMANAGEMENT)
         }}></Header>
         <div className="py-2 px-6 flex flex-row items-center">
             <Title order={4} className="text-base"> Owner's Store </Title>
-            <Text className="px-4 text-base">Brian Huynh</Text>
+            <Text className="px-4 text-base">{storeInfo?.ownerstore}</Text>
             <Title order={5} className="text-base"> Username </Title>
-            <Text className="px-4">Brian Huynh</Text>
+            <Text className="px-4">{storeInfo?.email}</Text>
             <Title order={5} className="text-base"> Status </Title>
-            <Text className="px-4">Active</Text>
+            <Text className="px-4">{storeInfo?.status == Status.Active ? 'Active' : 'Deactive'}</Text>
         </div>
         <Container fluid className="flex flex-1 mx-2">
             <div className="flex flex-1 flex-col justify-start">
@@ -150,7 +199,9 @@ const AddressListPage = () => {
                     />
 
                     <Container className="flex flex-row items-center flex-1 flex-grow justify-end mr-0 px-0">
-                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey">
+                        <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey" onClick={() => {
+                            getData();
+                        }}>
                             <IconRefresh style={{ width: '70%', height: '70%' }} stroke={1.5} />
                         </ActionIcon>
                         <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm" onClick={() => {
@@ -176,7 +227,7 @@ const AddressListPage = () => {
                     </ScrollArea>
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
-                    <Pagination total={2} />
+                    <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />
                 </Container>
             </div>
         </Container>

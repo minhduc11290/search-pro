@@ -14,11 +14,22 @@ import CreateProductPage from "./components/create";
 import { Status } from "../../@types/enum/status";
 import { Product } from "../../@types/product-props";
 import ListLocationPage from "./components/list-location";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Store } from "../../@types/store-props";
+import useStoreProducts from "../../hooks/store-products";
 const ProductsPage = () => {
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const storeId = location.state.id;
+    console.log("storeId", storeId);
     const [data, setData] = useState<Product[]>([]);
+    const [dataFiltered, setDataFiltered] = useState<Product[]>([]);
+    const [dataDisplay, setDataDisplay] = useState<Product[]>([]);
+    const [totalPage, setTotalPage] = useState<number>(0);
+    const [currentPage, setCurrentPage] = useState<number>(1);
+
+    const [storeInfo, setStoreInfo] = useState<Store | null>(null);
+
     const [locations, setLocations] = useState<ComboboxItem[]>([]);
 
     const [search, setSearch] = useState('');
@@ -27,68 +38,80 @@ const ProductsPage = () => {
     const [showList, setShowList] = useState(false);
 
     const [productSelected, setProductSelected] = useState<Product>({
+        id: '',
         no: 0,
         SKU: '',
         productName: '',
-        keysword: '',
+        keysword: [],
         description: '',
         locationInfo: [],
         image: '',
+        attachments: [],
         status: Status.Deactive
     });
 
-    useEffect(() => {
-        setData([{
-            no: 1,
-            SKU: 'pr001',
-            productName: 'Whiskey',
-            keysword: 'whis, wskey',
-            description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-            locationInfo: [{
-                locationID: 'store001',
-                address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-                state: 'NJ',
-                zipCode: '08234',
-                price: "0",
-            }, {
-                locationID: 'store002',
-                address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-                state: 'NJ',
-                zipCode: '08234',
-                price: "0",
-            }],
-            image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
-            status: Status.Active
-        }, {
-            no: 2,
-            SKU: 'pr001',
-            productName: 'Whiskey',
-            keysword: 'whis, wskey',
-            description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-            locationInfo: [{
-                locationID: 'store001',
-                address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-                state: 'NJ',
-                zipCode: '08234',
-                price: "0",
-            }, {
-                locationID: 'store002',
-                address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-                state: 'NJ',
-                zipCode: '08234',
-                price: "0",
-            }],
-            image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
-            status: Status.Active
-        },]);
+    const { isLoading, getStoreProducts, getStoreInfoById } = useStoreProducts();
+    const getData = async () => {
+        const stores = await getStoreInfoById(storeId);
+        setStoreInfo(stores);
+        const products = await getStoreProducts(storeId);
+        setData(products);
+        setDataFiltered(products);
+    }
 
-        setLocations([{
-            value: "1",
-            label: 'store001'
-        }, {
-            value: "2",
-            label: 'store002'
-        }])
+    useEffect(() => {
+        // setData([{
+        //     no: 1,
+        //     SKU: 'pr001',
+        //     productName: 'Whiskey',
+        //     keysword: 'whis, wskey',
+        //     description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //     locationInfo: [{
+        //         locationID: 'store001',
+        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //         state: 'NJ',
+        //         zipCode: '08234',
+        //         price: "0",
+        //     }, {
+        //         locationID: 'store002',
+        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //         state: 'NJ',
+        //         zipCode: '08234',
+        //         price: "0",
+        //     }],
+        //     image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
+        //     status: Status.Active
+        // }, {
+        //     no: 2,
+        //     SKU: 'pr001',
+        //     productName: 'Whiskey',
+        //     keysword: 'whis, wskey',
+        //     description: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //     locationInfo: [{
+        //         locationID: 'store001',
+        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //         state: 'NJ',
+        //         zipCode: '08234',
+        //         price: "0",
+        //     }, {
+        //         locationID: 'store002',
+        //         address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
+        //         state: 'NJ',
+        //         zipCode: '08234',
+        //         price: "0",
+        //     }],
+        //     image: 'https://res.cloudinary.com/dbibqov2j/image/upload/v1726197092/foods/monle_1726197090.jpg',
+        //     status: Status.Active
+        // },]);
+
+        // setLocations([{
+        //     value: "1",
+        //     label: 'store001'
+        // }, {
+        //     value: "2",
+        //     label: 'store002'
+        // }])
+        getData();
     }, []);
 
     const [scrolled, setScrolled] = useState(false);
@@ -102,11 +125,14 @@ const ProductsPage = () => {
             <Table.Td>{row.no}</Table.Td>
             <Table.Td>{row.SKU}</Table.Td>
             <Table.Td>{row.productName}</Table.Td>
-            <Table.Td>{row.keysword}</Table.Td>
+            <Table.Td>{row.keysword.join(",")}</Table.Td>
             <Table.Td>{row.description}</Table.Td>
             <Table.Td><a className="text-blue-500 cursor-pointer" onClick={(event) => {
                 event.preventDefault();
+                console.log("row", row);
+                setProductSelected(row);
                 setShowList(true);
+
             }}>Show location list</a></Table.Td>
             <Table.Td><Image
                 fit="contain"
@@ -160,11 +186,17 @@ const ProductsPage = () => {
 
     };
 
-    const hideEdit = () => {
+    const hideEdit = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowEdit(false)
     }
 
-    const hideCreate = () => {
+    const hideCreate = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
         setShowCreate(false)
     }
 
@@ -173,16 +205,16 @@ const ProductsPage = () => {
     }
 
     return <AuthLayout currentLink={PATH.STOREMANAGEMENT} >
-        <Header title="Location list" isBack={true} onBackPress={() => {
+        <Header title="Product list" isBack={true} onBackPress={() => {
             navigate(PATH.STOREMANAGEMENT)
         }}></Header>
         <div className="py-2 px-6 flex flex-row items-center">
             <Title order={4} className="text-base"> Owner's Store </Title>
-            <Text className="px-4 text-base">Brian Huynh</Text>
+            <Text className="px-4 text-base">{storeInfo?.ownerstore}</Text>
             <Title order={5} className="text-base"> Username </Title>
-            <Text className="px-4">Brian Huynh</Text>
+            <Text className="px-4">{storeInfo?.email}</Text>
             <Title order={5} className="text-base"> Status </Title>
-            <Text className="px-4">Active</Text>
+            <Text className="px-4">{storeInfo?.status == Status.Active ? 'Active' : 'Deactive'}</Text>
         </div>
         <Container fluid className="flex flex-1 mx-2">
             <div className="flex flex-1 flex-col justify-start">
@@ -253,13 +285,13 @@ const ProductsPage = () => {
                     </ScrollArea>
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
-                    <Pagination total={2} />
+                    <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />
                 </Container>
             </div>
         </Container>
         <CreateProductPage opened={showCreate} close={hideCreate} ></CreateProductPage>
         <EditProductPage opened={showEdit} productInfo={productSelected} close={hideEdit}></EditProductPage>
-        <ListLocationPage opened={showList} close={hideList} ></ListLocationPage>
+        <ListLocationPage opened={showList} close={hideList} locationPrice={productSelected.locationInfo} ></ListLocationPage>
     </AuthLayout>
 
 }

@@ -1,6 +1,7 @@
 import { ProductEntity } from '~/entities';
 import { BaseMapper } from '../base/BaseMapper';
 import { ProductResponseDto } from '~/share/dtos/product-response.dto';
+import { ProductStatus } from '~/share/consts/enums';
 
 export class ProductResponseMapper extends BaseMapper<
   ProductEntity,
@@ -13,6 +14,7 @@ export class ProductResponseMapper extends BaseMapper<
       name: source.name,
       keywords: source.keywords,
       description: source.description,
+      status: source.status ?? ProductStatus.INACTIVE,
       store: {
         id: source.store.id,
         name: source.store.name,
@@ -24,10 +26,12 @@ export class ProductResponseMapper extends BaseMapper<
         url: attachment.url,
       })),
       locations: source.productLocations?.map((productLocation) => ({
-        id: productLocation?.location.id,
+        locationId: productLocation?.location.id,
+        address: productLocation?.location.address,
         zipCode: productLocation?.location?.geoRef.zipCode,
         steName: productLocation?.location?.geoRef.steName,
         price: productLocation.price,
+        id: productLocation.id
       })),
     };
     return productDto;

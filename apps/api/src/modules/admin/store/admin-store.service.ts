@@ -29,7 +29,7 @@ export class AdminStoreService {
     return await this.em.findOne(
       StoreEntity,
       { id },
-      { populate: this.getPopulates(populate) },
+      { populate: this.getPopulates(populate), orderBy: { createdAt: 'DESC' } },
     );
   }
 
@@ -37,7 +37,7 @@ export class AdminStoreService {
     return this.em.find(
       StoreEntity,
       {},
-      { populate: this.getPopulates(populate) },
+      { populate: this.getPopulates(populate), orderBy: { createdAt: 'DESC' } },
     );
   }
 
@@ -47,6 +47,7 @@ export class AdminStoreService {
   ): Promise<StoreEntity[]> {
     return this.em.find(StoreEntity, condition, {
       populate: this.getPopulates(populate),
+      orderBy: { createdAt: 'DESC' }
     });
   }
 

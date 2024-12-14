@@ -21,21 +21,22 @@ export class ProductController {
   constructor(
     private readonly productService: ProductService,
     private readonly geoRefService: GeoRefService,
-  ) {}
+  ) { }
 
   @Get()
   @ApiOperation({ summary: 'List products' })
   @ApiResponse({
     status: 200,
-    type: PaginationResponseData<ProductLocationResponseDto>,
+    type: ProductLocationResponseDto // PaginationResponseData<ProductLocationResponseDto>,
   })
   async searchProducts(
     @Query() query: ProductFilterDto,
-  ): Promise<PaginationResponseData<ProductLocationResponseDto>> {
+  ): Promise<ProductLocationResponseDto[]> {
     const geoRef = await this.geoRefService.findOneByZipCodeAndSteName(
       query.zipCode,
       query.steName,
     );
+    console.log("geo", geoRef)
     const conditions: FilterQuery<ProductLocationEntity> = {
       location: {
         geoRef: geoRef,
@@ -46,13 +47,16 @@ export class ProductController {
         name: { $like: `%${query.productName}%` },
       };
     }
-    const { page = 1, limit = 10 } = query;
+    console.log("conditions", conditions)
+    // const { page = 1, limit = 10 } = query;
     const productLocations = await this.productService.findByCondition(
-      conditions,
-      { page, limit },
+      conditions
+      // { page, limit },
     );
+    console.log("productLocations", productLocations);
     const data = new ProductLocationResponseMapper().mapArray(productLocations);
-    return { data, page, limit };
+    // return { data, page, limit };
+    return data;
   }
 
   @Get(':productLocationId')
@@ -78,4 +82,8 @@ export class ProductController {
     }
     return new ProductLocationResponseMapper().map(store);
   }
+
+
+
+
 }

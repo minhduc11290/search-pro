@@ -2,7 +2,7 @@ import { ActionIcon, Button, Container, Pagination, rem, TextInput, Text, Title,
 import { AuthLayout } from "../../components/auth-layout";
 import { PATH } from "../../constants/paths";
 import { useEffect, useState } from 'react';
-import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
+import { Table, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './product-list.module.css';
 import { Header } from "../../components/header";
@@ -109,7 +109,7 @@ const ProductsPage = () => {
         }
     }
 
-    const [scrolled, setScrolled] = useState(false);
+    // const [scrolled, setScrolled] = useState(false);
 
     const moveToEdit = (product: Product) => {
         setShowEdit(true);
@@ -267,23 +267,23 @@ const ProductsPage = () => {
                     </Container>
                 </div>
                 <div>
-                    <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-                        <Table miw={700} className={classes.table} withTableBorder={true}>
-                            <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-                                <Table.Tr>
-                                    <Table.Th>No</Table.Th>
-                                    <Table.Th>SKU</Table.Th>
-                                    <Table.Th>Product name</Table.Th>
-                                    <Table.Th>Keysword</Table.Th>
-                                    <Table.Th>Description</Table.Th>
-                                    <Table.Th>Location</Table.Th>
-                                    <Table.Th>Image</Table.Th>
-                                    <Table.Th>Action</Table.Th>
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>{rows}</Table.Tbody>
-                        </Table>
-                    </ScrollArea>
+                    {/* <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}> */}
+                    <Table miw={700} className={classes.table} withTableBorder={true}>
+                        <Table.Thead className={cx(classes.header)}>
+                            <Table.Tr>
+                                <Table.Th>No</Table.Th>
+                                <Table.Th>SKU</Table.Th>
+                                <Table.Th>Product name</Table.Th>
+                                <Table.Th>Keysword</Table.Th>
+                                <Table.Th>Description</Table.Th>
+                                <Table.Th>Location</Table.Th>
+                                <Table.Th>Image</Table.Th>
+                                <Table.Th>Action</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
+                    {/* </ScrollArea> */}
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
                     <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />

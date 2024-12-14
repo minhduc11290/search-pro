@@ -17,6 +17,15 @@ export class MinLocationDto {
 
   @ApiProperty({ required: true, example: '12345' })
   price!: number;
+
+  @ApiProperty({ required: true, example: '12345' })
+  address?: string;
+
+  @ApiProperty({ required: true, example: '12345' })
+  openTime?: string;
+
+  @ApiProperty({ required: true, example: '12345' })
+  closeTime?: string;
 }
 
 export class LocationPriceDto {

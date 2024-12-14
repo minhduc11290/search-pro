@@ -2,7 +2,7 @@ import { ActionIcon, Button, Container, Pagination, rem, TextInput, Text } from 
 import { AuthLayout } from "../../components/auth-layout";
 import { PATH } from "../../constants/paths";
 import { useEffect, useState } from 'react';
-import { Table, ScrollArea, Tooltip, Switch } from '@mantine/core';
+import { Table, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './store-management.module.css';
 import { Header } from "../../components/header";
@@ -66,7 +66,7 @@ const StoreManagementPage = () => {
         setDataFiltered(stores);
     }
 
-    const [scrolled, setScrolled] = useState(false);
+    // const [scrolled, setScrolled] = useState(false);
 
     const moveToEdit = (store: Store) => {
         setShowEdit(true);
@@ -224,24 +224,25 @@ const StoreManagementPage = () => {
                     </Container>
                 </div>
                 <div>
-                    <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-                        <Table miw={700} className={classes.table} withTableBorder={true}>
-                            <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
-                                <Table.Tr>
-                                    <Table.Th>No</Table.Th>
-                                    <Table.Th>Owner's Store</Table.Th>
-                                    {/* <Table.Th>Username</Table.Th> */}
-                                    <Table.Th>Phone</Table.Th>
-                                    <Table.Th>Email</Table.Th>
-                                    <Table.Th>Status</Table.Th>
-                                    <Table.Th>Address List</Table.Th>
-                                    <Table.Th>Product List</Table.Th>
-                                    <Table.Th>Action</Table.Th>
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>{rows}</Table.Tbody>
-                        </Table>
-                    </ScrollArea>
+                    {/* <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}> */}
+                    <Table miw={700} className={classes.table} withTableBorder={true}>
+                        {/* <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}> */}
+                        <Table.Thead className={cx(classes.header)}>
+                            <Table.Tr>
+                                <Table.Th>No</Table.Th>
+                                <Table.Th>Owner's Store</Table.Th>
+                                {/* <Table.Th>Username</Table.Th> */}
+                                <Table.Th>Phone</Table.Th>
+                                <Table.Th>Email</Table.Th>
+                                <Table.Th>Status</Table.Th>
+                                <Table.Th>Address List</Table.Th>
+                                <Table.Th>Product List</Table.Th>
+                                <Table.Th>Action</Table.Th>
+                            </Table.Tr>
+                        </Table.Thead>
+                        <Table.Tbody>{rows}</Table.Tbody>
+                    </Table>
+                    {/* </ScrollArea> */}
                 </div>
                 <Container fluid className="mx-0 px-0 flex flex-row-reverse py-2">
                     <Pagination value={currentPage} total={totalPage} onChange={setCurrentPage} />

@@ -10,7 +10,7 @@ export class ProductService {
     'product.attachments',
     'location',
   ] as never[];
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager) { }
 
   private getPopulates(populate?: string[]) {
     if (populate) {
@@ -44,16 +44,16 @@ export class ProductService {
 
   async findByCondition(
     condition: FilterQuery<ProductLocationEntity>,
-    options: { page: number; limit: number },
+    // options: { page: number; limit: number },
     populate?: string[],
   ): Promise<ProductLocationEntity[]> {
-    const { page, limit } = options;
+    // const { page, limit } = options;
     const [productLocations] = await this.em.findAndCount(
       ProductLocationEntity,
       condition,
       {
-        limit,
-        offset: (page - 1) * limit,
+        // limit,
+        // offset: (page - 1) * limit,
         populate: this.getPopulates(populate),
       },
     );

@@ -27,7 +27,8 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
             .string().trim()
             .min(1, { message: 'Required information' }),
         name: z.string().trim().min(1, { message: 'Required information' }),
-        description: z.string().trim().min(1, { message: 'Required information' }),
+        // description: z.string().trim().min(1, { message: 'Required information' }),
+        description: z.string(),
         keywords: z.string().array().min(0, { message: 'Required information' }),
         locations: z.object({
             location: z
@@ -192,7 +193,6 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 <TextInput
                     label="Description"
                     placeholder="Enter description"
-                    withAsterisk
                     key={form.key('description')}
                     {...form.getInputProps('description')}
                 />

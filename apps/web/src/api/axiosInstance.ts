@@ -3,8 +3,8 @@ import axios from "axios";
 import { PATH } from "../constants/paths";
 
 const axiosInstance = axios.create({
-    baseURL: "http://localhost:6868/",
-    // baseURL: "https://dsa-api.devforce.one/", // Thay bằng URL API của bạn
+    // baseURL: "http://localhost:6868/",
+    baseURL: "https://dsa-api.devforce.one/", // Thay bằng URL API của bạn
     timeout: 10000, // Thời gian chờ tối đa
     headers: {
         "Content-Type": "application/json",

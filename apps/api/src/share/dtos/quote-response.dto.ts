@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 import { QuoteStatus } from '../consts/enums';
+import { MinAttachmentDto } from './product-response.dto';
 
 class MinProductDto {
   @ApiProperty({
@@ -14,6 +15,15 @@ class MinProductDto {
 
   @ApiProperty({ required: false, example: 'Product Name' })
   name?: string;
+
+  @ApiProperty({ required: false, example: 'Product Name' })
+  attachments?: MinAttachmentDto[];
+
+  @ApiProperty({ required: false, example: 'Product Name' })
+  description?: string;
+
+  @ApiProperty({ required: false, example: '3' })
+  price?: number;
 }
 
 class MinStoreDto {
@@ -53,25 +63,56 @@ class MinLocationDto {
   closeTime!: string;
 }
 
-class MinCommentDto {
+export class MinCommentDto {
   @ApiProperty({
     required: true,
     example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
   })
+  @IsString()
   id!: string;
 
   @ApiProperty({ required: true, example: 'outOfStock' })
+  @IsBoolean()
   outOfStock!: boolean;
 
   @ApiProperty({ required: false, example: 'price' })
+  @IsNumber()
   price?: number;
 
   @ApiProperty({ required: false, example: 'quantity' })
+  @IsNumber()
   quantity?: number;
 
   @ApiProperty({ required: false, example: 'content' })
   @IsOptional()
   content?: string;
+}
+
+export class ContactDto {
+  @ApiProperty({
+    example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
+  })
+  @IsString()
+  name?: string;
+
+  @ApiProperty({
+    example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
+  })
+  @IsString()
+  email?: string;
+
+  @ApiProperty({
+    example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
+  })
+  @IsString()
+  phone?: string;
+
+  @ApiProperty({
+    example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
+  })
+  @IsString()
+  note?: string;
+
 }
 
 export class QuoteResponseDto {
@@ -96,4 +137,11 @@ export class QuoteResponseDto {
 
   @ApiProperty({ required: false, example: 'WAITING' })
   status?: QuoteStatus;
+
+  @ApiProperty({
+    required: true,
+    example: '9da8b809-efdf-43ff-8ff5-03b364021fb6',
+  })
+  contact?: ContactDto;
+
 }

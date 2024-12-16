@@ -14,11 +14,12 @@ export class ProductLocationResponseMapper extends BaseMapper<
       sku: source.product.sku,
       name: source.product.name,
       keywords: source.product.keywords,
+      description: source.product.description,
       status: source.product.status ?? ProductStatus.INACTIVE,
       store: {
         id: source.location.store.id,
         name: source.location.store.name,
-       
+        phone: source.location.store.primaryPhone,
       },
       location: {
         id: source.location.id,

@@ -5,7 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
-  Post,
+  Put,
   Query,
   UseGuards,
 } from '@nestjs/common';
@@ -18,34 +18,37 @@ import {
 import { CurrentUser } from '~/decorators';
 import { QuoteResponseMapper } from '~/mappers/responses/QuoteResponseMapper';
 import {
+  MinCommentDto,
   QuoteCreationDto,
   QuoteFilterDto,
   QuoteResponseDto,
 } from '~/share/dtos';
 import { UserResponseDto } from '~/share/dtos/user-response.dto';
-import { QuoteService } from './quote.service';
+import { StoreQuoteService } from './quote.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { JwtGuard } from '../share/auth/guard';
 import { QuoteStatus } from '~/share/consts/enums';
 
-@ApiTags('App - Quotes')
-@Controller('quotes')
-@RolesGuard('APP_USER')
+@ApiTags('Store - Quotes')
+@Controller('store-quotes')
+@RolesGuard('STORE_OWNER')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
-export class QuoteController {
-  constructor(private readonly quoteService: QuoteService) { }
+export class StoreQuoteController {
+  constructor(private readonly quoteService: StoreQuoteService) { }
 
-  @Post()
-  @ApiOperation({ summary: 'Quote a product' })
+  @Put(":quoteId")
+  @ApiOperation({ summary: 'Respond quote' })
   @ApiResponse({ status: 200, type: [QuoteResponseDto] })
   async quoteProduct(
     @CurrentUser() user: UserResponseDto,
-    @Body() quoteData: QuoteCreationDto,
+    @Param('quoteId') quoteId: string,
+    @Body() quoteData: MinCommentDto,
   ): Promise<QuoteResponseDto> {
-    const quote = await this.quoteService.createQuote(user.id, quoteData);
+    console.log("quoteId", quoteId);
+    const quote = await this.quoteService.respondQuote(quoteId, quoteData, user.id);
 
-    const updatedQuote = await this.quoteService.findById(quote.id, user.id);
+    const updatedQuote = await this.quoteService.findByQuoteId(quoteId);
     if (!updatedQuote) {
       throw new NotFoundException('Product not found');
     }
@@ -57,9 +60,9 @@ export class QuoteController {
   @ApiResponse({ status: 200, type: [QuoteResponseDto] })
   async searchQuotes(
     @CurrentUser() user: UserResponseDto,
-    @Query() query: QuoteFilterDto,
   ): Promise<QuoteResponseDto[]> {
-    const quotes = await this.quoteService.findByStatus(user.id, query.status);
+    console.log("store", user.stores);
+    const quotes = await this.quoteService.findByStore(user.stores);
     return new QuoteResponseMapper().mapArray(quotes);
   }
 
@@ -70,7 +73,12 @@ export class QuoteController {
     @Param('quoteId') quoteId: string,
     @CurrentUser() user: UserResponseDto,
   ): Promise<QuoteResponseDto> {
-    const quote = await this.quoteService.findById(quoteId, user.id);
+    if (user.stores.length == 0) {
+      throw new NotFoundException('Store not found');
+    }
+    console.log("findByQuoteIdAndStore", quoteId);
+    console.log("store", user.stores);
+    const quote = await this.quoteService.findByQuoteIdAndStore(quoteId, user.stores);
     if (!quote) {
       throw new NotFoundException('Product not found');
     }

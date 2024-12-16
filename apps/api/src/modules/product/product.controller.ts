@@ -14,6 +14,7 @@ import { ProductLocationResponseDto } from '~/share/dtos/product-location-respon
 import { GeoRefService } from '../share/geo-ref/geo-ref.service';
 import { ProductService } from './product.service';
 import { ProductDetailFilterDto } from '~/share/dtos/product-detail-filter.dto';
+import { ProductStatus } from '~/share/consts/enums';
 
 @ApiTags('App - Products')
 @Controller('products')
@@ -37,14 +38,21 @@ export class ProductController {
       query.steName,
     );
     console.log("geo", geoRef)
+
     const conditions: FilterQuery<ProductLocationEntity> = {
       location: {
         geoRef: geoRef,
       },
     };
+
     if (query.productName) {
       conditions.product = {
         name: { $like: `%${query.productName}%` },
+        status: ProductStatus.ACTIVE
+      };
+    } else {
+      conditions.product = {
+        status: ProductStatus.ACTIVE
       };
     }
     console.log("conditions", conditions)
@@ -53,7 +61,7 @@ export class ProductController {
       conditions
       // { page, limit },
     );
-    console.log("productLocations", productLocations);
+    
     const data = new ProductLocationResponseMapper().mapArray(productLocations);
     // return { data, page, limit };
     return data;

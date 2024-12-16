@@ -11,7 +11,7 @@ import { QuoteModule } from './modules/quote/quote.module';
 import { GeoRefModule } from './modules/share/geo-ref/geo-ref.module';
 import { OrmModule } from './modules/share/orm/orm.module';
 import { UserModule } from './modules/user/user.module';
-
+import { StoreQuoteModule } from './modules/store-quote/quote.module';
 @Module({
   imports: [
     OrmModule,
@@ -20,6 +20,7 @@ import { UserModule } from './modules/user/user.module';
     UserModule,
     ProductModule,
     QuoteModule,
+    StoreQuoteModule,
     // StoreModule,
     FileModule,
     ConfigModule.forRoot({ isGlobal: true }),
@@ -43,7 +44,7 @@ import { UserModule } from './modules/user/user.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }
 function join(__dirname: string, arg1: string, arg2: string): string {
   return pathJoin(__dirname, arg1, arg2);
 }

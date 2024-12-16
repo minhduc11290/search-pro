@@ -5,12 +5,13 @@ import {
   QueryOrder,
 } from '@mikro-orm/core';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ContactEntity, ProductLocationEntity, QuoteEntity } from '~/entities';
+import { CommentEntity, ContactEntity, ProductLocationEntity, QuoteEntity, StoreEntity } from '~/entities';
 import { QuoteStatus } from '~/share/consts/enums';
-import { QuoteCreationDto } from '~/share/dtos';
+import { MinCommentDto, QuoteCreationDto } from '~/share/dtos';
+import { MinDto } from '~/share/dtos/min.dto';
 
 @Injectable()
-export class QuoteService {
+export class StoreQuoteService {
   public defaultPopulate: AutoPath<QuoteEntity, any> = [
     'store',
     'requestor',
@@ -109,5 +110,73 @@ export class QuoteService {
       populate: this.getPopulates(populate),
       orderBy: { createdAt: QueryOrder.DESC },
     });
+  }
+
+  async findByStore(
+    stores: MinDto<string>[],
+    status?: QuoteStatus,
+    populate?: string[],
+  ): Promise<QuoteEntity[]> {
+    const conditions: FilterQuery<QuoteEntity> = {};
+    const storeIds = stores.map(store => { return store.id });
+    conditions.store = { $in: storeIds };
+
+    return this.em.find(QuoteEntity, conditions, {
+      populate: this.getPopulates(populate),
+      orderBy: { createdAt: QueryOrder.DESC },
+    });
+  }
+
+  async respondQuote(quoteId: string, respond: MinCommentDto, userId: string) {
+
+    const quote = await this.em.findOneOrFail(QuoteEntity, quoteId);
+    const comment = this.em.create(CommentEntity, {
+      outOfStock: respond.outOfStock,
+      price: respond.price,
+      quantity: respond.quantity,
+      content: respond.content,
+      quote: quote,
+      sender: userId,
+    });
+
+
+    quote.assign({
+      comments: comment,
+      updatedBy: userId,
+      status: QuoteStatus.RESPONDED
+    });
+
+    await this.em.persistAndFlush(quote);
+
+  }
+
+
+  async findByQuoteId(
+    id: string
+  ): Promise<QuoteEntity | null> {
+    return this.em.findOne(
+      QuoteEntity,
+      { id },
+      {
+        populate: this.getPopulates(),
+      },
+    );
+  }
+
+  async findByQuoteIdAndStore(
+    id: string,
+    stores: MinDto<string>[],
+  ): Promise<QuoteEntity | null> {
+    const conditions: FilterQuery<QuoteEntity> = { id };
+    const storeIds = stores.map(store => { return store.id });
+    conditions.store = { $in: storeIds };
+
+    return this.em.findOne(
+      QuoteEntity,
+      conditions,
+      {
+        populate: this.getPopulates(),
+      },
+    );
   }
 }

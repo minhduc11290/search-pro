@@ -23,6 +23,7 @@ import { UserResponseDto } from '~/share/dtos/user-response.dto';
 import { JwtGuard } from '../share/auth/guard';
 import { StoreService } from './store.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
+import { StoreStatus } from '~/share/consts/enums';
 
 @ApiTags('Owner - Stores')
 @Controller('stores')
@@ -40,6 +41,7 @@ export class StoreController {
   ): Promise<StoreResponseDto[]> {
     const stores = await this.storeService.findByCondition({
       owners: [user.id],
+      status: StoreStatus.ACTIVE
     });
     return new StoreResponseMapper().mapArray(stores);
   }

@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem, Container, ActionIcon, Image } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -11,7 +11,11 @@ import useGeoRef from "../../../hooks/georef";
 import { GeoProps } from "../../../@types/geo-props";
 import useStoreLocations from "../../../hooks/store-locations";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
+import { phoneRegex } from "../../../utils/regex";
+import { FileInfo } from "../../../@types/file-info";
+import useStoreProducts from "../../../hooks/store-products";
 const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
     const location = useLocation();
     const storeId = location.state.id;
@@ -25,9 +29,20 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
         zipCode: z.string({ required_error: "Required information", invalid_type_error: "Required information", }).trim().min(1, { message: 'Required information' }),
         openAt: z.string().trim().min(1, { message: 'Required information' }),
         closeAt: z.string().trim().min(1, { message: 'Required information' }),
+        phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' }),
+
     });
 
-    const form = useForm({
+    const form = useForm<{
+        address: string,
+        state: string,
+        zipCode: string,
+        openAt: string,
+        closeAt: string,
+        status: Status,
+        images: FileWithPath[]
+        phone: string,
+    }>({
         mode: 'uncontrolled',
         initialValues: {
             address: '',
@@ -35,11 +50,15 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
             zipCode: '',
             openAt: '',
             closeAt: '',
-            status: Status.Deactive
+            status: Status.Deactive,
+            images: [],
+            phone: ''
         },
         validate: zodResolver(schema),
 
     });
+
+    const { uploadFile } = useStoreProducts();
 
     const handleSubmit = async () => {
         console.log("form", form.getValues());
@@ -48,6 +67,12 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
             // console.log(form.getValues());
             const geoRefId = geos.find((geo) => geo.steName == form.getValues().state && geo.zipCode == form.getValues().zipCode);
             if (geoRefId) {
+                let images: FileInfo[] = [];
+                if (form.getValues().images) {
+                    const { data } = await uploadFile(form.getValues().images);
+
+                    images = [...data];
+                }
                 const { result, errorMessage } = await createLocation(storeId, {
                     name: form.getValues().address,
                     address: form.getValues().address,
@@ -55,6 +80,13 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     closeTime: form.getValues().closeAt,
                     geoRefId: geoRefId?.id ?? "",
                     isActive: form.getValues().status == Status.Active,
+                    phone: form.getValues().phone,
+                    attachments: images.map((image) => {
+                        return {
+                            name: image.fileName,
+                            url: image.fileName,
+                        }
+                    }),
                 });
                 if (result) {
                     notifications.show({
@@ -164,6 +196,14 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     {...form.getInputProps('zipCode')}
                 />
             </Grid.Col>
+            <Grid.Col span={12} >
+                <TextInput
+                    label="Phone"
+                    placeholder="Enter phone"
+                    key={form.key('phone')}
+                    {...form.getInputProps('phone')}
+                />
+            </Grid.Col>
             <Grid.Col span={12} className="flex flex-row">
                 <Title order={4}>Open time</Title><Text className="text-red">*</Text>
             </Grid.Col>
@@ -192,6 +232,56 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     form.setFieldValue('status', event.currentTarget.checked ? Status.Active : Status.Deactive)
                 }} ></Switch>
                 <Text className="ml-2 font-normal text-sm">Active/ Deactive location</Text>
+            </Grid.Col>
+            <Grid.Col span={12} className="flex flex-row pt-0">
+                {
+                    form.getValues().images.map((file, index) =>
+                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={index}>
+
+                            <Image className="w-full h-full" radius="md" fit="contain"
+                                src={URL.createObjectURL(file) ?? ''}></Image>
+                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                () => {
+                                    form.removeListItem('images', index);
+                                }
+                            }>
+                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                            </ActionIcon>
+                        </Container>
+                    )
+
+                }
+                <Dropzone
+                    multiple
+                    onDrop={(files) => {
+                        console.log(files);
+                        const _files = form.getValues().images;
+                        if (_files.length + files.length > 10) {
+                            form.setFieldError('images', 'Only upload 10 files for every product');
+                            return;
+                        }
+
+                        form.setFieldValue('images', [..._files, ...files]);
+                    }}
+                    maxSize={5 * 1024 ** 2}
+                    accept={IMAGE_MIME_TYPE}
+                >
+                    <Container className="w-20 h-20 flex items-center justify-center border rounded-lg">
+                        <Group justify="center" gap="xl" mih={48} style={{ pointerEvents: 'none' }}>
+                            <Dropzone.Idle>
+                                <IconPlus
+                                    style={{ width: rem(20), height: rem(20), color: 'var(--mantine-color-dimmed)' }}
+                                    stroke={1.5}
+                                />
+                            </Dropzone.Idle>
+                        </Group>
+                    </Container>
+                </Dropzone>
+                {form.errors.files && (
+                    <Text c="red" mt={5}>
+                        {form.errors.files}
+                    </Text>
+                )}
             </Grid.Col>
         </Grid>
 

@@ -24,7 +24,8 @@ export class QuoteResponseMapper extends BaseMapper<
             url: attachment.url,
           }
         }),
-        description: source.productLocation.product.description
+        description: source.productLocation.product.description,
+        banner: source.productLocation.location.attachments.length > 0 ? source.productLocation.location.attachments[0].name : undefined
       },
       store: {
         id: source.store.id,

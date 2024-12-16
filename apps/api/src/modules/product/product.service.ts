@@ -9,6 +9,7 @@ export class ProductService {
     'product.store',
     'product.attachments',
     'location',
+    'location.attachments',
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 

@@ -20,6 +20,7 @@ export class QuoteService {
     'productLocation.location',
     'productLocation.product',
     'productLocation.product.attachments',
+    'productLocation.location.attachments',
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 

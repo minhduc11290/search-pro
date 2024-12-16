@@ -5,14 +5,16 @@ import {
   RequiredEntityData,
 } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { LocationEntity } from '~/entities';
+import { AttachmentEntity, LocationEntity } from '~/entities';
 import { LocationStatus } from '~/share/consts/enums';
+import { AttachmentDto } from '~/share/dtos/product-creation.dto';
 
 @Injectable()
 export class AdminLocationService {
   public defaultPopulate: AutoPath<LocationEntity, any> = [
     'store',
     'geoRef',
+    'attachments'
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 
@@ -51,9 +53,21 @@ export class AdminLocationService {
 
   async create(
     locationData: RequiredEntityData<LocationEntity>,
+    attachments?: AttachmentDto[]
   ): Promise<LocationEntity> {
 
     const location = this.em.create(LocationEntity, locationData);
+    if (attachments) {
+      const locationAttachments = attachments.map((attachment) =>
+        this.em.create(AttachmentEntity, {
+          name: attachment.name,
+          type: '',
+          url: attachment.url,
+          location: location,
+        }),
+      );
+      await this.em.persistAndFlush(locationAttachments);
+    }
     await this.em.persistAndFlush(location);
     return location;
   }
@@ -72,5 +86,30 @@ export class AdminLocationService {
     const location = await this.em.findOneOrFail(LocationEntity, id);
     location.status = LocationStatus.INACTIVE;
     await this.em.persistAndFlush(location);
+  }
+
+
+  // async deleteAttachment(
+  //   id: string
+  // ): Promise<void> {
+  //   await this.em.nativeDelete(AttachmentEntity, {
+  //     id
+  //   });
+  // }
+
+  async addAttachment(locationId: string, attachments: AttachmentDto[]): Promise<AttachmentEntity[]> {
+    let location = await this.findById(locationId);
+
+    const productAttachments = attachments.map((attachment) =>
+      this.em.create(AttachmentEntity, {
+        name: attachment.name,
+        type: '',
+        url: attachment.url,
+        location: location,
+      }),
+
+    );
+    await this.em.persistAndFlush(productAttachments);
+    return productAttachments;
   }
 }

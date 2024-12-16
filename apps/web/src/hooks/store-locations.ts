@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Status } from "../@types/enum/status";
 import { LocationInfo, LocationInfoRequest } from "../@types/location-props";
-import { apiGetStoreLocations, apiPostStoreLocation, apiPutStoreLocation } from "../api/store-locations";
+import { apiAddLocationAttachement, apiGetStoreLocations, apiPostStoreLocation, apiPutStoreLocation } from "../api/store-locations";
 import { Store } from "../@types/store-props";
 import { apiGetStoreById } from "../api/stores";
 import { AxiosError } from "axios";
+import { Attachment } from "../@types/product-props";
 
 const useStoreLocations = () => {
 
@@ -37,6 +38,8 @@ const useStoreLocations = () => {
                         openAt: item.openTime,
                         closeAt: item.closeTime,
                         status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                        phone: item.phone,
+                        attachments: item.attachments
                     }
                     return location;
                 });
@@ -81,7 +84,7 @@ const useStoreLocations = () => {
         try {
             setIsLoading(true);
             const response = await apiPutStoreLocation(storeId, locationId, locationInfo);
-            if (response.status == 201) {
+            if (response.status == 200) {
                 result = true;
             }
         } catch (ex) {
@@ -126,10 +129,35 @@ const useStoreLocations = () => {
     }, []);
 
 
+    const addLocationAttachment = useCallback(async (productId: string, files: Attachment[]) => {
+        let result = false;
+        let errorMessage = "";
+        try {
+            setIsLoading(true);
+            // const strFiles: string[] = [];
+            // files.forEach(file => {
+            //     strFiles.push(file.name);
+            // });
+            const response = await apiAddLocationAttachement(productId, files);
+            if (response.status == 201) {
+                result = true;
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage };
+    }, []);
 
 
-
-    return { isLoading, getStoreLocations, getStoreInfoById, createLocation, updateLocation };
+    return { isLoading, getStoreLocations, getStoreInfoById, createLocation, updateLocation, addLocationAttachment };
 };
 
 export default useStoreLocations;

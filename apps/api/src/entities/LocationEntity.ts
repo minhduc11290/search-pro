@@ -35,4 +35,7 @@ export class LocationEntity extends BaseEntity<LocationEntity> {
 
   @OneToMany(() => AttachmentEntity, 'location')
   attachments = new Collection<AttachmentEntity>(this);
+
+  @Property({ length: 100, nullable: true })
+  phone?: string;
 }

@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsBoolean, IsOptional, IsArray } from 'class-validator';
+import { AttachmentDto } from './product-creation.dto';
+import { Type } from 'class-transformer';
 
 export class LocationCreationDto {
   @ApiProperty({ example: 'Location Name' })
@@ -26,5 +28,16 @@ export class LocationCreationDto {
   @IsNotEmpty()
   @IsBoolean()
   isActive!: boolean;
+
+  @ApiProperty({ example: '9da8b809-efdf-43ff-8ff5-03b364021fb6' })
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+
+  @ApiProperty({ required: true, type: [AttachmentDto] })
+  @IsArray()
+  @Type(() => AttachmentDto)
+  attachments?: AttachmentDto[];
 
 }

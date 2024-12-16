@@ -25,9 +25,11 @@ import { UserResponseDto } from '~/share/dtos/user-response.dto';
 import { AdminLocationService } from './admin-location.service';
 import { LocationStatus } from '~/share/consts/enums';
 import { GeoRefService } from '~/modules/share/geo-ref/geo-ref.service';
+import { AttachmentDto } from '~/share/dtos/product-creation.dto';
+import { AttachmentEntity } from '~/entities';
 
 @ApiTags('System - Locations')
-@Controller('admin/stores/:storeId/locations')
+@Controller('admin')
 @RolesGuard('SUPER_ADMIN')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
@@ -36,7 +38,7 @@ export class AdminLocationController {
     private readonly geoService: GeoRefService
   ) { }
 
-  @Get()
+  @Get('stores/:storeId/locations')
   @ApiOperation({ summary: 'Location list' })
   @ApiResponse({ status: 200, type: [StoreLocationResponseDto] })
   async getLocations(
@@ -45,10 +47,11 @@ export class AdminLocationController {
     const locations = await this.adminLocationService.findByCondition({
       store: storeId,
     });
+    console.log("locations", locations);
     return new StoreLocationResponseMapper().mapArray(locations);
   }
 
-  @Get(':locationId')
+  @Get('stores/:storeId/locations/:locationId')
   @ApiOperation({ summary: 'Get location detail' })
   @ApiResponse({ status: 200, type: StoreLocationResponseDto })
   async getLocation(
@@ -62,7 +65,7 @@ export class AdminLocationController {
     return new StoreLocationResponseMapper().map(location);
   }
 
-  @Post()
+  @Post('stores/:storeId/locations/')
   @ApiOperation({ summary: 'Create a new location' })
   @ApiResponse({ status: 201, type: StoreLocationResponseDto })
   async create(
@@ -77,12 +80,14 @@ export class AdminLocationController {
     const location = await this.adminLocationService.create({
       ...creationData,
       createdBy: user.id,
-    });
+    }, locationCreationDto.attachments);
+
+
     return new StoreLocationResponseMapper().map(location);
   }
 
 
-  @Put(':locationId')
+  @Put('/stores/:storeId/locations/:locationId')
   @ApiOperation({ summary: 'Update a Location' })
   @ApiResponse({ status: 200, type: StoreLocationResponseDto })
   async updateStore(
@@ -111,6 +116,7 @@ export class AdminLocationController {
       geoRef: geo,
       status: status,
       updatedBy: user.id,
+      phone: locationCreationDto.phone ?? _location.phone
     });
 
     return new StoreLocationResponseMapper().map(location);
@@ -118,10 +124,38 @@ export class AdminLocationController {
 
   }
 
-  @Delete(':locationId')
+  @Delete('/stores/:storeId/locations/:locationId')
   @ApiOperation({ summary: 'Inactive a location' })
   @ApiResponse({ status: 200 })
   async deleteLocation(@Param('id') id: string): Promise<void> {
     return this.adminLocationService.softDelete(id);
   }
+
+
+  @Post('/locations/:locationId/attachment')
+  @ApiOperation({ summary: 'Add an attachments product' })
+  @ApiResponse({ status: 200 })
+  async addAttachment(
+    @Param('locationId') locationId: string,
+    @Body() attachments: AttachmentDto[],
+  ): Promise<AttachmentEntity[]> {
+    return this.adminLocationService.addAttachment(
+      locationId,
+      attachments
+    );
+
+  }
+
+  // @Delete('/attachment/:attachmentId')
+  // @ApiOperation({ summary: 'Delete an attachments product' })
+  // @ApiResponse({ status: 200 })
+  // async deleteAttachment(
+  //   @Param('attachmentId') attachmentId: string,
+  // ): Promise<void> {
+  //   return this.adminLocationService.deleteAttachment(
+  //     attachmentId
+  //   );
+
+  // }
+
 }

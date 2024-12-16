@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem, Container, ActionIcon, Image } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -11,7 +11,13 @@ import { GeoProps } from "../../../@types/geo-props";
 import useStoreLocations from "../../../hooks/store-locations";
 import { useLocation } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone";
+import { Attachment } from "../../../@types/product-props";
+import { getLink } from "../../../utils/image";
+import { phoneRegex } from "../../../utils/regex";
+import useStoreProducts from "../../../hooks/store-products";
+import { FileInfo } from "../../../@types/file-info";
 
 const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => {
     const location = useLocation();
@@ -21,11 +27,22 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
             .string().trim()
             .min(1, { message: 'Required information' }),
         state: z.string().trim().min(1, { message: 'Required information' }),
-        zipCode: z.string().min(5, { message: 'Required information' })
-
+        zipCode: z.string().min(5, { message: 'Required information' }),
+        phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' }),
+        openAt: z.string().trim().min(1, { message: 'Required information' }),
+        closeAt: z.string().trim().min(1, { message: 'Required information' }),
     });
 
-    const form = useForm({
+    const form = useForm<{
+        address: string,
+        state: string,
+        zipCode: string,
+        openAt: string,
+        closeAt: string,
+        status: Status,
+        images: FileWithPath[]
+        phone: string,
+    }>({
         mode: 'uncontrolled',
         initialValues: {
             address: locationInfo.address,
@@ -33,7 +50,10 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
             zipCode: locationInfo.zipCode,
             openAt: locationInfo.openAt,
             closeAt: locationInfo.closeAt,
-            status: locationInfo.status
+            status: locationInfo.status,
+            phone: locationInfo.phone ?? '',
+            images: [],
+
         },
         validate: zodResolver(schema),
 
@@ -53,17 +73,23 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
             zipCode: locationInfo.zipCode,
             openAt: locationInfo.openAt,
             closeAt: locationInfo.closeAt,
-            status: locationInfo.status
+            status: locationInfo.status,
+            phone: locationInfo.phone,
+            images: []
         })
+        setImages(locationInfo.attachments ?? []);
     }
 
-    const { updateLocation } = useStoreLocations();
+    const { updateLocation, addLocationAttachment } = useStoreLocations();
 
     const { getGeoRef } = useGeoRef();
 
     const [geos, setGeos] = useState<GeoProps[]>([]);
     const [states, setStates] = useState<string[]>([]);
     const [zipCodes, setZipCodes] = useState<string[]>([]);
+    const [imageDelete, setImageDelete] = useState<string[]>([]);
+    const [images, setImages] = useState<Attachment[]>([]);
+
 
     const getData = async () => {
         const _geos = await getGeoRef();
@@ -100,12 +126,39 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
         setZipCodes(uniqueZipCodes);
 
     }
-
+    const { uploadFile, deleteAttachment } = useStoreProducts();
     const handleSubmit = async () => {
         const formData = form.validate();
         if (!formData.hasErrors) {
             const geoRefId = geos.find((geo) => geo.steName == form.getValues().state && geo.zipCode == form.getValues().zipCode);
             if (geoRefId) {
+                let images: FileInfo[] = [];
+                if (imageDelete) {
+                    for (const _image of imageDelete) {
+                        await deleteAttachment(_image);
+                    }
+                }
+
+                if (form.getValues().images && form.getValues().images.length > 0) {
+                    const { data } = await uploadFile(form.getValues().images);
+
+                    images = [...data];
+                    // for (const _image in data) {
+                    //     attachments.push({
+                    //         id: "",
+                    //         name: _image.fileName
+                    //     });
+                    // }
+                    const attachments: Attachment[] = images.map((image) => {
+                        return {
+                            name: image.fileName,
+                            url: image.fileName,
+                        }
+                    });
+                    await addLocationAttachment(locationInfo.locationID ?? '', attachments);
+                }
+
+
                 const { result, errorMessage } = await updateLocation(storeId, locationInfo.locationID, {
                     name: form.getValues().address,
                     address: form.getValues().address,
@@ -113,6 +166,13 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                     closeTime: form.getValues().closeAt,
                     geoRefId: geoRefId?.id ?? "",
                     isActive: form.getValues().status == Status.Active,
+                    phone: form.getValues().phone,
+                    attachments: images.map((image) => {
+                        return {
+                            name: image.fileName,
+                            url: image.fileName,
+                        }
+                    }),
                 });
                 if (result) {
                     notifications.show({
@@ -179,6 +239,14 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                     {...form.getInputProps('zipCode')}
                 />
             </Grid.Col>
+            <Grid.Col span={12} >
+                <TextInput
+                    label="Phone"
+                    placeholder="Enter phone"
+                    key={form.key('phone')}
+                    {...form.getInputProps('phone')}
+                />
+            </Grid.Col>
             <Grid.Col span={12} className="flex flex-row">
                 <Title order={4}>Open time</Title><Text className="text-red">*</Text>
             </Grid.Col>
@@ -207,6 +275,69 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                     form.setFieldValue('status', event.currentTarget.checked ? Status.Active : Status.Deactive)
                 }} ></Switch>
                 <Text className="ml-2 font-normal text-sm">Active/ Deactive location</Text>
+            </Grid.Col>
+            <Grid.Col span={12} className="flex flex-row pt-0">
+                {
+                    images && images.map((file, index) =>
+                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={`image_${index}`}>
+
+                            <Image className="w-full h-full" radius="md" fit="contain"
+                                src={getLink(file.name)}></Image>
+                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                () => {
+                                    // form.removeListItem('images', index);
+                                    // setImageDelete([...imageDelete, file.id]);
+                                    // setImages([...images.slice(index)]);
+                                    setImageDelete([...imageDelete, file.id!]);
+                                    console.log("index", index);
+                                    images.splice(index, 1);
+                                    setImages([...images]);
+                                }
+                            }>
+                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                            </ActionIcon>
+                        </Container>
+                    )
+                }
+
+                {
+                    form.getValues().images.map((file, index) =>
+                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={index}>
+
+                            <Image className="w-full h-full" radius="md" fit="contain"
+                                src={typeof file === "string" ? file : (URL.createObjectURL(file) ?? '')}></Image>
+                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                () => {
+                                    form.removeListItem('images', index);
+                                }
+                            }>
+                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                            </ActionIcon>
+                        </Container>
+                    )
+
+                }
+                <Dropzone
+                    multiple
+                    onDrop={(files) => {
+
+                        const _files = form.getValues().images;
+                        form.setFieldValue('images', [..._files, ...files]);
+                    }}
+                    maxSize={5 * 1024 ** 2}
+                    accept={IMAGE_MIME_TYPE}
+                >
+                    <Container className="w-20 h-20 flex items-center justify-center border rounded-lg">
+                        <Group justify="center" gap="xl" mih={48} style={{ pointerEvents: 'none' }}>
+                            <Dropzone.Idle>
+                                <IconPlus
+                                    style={{ width: rem(20), height: rem(20), color: 'var(--mantine-color-dimmed)' }}
+                                    stroke={1.5}
+                                />
+                            </Dropzone.Idle>
+                        </Group>
+                    </Container>
+                </Dropzone>
             </Grid.Col>
         </Grid>
 

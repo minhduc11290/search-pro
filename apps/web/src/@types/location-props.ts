@@ -1,4 +1,5 @@
 import { Status } from "./enum/status";
+import { Attachment } from "./product-props";
 
 export interface LocationInfo {
     no: number;
@@ -10,6 +11,8 @@ export interface LocationInfo {
     openAt: string;
     closeAt: string,
     status: Status
+    phone?: string,
+    attachments?: Attachment[];
 
 }
 
@@ -19,5 +22,7 @@ export interface LocationInfoRequest {
     openTime?: string;
     closeTime?: string,
     geoRefId?: string,
-    isActive: boolean
+    isActive: boolean,
+    phone?: string,
+    attachments?: Attachment[];
 }

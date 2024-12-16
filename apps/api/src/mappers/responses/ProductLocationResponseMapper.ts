@@ -19,8 +19,9 @@ export class ProductLocationResponseMapper extends BaseMapper<
       store: {
         id: source.location.store.id,
         name: source.location.store.name,
-        phone: source.location.store.primaryPhone,
+        phone: source.location.phone ?? source.location.store.primaryPhone,
       },
+
       location: {
         id: source.location.id,
         zipCode: source.location.geoRef.zipCode,
@@ -38,7 +39,8 @@ export class ProductLocationResponseMapper extends BaseMapper<
           type: attachment.type,
           url: attachment.url,
         }
-      })
+      }),
+      banner: source.location.attachments.length > 0 ? source.location.attachments[0].name : undefined
       // [
       //   {
       //     id: '1',

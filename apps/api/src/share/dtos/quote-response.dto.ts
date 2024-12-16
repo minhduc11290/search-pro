@@ -24,6 +24,9 @@ class MinProductDto {
 
   @ApiProperty({ required: false, example: '3' })
   price?: number;
+
+  @ApiProperty({ required: false, example: 'Banner' })
+  banner?: string;
 }
 
 class MinStoreDto {

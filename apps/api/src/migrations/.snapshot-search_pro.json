@@ -703,6 +703,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "uuid"
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
         }
       },
       "name": "locations",

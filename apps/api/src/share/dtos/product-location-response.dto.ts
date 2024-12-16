@@ -108,5 +108,6 @@ export class ProductLocationResponseDto {
   @ApiProperty({ required: true, example: 'ACTIVE' })
   status!: ProductStatus;
 
-
+  @ApiProperty({ required: true, example: 'ACTIVE' })
+  banner?: string;
 }

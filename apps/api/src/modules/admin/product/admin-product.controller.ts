@@ -50,35 +50,7 @@ export class AdminProductController {
     return new ProductResponseMapper().mapArray(products);
   }
 
-  // @Get('locations/:locationId/products')
-  // @ApiOperation({ summary: 'Get products by location' })
-  // @ApiResponse({ status: 200, type: [ProductLocationResponseDto] })
-  // async getProductsByLocation(
-  //   @Param('storeId') _: string,
-  //   @Param('locationId') locationId: string,
-  // ): Promise<ProductLocationResponseDto[]> {
-  //   const productLocations =
-  //     await this.adminProductService.findByLocation(locationId);
-  //   return new ProductLocationResponseMapper().mapArray(productLocations);
-  // }
-
-  // @Get('locations/:locationId/products/:productId')
-  // @ApiOperation({ summary: 'Get product detail in a location' })
-  // @ApiResponse({ status: 200, type: ProductLocationResponseDto })
-  // async getProductByProductId(
-  //   @Param('productId') productId: string,
-  //   @Param('locationId') locationId: string,
-  // ): Promise<ProductLocationResponseDto | null> {
-  //   const productLocation =
-  //     await this.adminProductService.findByProductAndLocation(
-  //       productId,
-  //       locationId,
-  //     );
-  //   if (!productLocation) {
-  //     return null;
-  //   }
-  //   return new ProductLocationResponseMapper().map(productLocation);
-  // }
+  
 
   //TODO:
   @Post('/stores/:storeId/products')

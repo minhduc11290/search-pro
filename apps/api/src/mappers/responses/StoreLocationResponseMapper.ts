@@ -23,6 +23,15 @@ export class StoreLocationResponseMapper extends BaseMapper<
         id: source.store.id,
         name: source.store.name,
       },
+      phone: source.phone,
+      attachments: source.attachments.length > 0 ? source.attachments?.map((attachment) => (
+        {
+          id: attachment.id,
+          name: attachment.name,
+          type: attachment.type,
+          url: attachment.url,
+        })) : [],
+
     };
     return storeLocationDto;
   }

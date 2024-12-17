@@ -6,7 +6,7 @@ import { Table, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './product-list.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconDownload, IconPlus, IconEdit } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconEdit } from "@tabler/icons-react";
 
 import { modals } from '@mantine/modals';
 import EditProductPage from "./components/edit"

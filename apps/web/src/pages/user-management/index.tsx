@@ -86,12 +86,12 @@ const UserManagementPage = () => {
     const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
             <Table.Td>{index + 1}</Table.Td>
-            <Table.Td>{row.userID}</Table.Td>
+            {/* <Table.Td>{row.userID}</Table.Td> */}
             <Table.Td>{row.userName}</Table.Td>
-            <Table.Td>{row.fullName}</Table.Td>
-            <Table.Td>{row.phone}</Table.Td>
+            {/* <Table.Td>{row.fullName}</Table.Td>
+            <Table.Td>{row.phone}</Table.Td> */}
             <Table.Td>{row.email}</Table.Td>
-            <Table.Td>{row.state}</Table.Td>
+            {/* <Table.Td>{row.state}</Table.Td> */}
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive account' : 'Active account'} refProp="rootRef">
@@ -159,12 +159,12 @@ const UserManagementPage = () => {
                             <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                                 <Table.Tr>
                                     <Table.Th>No</Table.Th>
-                                    <Table.Th>User ID</Table.Th>
+                                    {/* <Table.Th>User ID</Table.Th> */}
                                     <Table.Th>Username</Table.Th>
-                                    <Table.Th>Full name</Table.Th>
-                                    <Table.Th>Phone number</Table.Th>
+                                    {/* <Table.Th>Full name</Table.Th>
+                                    <Table.Th>Phone number</Table.Th> */}
                                     <Table.Th>Email</Table.Th>
-                                    <Table.Th>State/Zip</Table.Th>
+                                    {/* <Table.Th>State/Zip</Table.Th> */}
                                     <Table.Th>Action</Table.Th>
                                 </Table.Tr>
                             </Table.Thead>

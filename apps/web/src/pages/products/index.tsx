@@ -256,11 +256,11 @@ const ProductsPage = () => {
 
                         }} >Apply</Button>
 
-                        <Button leftSection={<IconDownload size={14} />} variant="default" className="ml-2" size="sm"
+                        {/* <Button leftSection={<IconDownload size={14} />} variant="default" className="ml-2" size="sm"
 
                             onClick={() => {
 
-                            }} >Import excel file</Button>
+                            }} >Import excel file</Button> */}
                         <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm" onClick={() => {
                             setShowCreate(true);
                         }} >Add new product</Button>

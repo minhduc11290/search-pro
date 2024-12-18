@@ -174,7 +174,7 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     label="State"
                     placeholder="State"
                     data={states}
-
+                    searchable
                     key={form.key('state')}
                     {...form.getInputProps('state')}
                     onChange={(_, option) => onChangeStates(option.value)}
@@ -194,6 +194,7 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
                     data={zipCodes}
                     key={form.key('zipCode')}
                     {...form.getInputProps('zipCode')}
+                    searchable
                 />
             </Grid.Col>
             <Grid.Col span={12} >

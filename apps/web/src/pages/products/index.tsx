@@ -6,7 +6,7 @@ import { Table, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './product-list.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconPlus, IconEdit } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconEdit, IconCheck, IconX } from "@tabler/icons-react";
 
 import { modals } from '@mantine/modals';
 import EditProductPage from "./components/edit"
@@ -19,6 +19,7 @@ import { Store } from "../../@types/store-props";
 import useStoreProducts from "../../hooks/store-products";
 import { PAGINATION } from "../../constants/pagination";
 import useStoreLocations from "../../hooks/store-locations";
+import { notifications } from "@mantine/notifications";
 const ProductsPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -52,7 +53,7 @@ const ProductsPage = () => {
         status: Status.Deactive
     });
 
-    const { isLoading, getStoreProducts, getStoreInfoById } = useStoreProducts();
+    const { isLoading, getStoreProducts, getStoreInfoById, updateProduct } = useStoreProducts();
     const getData = async () => {
         const stores = await getStoreInfoById(storeId);
         setStoreInfo(stores);
@@ -137,12 +138,34 @@ const ProductsPage = () => {
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive location' : 'Active account'} refProp="rootRef">
-                        <Switch checked={row.status == Status.Active} onChange={(event) => {
+                        <Switch checked={row.status == Status.Active} onChange={async (event) => {
                             const title = row.status == Status.Active ? 'Deactive account' : 'Active account';
                             const checked = event.currentTarget.checked;
-                            openModal(title, () => {
+                            openModal(title, async () => {
                                 row.status = (checked ? Status.Active : Status.Deactive);
                                 setData([...data]);
+
+                                const { result, errorMessage } = await updateProduct(row.id!, {
+                                    isActive: checked,
+                                });
+                                if (result) {
+                                    notifications.show({
+                                        title: `Success`,
+                                        message: `Product have been updated successfully`,
+                                        color: 'teal',
+                                        icon: <IconCheck style={{ width: rem(18), height: rem(18) }} />,
+                                        position: 'top-right'
+                                    });
+                                } else {
+                                    console.log("errorMessage", errorMessage);
+                                    notifications.show({
+                                        title: `Error`,
+                                        message: errorMessage,
+                                        color: 'red',
+                                        icon: <IconX />,
+                                        position: 'top-right'
+                                    });
+                                }
                             });
 
                         }} />

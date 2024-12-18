@@ -48,9 +48,9 @@ export interface ProductRequest {
 }
 
 export interface UpdateProductRequest {
-    sku: string,
-    name: string,
-    keywords: string[];
-    description: string;
+    sku?: string,
+    name?: string,
+    keywords?: string[];
+    description?: string;
     isActive: boolean
 }

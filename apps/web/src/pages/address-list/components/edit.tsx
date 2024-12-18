@@ -220,6 +220,7 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                     key={form.key('state')}
                     {...form.getInputProps('state')}
                     onChange={(_value, option) => onChangeStates(option?.value)}
+                    searchable
                 />
             </Grid.Col>
             <Grid.Col span={4} >
@@ -235,6 +236,7 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                     label="Zip code"
                     placeholder="Zip code"
                     data={zipCodes}
+                    searchable
                     key={form.key('zipCode')}
                     {...form.getInputProps('zipCode')}
                 />

@@ -116,6 +116,11 @@ const ProductsPage = () => {
         setShowEdit(true);
         setProductSelected(product);
     }
+
+    useEffect(() => {
+        getDataDisplay();
+    }, [currentPage, dataFiltered]);
+
     const rows = dataDisplay.map((row) => (
         <Table.Tr key={row.no}>
             <Table.Td>{row.no}</Table.Td>

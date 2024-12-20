@@ -83,7 +83,7 @@ const StoreManagementPage = () => {
                     Email: {_store?.email}
                 </Container>
                 <Container className="flex row">
-                    PW: {_store?.pw}
+                    Password: {_store?.pw}
                 </Container>
 
             </>

@@ -169,6 +169,7 @@ const useStoreProducts = () => {
                 phone: response.data.phone,
                 email: response.data.email,
                 status: response.data.status == "ACTIVE" ? Status.Active : Status.Deactive,
+                pw: response.data.pw
             };
         } catch (ex) {
             console.log(ex);

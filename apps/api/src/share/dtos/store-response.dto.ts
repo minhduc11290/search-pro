@@ -66,4 +66,8 @@ export class StoreResponseDto {
 
   @ApiProperty({ required: false, type: MinAttachmentDto })
   banner!: MinAttachmentDto;
+
+  @ApiProperty({ example: 'PW' })
+  pw?: string;
+
 }

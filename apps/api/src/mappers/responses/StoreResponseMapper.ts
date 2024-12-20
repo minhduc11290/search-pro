@@ -27,6 +27,7 @@ export class StoreResponseMapper extends BaseMapper<
         userName: owner.userName,
         email: owner.email,
       })),
+      pw: source.owners.length > 0 ? source.owners[0].pw : '',
       banner: {
         id: '1',
         name: 'banner',

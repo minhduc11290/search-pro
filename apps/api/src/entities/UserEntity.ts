@@ -36,6 +36,10 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @Property({ length: 100, nullable: true })
   password?: string;
 
+  @ApiProperty({ required: false, maxLength: 100 })
+  @Property({ length: 100, nullable: true })
+  pw?: string;
+
   @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
   @Property({ length: 100, nullable: false })
   @IsEmail()

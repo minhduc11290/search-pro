@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import useStore from "../../hooks/stores";
 import { PAGINATION } from "../../constants/pagination";
 import { notifications } from "@mantine/notifications";
+import useStoreProducts from "../../hooks/store-products";
 
 const StoreManagementPage = () => {
     const navigate = useNavigate();
@@ -71,6 +72,22 @@ const StoreManagementPage = () => {
     const moveToEdit = (store: Store) => {
         setShowEdit(true);
         setStoreSelected(store);
+    }
+    const { getStoreInfoById } = useStoreProducts();
+    const openPW = async (store: Store) => {
+        const _store = await getStoreInfoById(store.id);
+        modals.open({
+            title: 'Store info',
+            children: <>
+                <Container className="flex row">
+                    Email: {_store?.email}
+                </Container>
+                <Container className="flex row">
+                    PW: {_store?.pw}
+                </Container>
+
+            </>
+        })
     }
     const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
@@ -129,7 +146,7 @@ const StoreManagementPage = () => {
                     <ActionIcon variant="transparent" aria-label="Settings" className="mx-1" size="sm" onClick={() => moveToEdit(row)}>
                         <IconEdit style={{ width: '100%', height: '100%' }} stroke={1.5} />
                     </ActionIcon>
-                    <ActionIcon variant="transparent" aria-label="Settings" size="sm">
+                    <ActionIcon variant="transparent" aria-label="Settings" size="sm" onClick={() => openPW(row)}>
                         <IconLock style={{ width: '100%', height: '100%' }} stroke={1.5} />
                     </ActionIcon>
                 </Container>

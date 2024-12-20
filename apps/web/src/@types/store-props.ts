@@ -9,7 +9,7 @@ export interface Store {
     email: string;
     status: Status;
     password?: string;
-
+    pw?: string
 }
 
 export interface StoreRequest {

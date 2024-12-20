@@ -90,6 +90,7 @@ export class AdminStoreService {
       role: roleAppUser.id,
       password,
       emailVerified: true,
+      pw: storeOwnerDto.password
     });
     store.owners.add(owner);
 

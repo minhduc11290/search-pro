@@ -19,6 +19,7 @@ export class StoreQuoteService {
     'comments',
     'productLocation',
     'productLocation.location',
+    'productLocation.location.attachments',
     'productLocation.product',
     'productLocation.product.attachments',
   ] as never[];

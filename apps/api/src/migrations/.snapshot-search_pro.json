@@ -1087,6 +1087,16 @@
           "length": 100,
           "mappedType": "string"
         },
+        "pw": {
+          "name": "pw",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
+        },
         "email": {
           "name": "email",
           "type": "varchar(100)",

@@ -36,6 +36,7 @@ export class UserService {
       role: role.id,
       status: UserStatus.ACTIVE,
       emailVerified: true, //FIXME: use configuration
+      pw: userCreationDto.password
     };
     const user = this.em.create(UserEntity, requiredData);
     await this.em.persistAndFlush(user);

@@ -58,10 +58,12 @@ export class ProductCreationDto {
 
 export class ProductUpdateDto {
   @ApiProperty({ required: true, example: 'SKU123' })
+  @IsOptional()
   @IsString()
   sku?: string;
 
   @ApiProperty({ required: true, example: 'Product Name' })
+  @IsOptional()
   @IsString()
   name?: string;
 

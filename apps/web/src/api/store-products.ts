@@ -15,3 +15,4 @@ export const apiAddLocation = (productId: string, location: {
     price: number,
     id: string,
 }) => axiosInstance.post(`/admin/products/${productId}/locations`, location);
+export const apiDeleteLocation = (locationId: string) => axiosInstance.delete(`/admin/products/locations/${locationId}`);

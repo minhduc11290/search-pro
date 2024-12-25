@@ -4,7 +4,7 @@ import { Store } from "../@types/store-props";
 import { apiGetStoreById } from "../api/stores";
 import { AxiosError } from "axios";
 import { Attachment, LocationPrice, Product, ProductRequest, UpdateProductRequest } from "../@types/product-props";
-import { apiGetStoreProducts, apiPostStoreProduct, apiPutStoreProduct, apiUpdateLocation, apiAddAttachement, apiAddLocation, apiDeleteAttachement } from "../api/store-products";
+import { apiGetStoreProducts, apiPostStoreProduct, apiPutStoreProduct, apiUpdateLocation, apiAddAttachement, apiAddLocation, apiDeleteAttachement, apiDeleteLocation } from "../api/store-products";
 import { apiPostFile } from "../api/file";
 import { FileInfo } from "../@types/file-info";
 import { getLink } from "../utils/image";
@@ -179,6 +179,35 @@ const useStoreProducts = () => {
         return store;
     }, []);
 
+    const deleteLocations = useCallback(async (storeIds: string[]) => {
+        let result = false;
+        let errorMessage = "";
+        let statusCode = 201;
+        try {
+            setIsLoading(true);
+            console.log("storeIds:", storeIds);
+            for (const storeId of storeIds) {
+                console.log("storeId", storeId);
+                let response = await apiDeleteLocation(storeId);
+                if (response.status == 201) {
+                    result = true;
+                }
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                statusCode = ex.response?.status ?? 0;
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage, statusCode };
+    }, []);
+
 
     const deleteAttachment = useCallback(async (id: string) => {
         let result = false;
@@ -286,7 +315,7 @@ const useStoreProducts = () => {
     }, []);
 
 
-    return { isLoading, getStoreProducts, getStoreInfoById, createProduct, updateProduct, uploadFile, deleteAttachment, addAttachment, updateLocation, addLocation };
+    return { isLoading, getStoreProducts, getStoreInfoById, createProduct, updateProduct, uploadFile, deleteAttachment, addAttachment, updateLocation, addLocation, deleteLocations };
 };
 
 export default useStoreProducts;

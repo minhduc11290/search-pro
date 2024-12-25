@@ -10,7 +10,7 @@ export class ProductResponseMapper extends BaseMapper<
   map(source: ProductEntity): ProductResponseDto {
     const productDto: ProductResponseDto = {
       id: source.id,
-      sku: source.sku,
+      sku: source.sku ?? '',
       name: source.name,
       keywords: source.keywords,
       description: source.description,

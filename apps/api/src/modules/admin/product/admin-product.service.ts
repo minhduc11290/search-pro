@@ -150,6 +150,14 @@ export class AdminProductService {
     });
   }
 
+  async deleteLocation(
+    id: string
+  ): Promise<void> {
+    await this.em.nativeDelete(ProductLocationEntity, {
+      id
+    });
+  }
+
   async deleteAttachment(
     id: string
   ): Promise<void> {

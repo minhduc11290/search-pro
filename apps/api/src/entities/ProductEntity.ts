@@ -14,11 +14,11 @@ import { BaseEntity } from './BaseEntity';
 import { IsOptional } from 'class-validator';
 
 @Entity({ tableName: 'products' })
-@Unique({ properties: ['sku', 'store'] })
+// @Unique({ properties: ['sku', 'store'] })
 export class ProductEntity extends BaseEntity<ProductEntity> {
   @Property({ length: 100 })
   // @Unique()
-  sku!: string;
+  sku?: string;
 
   @Property({ length: 255, nullable: true })
   name!: string;

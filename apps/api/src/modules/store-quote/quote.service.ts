@@ -18,10 +18,10 @@ export class StoreQuoteService {
     'contact',
     'comments',
     'productLocation',
-    'productLocation.location',
-    'productLocation.location.attachments',
-    'productLocation.product',
-    'productLocation.product.attachments',
+    // 'productLocation.location',
+    // 'productLocation.location.attachments',
+    // 'productLocation.product',
+    // 'productLocation.product.attachments',
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 
@@ -65,6 +65,9 @@ export class StoreQuoteService {
       store: productLocation.location.store,
       requestor: requesterId,
       contact,
+      product: '',
+      geoRef: '',
+      locationId: ''
     });
     await this.em.persistAndFlush(quote);
     return quote;

@@ -61,7 +61,8 @@ export class ProductController {
       conditions
       // { page, limit },
     );
-    
+
+    console.log("productLocations", productLocations)
     const data = new ProductLocationResponseMapper().mapArray(productLocations);
     // return { data, page, limit };
     return data;

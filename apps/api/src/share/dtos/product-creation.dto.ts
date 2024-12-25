@@ -21,8 +21,9 @@ export class AttachmentDto {
 
 export class ProductCreationDto {
   @ApiProperty({ required: true, example: 'SKU123' })
+  @IsOptional()
   @IsString()
-  sku!: string;
+  sku?: string;
 
   @ApiProperty({ required: true, example: 'Product Name' })
   @IsString()

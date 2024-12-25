@@ -85,7 +85,7 @@ export class ProductLocationResponseDto {
   productId!: string;
 
   @ApiProperty({ required: true, example: 'SKU123' })
-  sku!: string;
+  sku?: string;
 
   @ApiProperty({ required: false, example: 'Product Name' })
   name?: string;

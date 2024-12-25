@@ -9,5 +9,5 @@ COPY . .
 
 RUN pnpm run build
 
-EXPOSE 5173
-CMD ["pnpm", "preview"]
+EXPOSE 4173
+CMD ["pnpm", "preview" , "--host", "0.0.0.0"]

@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, Select, TagsInput, ScrollArea, Table, ComboboxItem, rem, Image, ActionIcon } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Container, Select, TagsInput, ScrollArea, Table, ComboboxItem, rem, Image, ActionIcon, Textarea } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -6,7 +6,7 @@ import { Status } from "../../../@types/enum/status";
 import classes from '../product-list.module.css';
 import { useEffect, useState } from "react";
 import cx from 'clsx';
-import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from '@mantine/dropzone';
 import { LocationPrice } from "../../../@types/product-props";
 import { CreateProductProps } from "../../../@types/create-product-props";
@@ -21,25 +21,56 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
 
     const location = useLocation();
     const storeId = location.state.id;
+    const locationSchema = z.object({
+        location: z
+            .string().min(1, { message: 'Required information' }),
+        price: z.preprocess(
+            (value) => (typeof value === 'string' && value ? Number(value) : value),
+            z.number().min(0, { message: 'Price must be a positive number' })
+        ), // z.number(),
+    });
 
     const schema = z.object({
         sku: z
-            .string().trim()
-            .min(1, { message: 'Required information' }),
+            .string(),
         name: z.string().trim().min(1, { message: 'Required information' }),
         // description: z.string().trim().min(1, { message: 'Required information' }),
-        description: z.string(),
-        keywords: z.string().array().min(0, { message: 'Required information' }),
-        locations: z.object({
-            location: z
-                .string(),
-            price: z.preprocess(
-                (value) => (typeof value === 'string' ? Number(value) : value),
-                z.number().min(0, { message: 'Price must be a positive number' })
-            ) // z.number(),
-        }).array(),
+        description: z.string().max(1000, { message: 'Only 1000 character' }),
+        keywords: z.string().array(), //.min(0, { message: 'Required information' }),
+        // locations: z.object({
+        //     location: z
+        //         .string().min(1, { message: 'Required information' }),
+        //     price: z.preprocess(
+        //         (value) => (typeof value === 'string' && value ? Number(value) : value),
+        //         z.number().min(0, { message: 'Price must be a positive number' })
+        //     ), // z.number(),
+        // }).array().min(1, { message: 'Required information' }),
+        locations: z
+            .array(locationSchema).min(1, { message: 'Required information' }).superRefine((arr, ctx) => {
+                const seen = new Map(); // Track seen IDs with their indices
+                console.log("array", arr);
+                for (let i = 0; i < arr.length; i++) {
+                    const obj = arr[i];
+                    console.log("object", obj);
+                    if (seen.has(obj.location)) {
+                        console.log("vo day loi", obj);
+                        // Add an issue pointing to the duplicate's index
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            message: `Duplicate location`,
+                            path: [i, "location"], // Point to the current duplicate's index
+                        });
+                        // form.setFieldError(`locations.${i}.location`, `Duplicate location`);
+                        // return; // Stop on the first duplicate
+                    }
+                    seen.set(obj.location, obj);
 
+
+                }
+            })
     });
+
+
 
     const form = useForm<{
         sku: string,
@@ -95,7 +126,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
             const _locationData: ComboboxItem[] = _locations.map(location => {
                 return {
                     value: location.locationID,
-                    label: location.address
+                    label: location.address + " (" + location.state + " " + location.zipCode + ")"
                 }
             });
             setLocations(_locationData);
@@ -104,10 +135,14 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
     }
     const [scrolled, setScrolled] = useState(false);
 
+    console.log("errors", form.errors);
 
     const handleSubmit = async () => {
         console.log("data", form.getValues());
+        console.log("errors", form.errors);
         const formData = form.validate();
+        console.log("errors", form.errors);
+
         if (!formData.hasErrors) {
             let images: FileInfo[] = [];
             if (form.getValues().images) {
@@ -167,19 +202,11 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
         }
     }
 
-    return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
+    return (<Modal opened={opened} onClose={() => { }} size="xl" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Create new product </Title>
         <Grid grow>
-            <Grid.Col span={6} >
-                <TextInput
-                    label="SKU"
-                    placeholder="Enter SKU"
-                    withAsterisk
-                    key={form.key('sku')}
-                    {...form.getInputProps('sku')}
-                />
-            </Grid.Col>
-            <Grid.Col span={6} >
+
+            <Grid.Col span={12} >
                 <TextInput
                     label="Product Name"
                     placeholder="Enter product name"
@@ -190,11 +217,15 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
             </Grid.Col>
 
             <Grid.Col span={12} >
-                <TextInput
-                    label="Description"
+                <Textarea
+                    label="Description (1000 characters)"
                     placeholder="Enter description"
                     key={form.key('description')}
                     {...form.getInputProps('description')}
+                    autosize
+                    minRows={4}
+                    maxRows={4}
+                    maxLength={1000}
                 />
             </Grid.Col>
 
@@ -202,9 +233,17 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 <TagsInput
                     label="Keyword"
                     placeholder="Enter keyword"
-                    withAsterisk
                     key={form.key('keywords')}
                     {...form.getInputProps('keywords')}
+                />
+            </Grid.Col>
+            <Grid.Col span={12} >
+                <TextInput
+                    label="SKU"
+                    placeholder="Enter SKU"
+
+                    key={form.key('sku')}
+                    {...form.getInputProps('sku')}
                 />
             </Grid.Col>
             <Grid.Col span={12} className="flex flex-row pb-0">
@@ -216,20 +255,21 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                     <Table className={classes.table} withTableBorder={true}>
                         <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                             <Table.Tr>
-                                <Table.Th>Location ID</Table.Th>
-                                <Table.Th>Address</Table.Th>
-                                <Table.Th>State/Zip</Table.Th>
+                                <Table.Th style={{ width: '70%' }}>Location ID</Table.Th>
+                                {/* <Table.Th>Address</Table.Th>
+                                <Table.Th>State/Zip</Table.Th> */}
                                 <Table.Th>Product price</Table.Th>
+                                <Table.Th></Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
                             {
-                                form.getValues().locations.map((_, index) => {
+                                form.getValues().locations.map((item, index) => {
                                     return (
-                                        <Table.Tr key={index}>
+                                        <Table.Tr key={`${item.id ?? ""}_${item.locationID ?? ""}_location_${index}`}>
                                             <Table.Td>
                                                 <Select
-                                                    className="w-32"
+                                                    className="w-full"
                                                     placeholder="Location"
                                                     data={locations}
                                                     key={form.key(`locations.${index}.location`)}
@@ -252,7 +292,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                                     }}
                                                 />
                                             </Table.Td>
-                                            <Table.Td>
+                                            {/* <Table.Td>
                                                 <TextInput
                                                     disabled
                                                     placeholder="Enter address"
@@ -270,8 +310,8 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                                     key={form.key(`locations.${index}.state`)}
                                                     {...form.getInputProps(`locations.${index}.state`)}
                                                 />
-                                            </Table.Td>
-                                            <Table.Th>
+                                            </Table.Td> */}
+                                            <Table.Td>
                                                 <TextInput
                                                     type="number"
                                                     placeholder="Enter price"
@@ -279,17 +319,15 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                                     key={form.key(`locations.${index}.price`)}
                                                     // {...form.getInputProps(`locations.${index}.price`)}
                                                     {...form.getInputProps(`locations.${index}.price`)}
-                                                // onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                                                //     console.log("vo ne");
-                                                //     form.setFieldValue(`locations.${index}.price`, Number(event.target.value));
-                                                //     console.log("data", form.getValues());
-                                                //     event.target.focus();
-                                                // }
-                                                // }
-
-
                                                 />
-                                            </Table.Th>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <ActionIcon variant="transparent" aria-label="IconTrash" className="mx-1" size="sm" onClick={() => {
+                                                    form.removeListItem("locations", index);
+                                                }}>
+                                                    <IconTrash style={{ width: '100%', height: '100%' }} stroke={1.5} />
+                                                </ActionIcon>
+                                            </Table.Td>
                                         </Table.Tr>);
                                 })
                             }
@@ -305,7 +343,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                                             address: '',
                                             state: '',
                                             zipCode: '',
-                                            price: 0,
+                                            price: '',
                                         });
 
                                         // setLocatio([...locations])
@@ -322,7 +360,14 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                         </Table.Tbody>
                     </Table>
                 </ScrollArea>
+
             </Grid.Col>
+            {
+                form.errors.locations && <Grid.Col span={12} className="flex flex-row pt-0">
+                    <Text className="text-xs text-red-500"> {form.errors.locations}</Text>
+                </Grid.Col>
+
+            }
             <Grid.Col span={12} className="flex flex-row pb-0">
                 <Text className="text-sm font-semibold">Images</Text>
                 {/* <Text className="ml-1 text-red-500">*</Text> */}

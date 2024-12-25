@@ -16,11 +16,11 @@ export class QuoteService {
     'requestor',
     'contact',
     'comments',
-    'productLocation',
-    'productLocation.location',
-    'productLocation.product',
-    'productLocation.product.attachments',
-    'productLocation.location.attachments',
+    // 'productLocation',
+    // 'productLocation.location',
+    // 'productLocation.product',
+    // 'productLocation.product.attachments',
+    // 'productLocation.location.attachments',
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 
@@ -33,6 +33,7 @@ export class QuoteService {
 
   //FIXME: This method is not used anywhere in the codebase
   async createQuote(requesterId: string, data: QuoteCreationDto) {
+    console.log("da chay source moi");
     const existingQuote = await this.em.findOne(QuoteEntity, {
       productLocation: data.productLocationId,
       requestor: requesterId,
@@ -45,7 +46,7 @@ export class QuoteService {
     const productLocation = await this.em.findOne(
       ProductLocationEntity,
       { id: data.productLocationId },
-      { populate: ['location.store'] },
+      { populate: ['location.store', 'location', 'product', 'product.attachments', 'location.attachments', "location.geoRef"] },
     );
 
     if (!productLocation) {
@@ -64,7 +65,22 @@ export class QuoteService {
       store: productLocation.location.store,
       requestor: requesterId,
       contact,
+      product: productLocation.product.id,
+      geoRef: productLocation.location.geoRef.id,
+      locationId: productLocation.id,
+      price: productLocation.price,
+      sku: productLocation.product.sku,
+      name: productLocation.product.name,
+      description: productLocation.product.description,
+      locationName: productLocation.location.address,
+      address: productLocation.location.address,
+      openTime: productLocation.location.openTime,
+      closeTime: productLocation.location.closeTime,
+      // image: (productLocation.location?.attachments ?? []).length > 0 ? productLocation.location.attachments[0].name : '',
+      image: (productLocation.product?.attachments ?? []).length > 0 ? productLocation.product.attachments[0].name : '',
+      banner: (productLocation.location?.attachments ?? []).length > 0 ? productLocation.location.attachments[0].name : '',
     });
+    console.log("quote", quote);
     await this.em.persistAndFlush(quote);
     return quote;
   }

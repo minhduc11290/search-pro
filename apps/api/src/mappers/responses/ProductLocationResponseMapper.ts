@@ -11,7 +11,7 @@ export class ProductLocationResponseMapper extends BaseMapper<
     const productLocationDto: ProductLocationResponseDto = {
       id: source.id,
       productId: source.product.id,
-      sku: source.product.sku,
+      sku: source.product.sku ?? '',
       name: source.product.name,
       keywords: source.product.keywords,
       description: source.product.description,

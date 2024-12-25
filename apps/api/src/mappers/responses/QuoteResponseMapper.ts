@@ -12,20 +12,28 @@ export class QuoteResponseMapper extends BaseMapper<
       status: source.status,
 
       product: {
-        id: source.productLocation.product.id,
-        sku: source.productLocation.product.sku,
-        name: source.productLocation.product.name,
-        price: source.productLocation.price,
-        attachments: source.productLocation?.product?.attachments?.map((attachment) => {
-          return {
-            id: attachment.id,
-            name: attachment.name,
-            type: attachment.type,
-            url: attachment.url,
-          }
-        }),
-        description: source.productLocation.product.description,
-        banner: (source.productLocation.location?.attachments ?? []).length > 0 ? source.productLocation.location.attachments[0].name : undefined
+        // id: source.productLocation.product.id,
+        sku: source.sku ?? "",
+        name: source.name,
+        price: source.price,
+        attachments: [{
+          id: "",
+          name: source.image ?? "",
+          url: source.image ?? "",
+          type: "",
+        }],
+        // attachments: source.productLocation?.product?.attachments?.map((attachment) => {
+        //   return {
+        //     id: attachment.id,
+        //     name: attachment.name,
+        //     type: attachment.type,
+        //     url: attachment.url,
+        //   }
+        // }),
+        description: source.description,
+        // banner: (source.productLocation.location?.attachments ?? []).length > 0 ? source.productLocation.location.attachments[0].name : undefined
+        banner: (source.banner ?? ""),
+        id: source.locationId
       },
       store: {
         id: source.store.id,
@@ -33,12 +41,12 @@ export class QuoteResponseMapper extends BaseMapper<
         phone: source.store.primaryPhone ?? '',
       },
       location: {
-        id: source.productLocation.location.id,
-        price: source.productLocation.price,
-        name: source.productLocation.location.name,
-        address: source.productLocation.location.address,
-        openTime: source.productLocation.location.openTime ?? 'N/A',
-        closeTime: source.productLocation.location.closeTime ?? 'N/A',
+        id: source.locationId,
+        price: source.price ?? 0,
+        name: source.locationName ?? "",
+        address: source.address ?? "",
+        openTime: source.openTime ?? 'N/A',
+        closeTime: source.closeTime ?? 'N/A',
       },
       contact: {
         name: source?.contact?.name,

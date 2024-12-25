@@ -50,7 +50,7 @@ export class AdminProductController {
     return new ProductResponseMapper().mapArray(products);
   }
 
-  
+
 
   //TODO:
   @Post('/stores/:storeId/products')
@@ -61,9 +61,11 @@ export class AdminProductController {
     @CurrentUser() user: UserResponseDto,
     @Body() locationCreationDto: ProductCreationDto,
   ): Promise<ProductResponseDto> {
-    const _exsistProduct = await this.adminProductService.findByStoreSku(storeId, locationCreationDto.sku);
-    if (_exsistProduct) {
-      throw new ConflictException('sku already exists');
+    if (locationCreationDto.sku) {
+      const _exsistProduct = await this.adminProductService.findByStoreSku(storeId, locationCreationDto.sku);
+      if (_exsistProduct) {
+        throw new ConflictException('sku already exists');
+      }
     }
 
 
@@ -93,6 +95,14 @@ export class AdminProductController {
   ): Promise<ProductResponseDto> {
     const _productEntity = await this.adminProductService.findProductById(productId
     );
+
+    if (productUpdateDto.sku) {
+      const _exsistProduct = await this.adminProductService.findByStoreSku(_productEntity.store.id, productUpdateDto.sku);
+      if (_exsistProduct && _exsistProduct.id != _productEntity.id) {
+        throw new ConflictException('sku already exists');
+      }
+    }
+
     const updateData = new ProductUpdateEntityMapper().map(
       productUpdateDto,
       { updateBy: user.id, product: _productEntity },
@@ -177,6 +187,19 @@ export class AdminProductController {
   ): Promise<void> {
     return this.adminProductService.deleteAttachment(
       attachmentId
+    );
+
+  }
+
+  @Delete('/products/locations/:locationId')
+  @ApiOperation({ summary: 'Delete an attachments product' })
+  @ApiResponse({ status: 200, type: ProductCreationDto })
+  async deleteLocations(
+    @Param('locationId') locationId: string,
+  ): Promise<void> {
+
+    return this.adminProductService.deleteLocation(
+      locationId
     );
 
   }

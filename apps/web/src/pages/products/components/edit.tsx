@@ -5,7 +5,7 @@ import { z } from 'zod';
 import classes from '../product-list.module.css';
 import { useEffect, useState } from "react";
 import { Status } from "../../../@types/enum/status";
-import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
+import { IconCheck, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
 import cx from 'clsx';
 import { EditProductProps } from "../../../@types/edit-product-props";
 import { Attachment, LocationPrice } from "../../../@types/product-props";
@@ -21,24 +21,55 @@ import { FileInfo } from "../../../@types/file-info";
 const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
     const location = useLocation();
     const storeId = location.state.id;
+    const locationSchema = z.object({
+        location: z
+            .string().min(1, { message: 'Required information' }),
+        price: z.preprocess(
+            (value) => (typeof value === 'string' && value ? Number(value) : value),
+            z.number().min(0, { message: 'Price must be a positive number' })
+        ), // z.number(),
+    });
 
     const schema = z.object({
         sku: z
-            .string().trim()
-            .min(1, { message: 'Required information' }),
+            .string().trim(),
+        // .min(1, { message: 'Required information' }),
         name: z.string().trim().min(1, { message: 'Required information' }),
         // description: z.string().trim().min(1, { message: 'Required information' }),
-        description: z.string(),
-        keywords: z.string().array().min(0, { message: 'Required information' }),
-        locations: z.object({
-            location: z
-                .string(),
-            price: z.preprocess(
-                (value) => (typeof value === 'string' ? Number(value) : value),
-                z.number().min(0, { message: 'Price must be a positive number' })
-            ),
-        }).array(),
+        description: z.string().max(1000, { message: 'Only 1000 character' }),
+        // keywords: z.string().array().min(0, { message: 'Required information' }),
+        keywords: z.string().array(),
+        // locations: z.object({
+        //     location: z
+        //         .string(),
+        //     price: z.preprocess(
+        //         (value) => (typeof value === 'string' ? Number(value) : value),
+        //         z.number().min(0, { message: 'Price must be a positive number' })
+        //     ),
+        // }).array(),
+        locations: z
+            .array(locationSchema).min(1, { message: 'Required information' }).superRefine((arr, ctx) => {
+                const seen = new Map(); // Track seen IDs with their indices
+                console.log("array", arr);
+                for (let i = 0; i < arr.length; i++) {
+                    const obj = arr[i];
+                    console.log("object", obj);
+                    if (seen.has(obj.location)) {
+                        console.log("vo day loi", obj);
+                        // Add an issue pointing to the duplicate's index
+                        ctx.addIssue({
+                            code: z.ZodIssueCode.custom,
+                            message: `Duplicate location`,
+                            path: [i, "location"], // Point to the current duplicate's index
+                        });
+                        // form.setFieldError(`locations.${i}.location`, `Duplicate location`);
+                        // return; // Stop on the first duplicate
+                    }
+                    seen.set(obj.location, obj);
 
+
+                }
+            })
     });
 
     const form = useForm<{
@@ -63,12 +94,12 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         validate: zodResolver(schema),
 
     });
-
+    const [locationDelete, setLocationDelete] = useState<string[]>([]);
     const [imageDelete, setImageDelete] = useState<string[]>([]);
     const [images, setImages] = useState<Attachment[]>([]);
 
     const { getStoreLocations } = useStoreLocations();
-    const { updateProduct, uploadFile, updateLocation, addLocation, addAttachment, deleteAttachment } = useStoreProducts();
+    const { updateProduct, uploadFile, updateLocation, addLocation, addAttachment, deleteAttachment, deleteLocations } = useStoreProducts();
     const [locations, setLocations] = useState<ComboboxItem[]>([]);
     const [locationsDB, setLocationsDB] = useState<LocationInfo[]>([]);
 
@@ -79,7 +110,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
             const _locationData: ComboboxItem[] = _locations.map(location => {
                 return {
                     value: location.locationID,
-                    label: location.address
+                    label: location.address + " (" + location.state + " " + location.zipCode + ")"
                 }
             });
             setLocations(_locationData);
@@ -143,6 +174,11 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
             const locations = form.getValues().locations;
             //update locations 
             console.log("locations", locations);
+
+            if (locationDelete && locationDelete.length > 0) {
+                await deleteLocations(locationDelete);
+            }
+
             const filterUpdateLocation = locations.filter((location) => location.status != 'ADD')
             console.log("filterUpdateLocation", filterUpdateLocation);
             if (filterUpdateLocation) {
@@ -154,7 +190,6 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
             const filterAddLocation = locations.filter((location) => location.status == 'ADD')
             console.log("filterAddLocation", filterAddLocation);
             if (filterAddLocation) {
-
                 for (const _location of filterAddLocation) {
                     await addLocation(productInfo.id ?? '', _location);
                 }
@@ -220,19 +255,11 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
         }
     }
 
-    return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
+    return (<Modal opened={opened} onClose={() => { }} size="xl" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Edit product </Title>
         <Grid grow>
-            <Grid.Col span={6} >
-                <TextInput
-                    label="SKU"
-                    placeholder="Enter SKU"
-                    withAsterisk
-                    key={form.key('sku')}
-                    {...form.getInputProps('sku')}
-                />
-            </Grid.Col>
-            <Grid.Col span={6} >
+
+            <Grid.Col span={12} >
                 <TextInput
                     label="Product Name"
                     placeholder="Enter product name"
@@ -244,7 +271,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
 
             <Grid.Col span={12} >
                 <TextInput
-                    label="Description"
+                    label="Description (1000 characters)"
                     placeholder="Enter description"
                     key={form.key('description')}
                     {...form.getInputProps('description')}
@@ -255,11 +282,20 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                 <TagsInput
                     label="Keyword"
                     placeholder="Enter keyword"
-                    withAsterisk
                     key={form.key('keywords')}
                     {...form.getInputProps('keywords')}
                 />
             </Grid.Col>
+
+            <Grid.Col span={12} >
+                <TextInput
+                    label="SKU"
+                    placeholder="Enter SKU"
+                    key={form.key('sku')}
+                    {...form.getInputProps('sku')}
+                />
+            </Grid.Col>
+
             <Grid.Col span={12} className="flex flex-row pb-0">
                 <Text className="text-sm font-semibold">Select location</Text>
                 {/* <Text className="ml-1 text-red-500">*</Text> */}
@@ -269,20 +305,21 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                     <Table className={classes.table} withTableBorder={true}>
                         <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                             <Table.Tr>
-                                <Table.Th>Location ID</Table.Th>
-                                <Table.Th>Address</Table.Th>
-                                <Table.Th>State/Zip</Table.Th>
+                                <Table.Th style={{ width: '70%' }}>Location ID</Table.Th>
+                                {/* <Table.Th>Address</Table.Th>
+                                <Table.Th>State/Zip</Table.Th> */}
                                 <Table.Th>Product price</Table.Th>
+                                <Table.Th></Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>
                             {
-                                Array.isArray(form.getValues().locations) && form.getValues().locations.map((_, index) => {
+                                Array.isArray(form.getValues().locations) && form.getValues().locations.map((item, index) => {
                                     return (
-                                        <Table.Tr key={`location_${index}`}>
+                                        <Table.Tr key={`${item.id ?? ""}_location_${index}`}>
                                             <Table.Td>
                                                 <Select
-                                                    className="w-32"
+                                                    className="w-full"
                                                     placeholder="Location"
                                                     data={locations}
                                                     key={form.key(`locations.${index}.location`)}
@@ -306,7 +343,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                                     }}
                                                 />
                                             </Table.Td>
-                                            <Table.Td>
+                                            {/* <Table.Td>
                                                 <TextInput
                                                     disabled
                                                     placeholder="Enter address"
@@ -323,8 +360,8 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                                     key={form.key(`locations.${index}.state`)}
                                                     {...form.getInputProps(`locations.${index}.state`)}
                                                 />
-                                            </Table.Td>
-                                            <Table.Th>
+                                            </Table.Td> */}
+                                            <Table.Td>
                                                 <TextInput
                                                     placeholder="Enter price"
                                                     withAsterisk
@@ -338,7 +375,25 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
                                                 // }}
 
                                                 />
-                                            </Table.Th>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <ActionIcon variant="transparent" aria-label="IconTrash" className="mx-1" size="sm" onClick={() => {
+                                                    console.log("removeItem", index);
+                                                    if (!form.getValues().locations[index].id) {
+                                                        form.removeListItem('locations', index);
+                                                    } else {
+                                                        console.log("id-delete", form.getValues().locations[index].id);
+                                                        setLocationDelete([...locationDelete, form.getValues().locations[index].id!]);
+                                                        form.removeListItem('locations', index);
+                                                    }
+                                                    // console.log("locations", form.getValues().locations);
+                                                    // form.setFieldValue("locations", form.getValues().locations);
+
+                                                    // form.removeListItem("locations", index);
+                                                }}>
+                                                    <IconTrash style={{ width: '100%', height: '100%' }} stroke={1.5} />
+                                                </ActionIcon>
+                                            </Table.Td>
                                         </Table.Tr>);
                                 })
                             }

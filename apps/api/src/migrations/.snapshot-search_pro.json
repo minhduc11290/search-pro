@@ -545,17 +545,6 @@
       "schema": "public",
       "indexes": [
         {
-          "keyName": "products_sku_store_id_unique",
-          "columnNames": [
-            "sku",
-            "store_id"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
           "keyName": "products_pkey",
           "columnNames": [
             "id"
@@ -1329,14 +1318,52 @@
           "length": 6,
           "mappedType": "datetime"
         },
-        "product_location_id": {
-          "name": "product_location_id",
+        "product_location": {
+          "name": "product_location",
           "type": "uuid",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "mappedType": "uuid"
+        },
+        "product": {
+          "name": "product",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "geo_ref": {
+          "name": "geo_ref",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "banner": {
+          "name": "banner",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
         },
         "store_id": {
           "name": "store_id",
@@ -1378,6 +1405,94 @@
             "RESPONDED"
           ],
           "mappedType": "enum"
+        },
+        "price": {
+          "name": "price",
+          "type": "real",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "float"
+        },
+        "sku": {
+          "name": "sku",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(1000)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 1000,
+          "mappedType": "string"
+        },
+        "location_id": {
+          "name": "location_id",
+          "type": "uuid",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "uuid"
+        },
+        "location_name": {
+          "name": "location_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "address": {
+          "name": "address",
+          "type": "varchar(1000)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1000,
+          "mappedType": "string"
+        },
+        "open_time": {
+          "name": "open_time",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
+        },
+        "close_time": {
+          "name": "close_time",
+          "type": "varchar(100)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 100,
+          "mappedType": "string"
         }
       },
       "name": "quotes",
@@ -1396,18 +1511,6 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "quotes_product_location_id_foreign": {
-          "constraintName": "quotes_product_location_id_foreign",
-          "columnNames": [
-            "product_location_id"
-          ],
-          "localTableName": "public.quotes",
-          "referencedColumnNames": [
-            "id"
-          ],
-          "referencedTableName": "public.product_locations",
-          "updateRule": "cascade"
-        },
         "quotes_store_id_foreign": {
           "constraintName": "quotes_store_id_foreign",
           "columnNames": [

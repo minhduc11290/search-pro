@@ -46,6 +46,7 @@ export class QuoteController {
     const quote = await this.quoteService.createQuote(user.id, quoteData);
 
     const updatedQuote = await this.quoteService.findById(quote.id, user.id);
+    
     if (!updatedQuote) {
       throw new NotFoundException('Product not found');
     }

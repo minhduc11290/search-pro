@@ -83,7 +83,7 @@ const AddressListPage = () => {
     const rows = dataDisplay.map((row, index) => (
         <Table.Tr key={row.no}>
             <Table.Td>{index + 1}</Table.Td>
-            <Table.Td>{row.locationID}</Table.Td>
+            {/* <Table.Td>{row.locationID}</Table.Td> */}
             <Table.Td>{row.address}</Table.Td>
             <Table.Td>{row.state} {row.zipCode}</Table.Td>
             <Table.Td>{formatTime(row.openAt)} - {formatTime(row.closeAt)}</Table.Td>
@@ -215,7 +215,7 @@ const AddressListPage = () => {
                             <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                                 <Table.Tr>
                                     <Table.Th>No</Table.Th>
-                                    <Table.Th>Location ID</Table.Th>
+                                    {/* <Table.Th>Location ID</Table.Th> */}
                                     <Table.Th>Address</Table.Th>
                                     <Table.Th>State/Zip</Table.Th>
                                     <Table.Th>Open time</Table.Th>

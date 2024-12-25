@@ -30,6 +30,7 @@ services:
     networks:
       - search-pro-network
   api:
+    restart: always
     container_name: search_pro_api
     build: ./apps/api
     environment:
@@ -43,7 +44,7 @@ services:
       - DATABASE_SSL=false
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_CONNECTION=${REDIS_CONNECTION:-redis://redis:6379}
+      - REDIS_CONNECTION=${REDIS_CONNECTION:-redis://search_pro_redis:6379}
     depends_on:
       - db
       - redis
@@ -54,6 +55,18 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
+  web:
+    container_name: search_pro_web
+    build: ./apps/web
+    environment:
+      - PORT=4173
+    ports:
+      - "4173:4173"
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    networks:
+      - search-pro-network
 networks:
   search-pro-network:
     driver: bridge

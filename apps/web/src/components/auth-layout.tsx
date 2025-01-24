@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Group } from '@mantine/core';
 import {
     IconShoppingCart,
-    IconUser
+    IconUser,
+    IconUserCog
 } from '@tabler/icons-react';
 
 import classes from './auth-layout.module.css';
@@ -11,33 +12,54 @@ import logo from '../assets/logo.png';
 import { Image } from '@mantine/core';
 import { PATH } from '../constants/paths';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/auth';
+import { UserInfo } from '../@types/user-props';
 
 const data = [
     { link: PATH.STOREMANAGEMENT, label: 'Store management', icon: IconShoppingCart },
-    { link: PATH.USERS, label: 'User management', icon: IconUser },
+    // { link: PATH.USERS, label: 'User management', icon: IconUser },
+];
 
+const dataSuperAdmin = [
+    { link: PATH.STOREMANAGEMENT, label: 'Store management', icon: IconShoppingCart },
+    { link: PATH.USERS, label: 'User management', icon: IconUser },
+    { link: PATH.ADMINMANAGEMENT, label: 'Admin management', icon: IconUserCog },
 ];
 
 export function AuthLayout({ children, currentLink, isLoading = false }: MainLayoutProps) {
     const navigate = useNavigate();
     const [active, setActive] = useState(currentLink);
+    const [user, setUser] = useState<UserInfo | null>(null);
+    const { getProfile } = useAuth();
 
-    const links = data.map((item) => (
-        <a
-            className={classes.link}
-            data-active={item.link === active || undefined}
-            // href={item.link}
-            key={item.label}
-            onClick={(event) => {
-                navigate(item.link);
-                event.preventDefault();
-                setActive(item.label);
-            }}
-        >
-            <item.icon className={classes.linkIcon} stroke={1.5} />
-            <span>{item.label}</span>
-        </a>
-    ));
+    useEffect(() => {
+        getData();
+    }, []);
+
+    const getData = async () => {
+        setUser(await getProfile());
+    }
+
+
+    const links = () => {
+        const _data = user && user.role == "baed5b1d-19e9-40f9-8d95-f2222f479944" ? dataSuperAdmin : data;
+        return _data.map((item) => (
+            <a
+                className={classes.link}
+                data-active={item.link === active || undefined}
+                // href={item.link}
+                key={item.label}
+                onClick={(event) => {
+                    navigate(item.link);
+                    event.preventDefault();
+                    setActive(item.label);
+                }}
+            >
+                <item.icon className={classes.linkIcon} stroke={1.5} />
+                <span>{item.label}</span>
+            </a>
+        ));
+    }
 
     return (
         <div className='w-screen h-screen flex flex-row relative'>
@@ -52,7 +74,7 @@ export function AuthLayout({ children, currentLink, isLoading = false }: MainLay
                             src={logo}
                         />
                     </Group>
-                    {links}
+                    {user && links()}
                 </div>
             </nav>
             <div className='flex flex-col flex-1'>

@@ -80,6 +80,10 @@ export class UserEntity extends BaseEntity<UserEntity> {
     return this.role.role === UserRole.SUPER_ADMIN;
   }
 
+  public isAdmin() {
+    return this.role.role === UserRole.ADMIN;
+  }
+
   public isAppUser() {
     return this.role.role === UserRole.APP_USER;
   }

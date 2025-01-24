@@ -51,7 +51,8 @@ const useAuth = () => {
                     phone: response.data.phone,
                     email: response.data.email,
                     state: '',
-                    status: response.data.status
+                    status: response.data.status,
+                    role: response.data.role?.id,
                 }
                 return user;
             }

@@ -39,4 +39,9 @@ export class StoreCreationDto {
   @IsNotEmpty()
   @IsBoolean()
   isActive!: boolean;
+
+  @ApiProperty({ required: true })
+  @IsOptional()
+  @IsString()
+  categoryId?: string;
 }

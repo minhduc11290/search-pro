@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { apiGetStores, apiPostStore, apiPutStore } from "../api/stores";
-import { Store, StoreRequest, UpdateStoreRequest } from "../@types/store-props";
+import { apiGetCategories, apiGetStores, apiPostStore, apiPutStore } from "../api/stores";
+import { Category, Store, StoreRequest, UpdateStoreRequest } from "../@types/store-props";
 import { Status } from "../@types/enum/status";
 import { AxiosError } from "axios";
 
@@ -16,10 +16,10 @@ const useStore = () => {
 
 
 
-    const getStores = useCallback(async (): Promise<Store[]> => {
+    const getStores = useCallback(async (categoryId?: string): Promise<Store[]> => {
         try {
             setIsLoading(true);
-            const response = await apiGetStores();
+            const response = await apiGetStores(categoryId);
 
             // localStorage.setItem('authToken', token);
             if (Array.isArray(response.data)) {
@@ -28,10 +28,11 @@ const useStore = () => {
                         no: index + 1,
                         id: item.id,
                         ownerstore: item.name,
-                        userName: '',
+                        userName: item.userName,
                         phone: item.primaryPhone,
                         email: item.email,
                         status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                        category: item.categoryId
                     }
                     return store;
                 });
@@ -46,7 +47,33 @@ const useStore = () => {
         return [];
     }, []);
 
-  
+
+    const getCategories = useCallback(async (): Promise<Category[]> => {
+        try {
+            setIsLoading(true);
+            const response = await apiGetCategories();
+
+            // localStorage.setItem('authToken', token);
+            if (Array.isArray(response.data)) {
+                return response.data.map((item) => {
+                    const store: Category = {
+                        id: item.id,
+                        name: item.name,
+                    }
+                    return store;
+                });
+            }
+            // setIsAuthenticated(true);
+            return [];
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return [];
+    }, []);
+
+
 
 
     const createStore = useCallback(async (store: StoreRequest) => {
@@ -129,7 +156,7 @@ const useStore = () => {
     // }, []);
 
 
-    return { isLoading, getStores, createStore, updateStore };
+    return { isLoading, getStores, createStore, updateStore, getCategories };
 };
 
 export default useStore;

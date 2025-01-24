@@ -1,7 +1,12 @@
 import { StoreRequest, UpdateStoreRequest } from "../@types/store-props";
 import axiosInstance from "./axiosInstance";
 
-export const apiGetStores = () => axiosInstance.get("/admin/stores");
+export const apiGetStores = (categoryId?: string) => axiosInstance.get("/admin/stores", {
+    params: categoryId ? {
+        category: categoryId
+    } : {}
+});
+export const apiGetCategories = () => axiosInstance.get("/admin/stores/categories");
 export const apiGetStoreById = (id: string) => axiosInstance.get(`/admin/stores/${id}`);
 export const apiPostStore = (store: StoreRequest) => axiosInstance.post(`/admin/stores/`, store);
 export const apiPostCreateStoreOwner = (id: string) => axiosInstance.post(`/admin/stores/${id}/owners`);

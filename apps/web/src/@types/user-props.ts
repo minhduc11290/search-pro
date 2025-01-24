@@ -9,6 +9,8 @@ export interface UserInfo {
     email: string;
     state: string;
     status: Status;
+    role?: string;
+    id?: string;
 }
 
 export interface UserLogin {

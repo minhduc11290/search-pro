@@ -7,6 +7,8 @@ import {
   Req,
   UnauthorizedException,
   UseGuards,
+  Param,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -24,6 +26,7 @@ import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { UsersResponseDto } from '~/share/dtos/users-response.dto';
 import { UserResponseMapper } from '~/mappers/responses/UserResponseMapper';
 import { UserRole } from '~/share/consts/enums';
+import { UserEntity } from '~/entities';
 
 @ApiTags('Admin - Users')
 @Controller('admin/user-management')
@@ -31,6 +34,7 @@ import { UserRole } from '~/share/consts/enums';
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class UsersController {
+  
   constructor(
     private readonly userService: UsersService,
   ) { }
@@ -45,14 +49,24 @@ export class UsersController {
     description: 'Return accessToken',
   })
   async getUsers(
+    @Query('type') type: string,
   ) {
-    let users = await this.userService.findByCondition({
-      role: {
-        role: UserRole.APP_USER
-      }
-    });
-
-    console.log("users", users);
+    console.log("type", type);
+    let users: UserEntity[] = [];
+    if (type == UserRole.ADMIN) {
+      users = await this.userService.findByCondition({
+        role: {
+          role: UserRole.ADMIN
+        }
+      });
+    }
+    else {
+      users = await this.userService.findByCondition({
+        role: {
+          role: UserRole.APP_USER
+        }
+      });
+    }
     return new UserResponseMapper().mapArray(users);
   }
 

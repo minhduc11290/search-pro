@@ -8,14 +8,15 @@ import {
 } from '@nestjs/swagger';
 import { GeoRefEntity } from '~/entities';
 import { GeoRefResponseMapper } from '~/mappers/responses/GeoRefResponseMapper ';
-import { GeoRefFilterDto, GeoRefResponseDto } from '~/share/dtos';
+import { GeoRefFilterDto, GeoRefMobileResponseDto, GeoRefResponseDto } from '~/share/dtos';
 import { GeoRefService } from './geo-ref.service';
+import { GeoRefMobileResponseMapper } from '~/mappers/responses/GeoRefMobileResponseMapper';
 
 @ApiTags('GeoRef - Locations')
 @Controller('georefs')
 @ApiBearerAuth()
 export class GeoRefController {
-  constructor(private readonly geoRefService: GeoRefService) {}
+  constructor(private readonly geoRefService: GeoRefService) { }
 
   @Get()
   @ApiOperation({ summary: 'GeoRef list by condition' })
@@ -34,6 +35,18 @@ export class GeoRefController {
     }
     const geoRefs = await this.geoRefService.findByCondition(condition);
     return new GeoRefResponseMapper().mapArray(geoRefs);
+  }
+
+
+  @Get("/mobile")
+  @ApiOperation({ summary: 'GeoRef list by condition' })
+  @ApiResponse({ status: 200, type: [GeoRefResponseDto] })
+  async getMobileGeoRefs(
+    // @Query() query: GeoRefFilterDto,
+  ): Promise<GeoRefMobileResponseDto[]> {
+
+    const geoRefs = await this.geoRefService.findByCondition({});
+    return new GeoRefMobileResponseMapper().mapArray(geoRefs);
   }
 
   @Get(':geoRefId')

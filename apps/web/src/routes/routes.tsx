@@ -7,6 +7,7 @@ import AddressListPage from "../pages/address-list";
 import ProductsPage from "../pages/products";
 import HomePage from "../pages/home";
 import UserManagementPage from "../pages/user-management";
+import AdminManagementPage from "../pages/admin-management";
 
 const router = createBrowserRouter([
     {
@@ -47,6 +48,14 @@ const router = createBrowserRouter([
         element:
             <ProtectedRoute>
                 <UserManagementPage></UserManagementPage>
+            </ProtectedRoute >
+
+    },
+    {
+        path: PATH.ADMINMANAGEMENT,
+        element:
+            <ProtectedRoute>
+                <AdminManagementPage></AdminManagementPage>
             </ProtectedRoute >
 
     },

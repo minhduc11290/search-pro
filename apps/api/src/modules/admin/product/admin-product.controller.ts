@@ -31,7 +31,7 @@ import { AttachmentEntity } from '~/entities';
 
 @ApiTags('System - Products')
 @Controller('admin')
-@RolesGuard('SUPER_ADMIN')
+@RolesGuard('SUPER_ADMIN', 'ADMIN')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class AdminProductController {

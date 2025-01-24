@@ -1,5 +1,10 @@
 import { Status } from "./enum/status";
 
+export interface Category {
+    name: string,
+    id: string
+}
+
 export interface Store {
     no: number;
     id: string;
@@ -9,7 +14,9 @@ export interface Store {
     email: string;
     status: Status;
     password?: string;
-    pw?: string
+    pw?: string,
+    category?: string,
+
 }
 
 export interface StoreRequest {
@@ -18,6 +25,7 @@ export interface StoreRequest {
     password: string;
     email: string;
     isActive: boolean;
+    categoryId: string;
 }
 
 export interface UpdateStoreRequest {
@@ -25,4 +33,5 @@ export interface UpdateStoreRequest {
     primaryPhone?: string;
     email?: string;
     isActive: boolean;
+    categoryId?: string;
 }

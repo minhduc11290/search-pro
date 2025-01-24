@@ -1,7 +1,11 @@
 import { UserLogin } from "../@types/user-props";
 import axiosInstance from "./axiosInstance";
 
-export const apiGetUsers = () => axiosInstance.get('admin/user-management/users');
+export const apiGetUsers = (type: string) => axiosInstance.get('admin/user-management/users', {
+    params: {
+        type: type
+    }
+});
 export const apiGetProfile = () => axiosInstance.get('users/me');
 // export const postCreateUser = (url: string, body: any) => axiosInstance.post(url, body);
 export const postlogin = (body: UserLogin) => axiosInstance.post('admin/users/login', body);

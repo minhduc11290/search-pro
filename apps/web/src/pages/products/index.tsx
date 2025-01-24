@@ -6,7 +6,7 @@ import { Table, Tooltip, Switch } from '@mantine/core';
 import cx from 'clsx';
 import classes from './product-list.module.css';
 import { Header } from "../../components/header";
-import { IconSearch, IconPlus, IconEdit, IconCheck, IconX } from "@tabler/icons-react";
+import { IconSearch, IconPlus, IconEdit, IconCheck, IconX, IconDownload } from "@tabler/icons-react";
 
 import { modals } from '@mantine/modals';
 import EditProductPage from "./components/edit"
@@ -20,6 +20,7 @@ import useStoreProducts from "../../hooks/store-products";
 import { PAGINATION } from "../../constants/pagination";
 import useStoreLocations from "../../hooks/store-locations";
 import { notifications } from "@mantine/notifications";
+import ImportProductPage from "./components/upload";
 const ProductsPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -38,6 +39,7 @@ const ProductsPage = () => {
     const [search, setSearch] = useState('');
     const [showEdit, setShowEdit] = useState(false);
     const [showCreate, setShowCreate] = useState(false);
+    const [showImport, setShowImport] = useState(false);
     const [showList, setShowList] = useState(false);
 
     const [productSelected, setProductSelected] = useState<Product>({
@@ -229,6 +231,13 @@ const ProductsPage = () => {
         setShowCreate(false)
     }
 
+    const hideImport = (isReload: boolean) => {
+        if (isReload) {
+            getData();
+        }
+        setShowImport(false)
+    }
+
     const hideList = () => {
         setShowList(false)
     }
@@ -284,11 +293,11 @@ const ProductsPage = () => {
 
                         }} >Apply</Button>
 
-                        {/* <Button leftSection={<IconDownload size={14} />} variant="default" className="ml-2" size="sm"
+                        <Button leftSection={<IconDownload size={14} />} variant="default" className="ml-2" size="sm"
 
                             onClick={() => {
-
-                            }} >Import excel file</Button> */}
+                                setShowImport(true);
+                            }} >Import excel file</Button>
                         <Button leftSection={<IconPlus size={14} />} variant="filled" className="ml-2" size="sm" onClick={() => {
                             setShowCreate(true);
                         }} >Add new product</Button>
@@ -321,6 +330,7 @@ const ProductsPage = () => {
         <CreateProductPage opened={showCreate} close={hideCreate} ></CreateProductPage>
         <EditProductPage opened={showEdit} productInfo={productSelected} close={hideEdit}></EditProductPage>
         <ListLocationPage opened={showList} close={hideList} locationPrice={productSelected.locationInfo} ></ListLocationPage>
+        <ImportProductPage opened={showImport} close={hideImport} ></ImportProductPage>
     </AuthLayout>
 
 }

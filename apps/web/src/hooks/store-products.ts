@@ -188,7 +188,7 @@ const useStoreProducts = () => {
             console.log("storeIds:", storeIds);
             for (const storeId of storeIds) {
                 console.log("storeId", storeId);
-                let response = await apiDeleteLocation(storeId);
+                const response = await apiDeleteLocation(storeId);
                 if (response.status == 201) {
                     result = true;
                 }

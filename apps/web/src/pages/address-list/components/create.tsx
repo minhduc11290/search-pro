@@ -126,6 +126,12 @@ const CreateAddressPage = ({ opened, close }: CreateLocationProps) => {
         getData();
     }, []);
 
+    useEffect(() => {
+        if (opened) {
+            form.reset();
+        }
+    }, [opened]);
+
     const getData = async () => {
         const _geos = await getGeoRef();
         setGeos(_geos);

@@ -24,6 +24,7 @@ import { JwtGuard } from '../share/auth/guard';
 import { StoreService } from './store.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { StoreStatus } from '~/share/consts/enums';
+import { StoreEntity } from '~/entities';
 
 @ApiTags('Owner - Stores')
 @Controller('stores')
@@ -38,11 +39,26 @@ export class StoreController {
   @ApiResponse({ status: 200, type: [StoreResponseDto] })
   async findAll(
     @CurrentUser() user: UserResponseDto,
+    @Param('categoryId') categoryId: string
   ): Promise<StoreResponseDto[]> {
-    const stores = await this.storeService.findByCondition({
-      owners: [user.id],
-      status: StoreStatus.ACTIVE
-    });
+    let stores: StoreEntity[] = [];
+    if (categoryId) {
+      stores = await this.storeService.findByCondition({
+        owners: [user.id],
+        status: StoreStatus.ACTIVE,
+        categoryId: categoryId,
+      });
+    } else {
+      stores = await this.storeService.findByCondition({
+        owners: [user.id],
+        status: StoreStatus.ACTIVE
+      });
+    }
+
+
+
+
+
     return new StoreResponseMapper().mapArray(stores);
   }
 

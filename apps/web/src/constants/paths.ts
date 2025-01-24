@@ -4,5 +4,6 @@ export const PATH = {
   STOREMANAGEMENT: "/store-management",
   ADDRESSLIST: "/address-list",
   PRODUCT: "/products",
-  USERS: "/users"
+  USERS: "/users",
+  ADMINMANAGEMENT: "/admin-management"
 }

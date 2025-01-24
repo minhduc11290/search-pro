@@ -17,6 +17,7 @@ export class StoreResponseMapper extends BaseMapper<
       email: source.email ?? '',
       website: source.website ?? '',
       status: source.status ?? StoreStatus.INACTIVE,
+      categoryId: source.categoryId,
       locations: source.locations.map((location) => ({
         id: location.id,
         name: location.name,

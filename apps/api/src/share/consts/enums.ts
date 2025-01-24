@@ -28,4 +28,5 @@ export enum UserRole {
   SUPER_ADMIN = 'SUPER_ADMIN',
   STORE_OWNER = 'STORE_OWNER',
   APP_USER = 'APP_USER',
+  ADMIN = 'ADMIN'
 }

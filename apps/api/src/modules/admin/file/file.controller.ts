@@ -33,7 +33,7 @@ export class FileController {
 
 
   @Post('uploads')
-  @RolesGuard('SUPER_ADMIN', 'STORE_OWNER')
+  @RolesGuard('SUPER_ADMIN', 'ADMIN')
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upload multiple image files' })

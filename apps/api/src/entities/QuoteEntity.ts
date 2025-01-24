@@ -38,8 +38,9 @@ export class QuoteEntity extends BaseEntity<QuoteEntity> {
   @ManyToOne(() => StoreEntity)
   store!: StoreEntity;
 
-  @ManyToOne(() => UserEntity)
-  requestor!: UserEntity;
+  //@ManyToOne(() => UserEntity)
+  @Property({ type: types.uuid })
+  requestor?: string;
 
   @ManyToOne(() => ContactEntity)
   contact!: ContactEntity;

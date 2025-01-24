@@ -22,6 +22,9 @@ import UsersService from './users/users.service';
 import { GeoRefService } from '../share/geo-ref/geo-ref.service';
 import { FileController } from './file/file.controller';
 import { FileModule } from './file/file.module';
+import { AdminAdminModule } from './admin/admin.module';
+import { AdminAdminController } from './admin/admin.controller';
+import { AdminAdminService } from './admin/admin.service';
 
 @Module({
   imports: [
@@ -32,7 +35,8 @@ import { FileModule } from './file/file.module';
     AdminLocationModule,
     AdminProductModule,
     ConfigModule.forRoot({ isGlobal: true }),
-    FileModule
+    FileModule,
+    AdminAdminModule
   ],
   controllers: [
     AdminUserController,
@@ -40,7 +44,8 @@ import { FileModule } from './file/file.module';
     AdminLocationController,
     AdminProductController,
     UsersController,
-    FileController
+    FileController,
+    AdminAdminController
   ],
   providers: [
     TokenService,
@@ -51,7 +56,8 @@ import { FileModule } from './file/file.module';
     AdminLocationService,
     AdminProductService,
     UsersService,
-    GeoRefService
+    GeoRefService,
+    AdminAdminService
   ],
 })
 export class AdminModule { }

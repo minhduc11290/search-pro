@@ -9,3 +9,4 @@ export * from './AttachmentEntity';
 export * from './QuoteEntity';
 export * from './ContactEntity';
 export * from './CommentEntity';
+export * from './CategoryEntity';

@@ -1,10 +1,10 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, rem } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, rem, Select, ComboboxItem } from "@mantine/core";
 import { EditStoreProps } from "../../../@types/edit-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
 import { phoneRegex } from '../../../utils/regex';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Status } from "../../../@types/enum/status";
 import useStore from "../../../hooks/stores";
 import { notifications } from "@mantine/notifications";
@@ -17,8 +17,10 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
             }).trim()
             .min(1, { message: 'Required information' }),
         email: z.string().trim().email({ message: 'Invalid email' }).min(1, { message: 'Required information' }),
-        phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' })
-
+        phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' }),
+        category: z.string({
+            required_error: 'Required information',
+        }).trim()
     });
 
     const form = useForm({
@@ -27,7 +29,8 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
             name: storeInfo.ownerstore,
             email: storeInfo.email,
             phone: storeInfo.phone,
-            status: storeInfo.status
+            status: storeInfo.status,
+            category: storeInfo.category
         },
         validate: zodResolver(schema),
 
@@ -39,11 +42,13 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
             name: storeInfo.ownerstore,
             email: storeInfo.email,
             phone: storeInfo.phone,
-            status: storeInfo.status
-        })
+            status: storeInfo.status,
+            category: storeInfo.category
+        });
+        getData();
     }, [storeInfo])
 
-    const { updateStore } = useStore();
+    const { updateStore, getCategories } = useStore();
 
     const handleSubmit = async () => {
         const result = form.validate();
@@ -56,7 +61,7 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
                 email: data.email,
                 name: data.name,
                 primaryPhone: data.phone,
-
+                categoryId: data.category
             });
             if (result) {
                 notifications.show({
@@ -81,6 +86,18 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
         }
     }
 
+    const [categories, setCategories] = useState<ComboboxItem[]>([]);
+    const getData = async () => {
+        const _categories = await getCategories();
+        const _categoryItems: ComboboxItem[] = _categories.map((item) => {
+            return {
+                value: item.id,
+                label: item.name
+            };
+        });
+        setCategories(_categoryItems);
+    }
+
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Edit store owner </Title>
         <Grid grow>
@@ -93,6 +110,16 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
                     {...form.getInputProps('name')}
                 />
             </Grid.Col>
+            <Grid.Col span={12} >
+                <Select
+                    className="mr-2"
+                    placeholder="Categories"
+                    data={categories}
+                    allowDeselect={false}
+                    key={form.key('category')}
+                    {...form.getInputProps('category')}
+                // onChange={(_, option) => onChangeStates(option.value)}
+                /> </Grid.Col>
             <Grid.Col span={6} >
                 <TextInput
                     label="Phone number"

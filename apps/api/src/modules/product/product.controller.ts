@@ -47,7 +47,7 @@ export class ProductController {
 
     if (query.productName) {
       conditions.product = {
-        name: { $like: `%${query.productName}%` },
+        name: { $ilike: `%${query.productName}%` },
         status: ProductStatus.ACTIVE
       };
     } else {

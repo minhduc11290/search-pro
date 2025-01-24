@@ -8,23 +8,7 @@ import { ListLocationProps } from "../../../@types/list-location-products";
 const ListLocationPage = ({ opened, close, locationPrice }: ListLocationProps) => {
     console.log("locationPrice", locationPrice);
     const [scrolled, setScrolled] = useState(false);
-    // const data: LocationPrice[] = [{
-    //     locationID: 'store001',
-    //     address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-    //     state: 'NJ',
-    //     zipCode: '08234',
-    //     // price: '$ 2.00',
-    //     price: 2
-    // }, {
-    //     locationID: 'store001',
-    //     address: '91 ELM ST MANCHESTER CT 06040-8610 USA',
-    //     state: 'NJ',
-    //     zipCode: '08234',
-    //     // price: '$ 2.00',
-    //     price: 2
-    // }];
-
-    // const [data, setData] =  useState<LocationPrice[]>([]);
+   
 
     const rows = locationPrice.map((row, index) => (
         <Table.Tr key={index}>

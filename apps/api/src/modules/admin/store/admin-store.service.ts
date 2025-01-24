@@ -5,7 +5,7 @@ import {
   RequiredEntityData,
 } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { RoleEntity, StoreEntity, UserEntity } from '~/entities';
+import { CategoryEntity, RoleEntity, StoreEntity, UserEntity } from '~/entities';
 import { StoreStatus, UserRole, UserStatus } from '~/share/consts/enums';
 import { StoreOwnerCreationDto } from '~/share/dtos';
 import * as argon from 'argon2';
@@ -30,6 +30,14 @@ export class AdminStoreService {
       StoreEntity,
       { id },
       { populate: this.getPopulates(populate), orderBy: { createdAt: 'DESC' } },
+    );
+  }
+
+  async findCategories() {
+    return await this.em.find(
+      CategoryEntity,
+      {},
+      {},
     );
   }
 

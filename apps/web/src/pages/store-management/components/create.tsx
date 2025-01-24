@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, PasswordInput, rem } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, PasswordInput, rem, ComboboxItem, Select } from "@mantine/core";
 import { CreateStoreProps } from "../../../@types/create-store-props";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
@@ -8,7 +8,7 @@ import { Status } from "../../../@types/enum/status";
 import useStore from "../../../hooks/stores";
 import { notifications } from '@mantine/notifications';
 import { IconX, IconCheck } from '@tabler/icons-react';
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
     const schema = z.object({
@@ -22,12 +22,16 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
         // userName: z.string().trim().min(4).min(1, { message: 'Required information' }),
         password: z.string().min(4),
         confirmPassword: z.string().min(4),
+        category: z
+            .string({
+                required_error: 'Required information',
+            }).trim()
 
     }).refine((data) => data.password === data.confirmPassword, {
         message: "Confirm password doesn't match",
         path: ["confirmPassword"],
     });;
-    const { createStore } = useStore();
+    const { createStore, getCategories } = useStore();
     const form = useForm({
         mode: 'uncontrolled',
         initialValues: {
@@ -38,6 +42,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
             userName: '',
             password: '',
             confirmPassword: '',
+            category: ''
         },
         validate: zodResolver(schema),
 
@@ -45,9 +50,22 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
 
     useEffect(() => {
         if (opened) {
+            getData();
+
             form.reset();
         }
     }, [opened]);
+    const [categories, setCategories] = useState<ComboboxItem[]>([]);
+    const getData = async () => {
+        const _categories = await getCategories();
+        const _categoryItems: ComboboxItem[] = _categories.map((item) => {
+            return {
+                value: item.id,
+                label: item.name
+            };
+        });
+        setCategories(_categoryItems);
+    }
 
     const handleSubmit = async () => {
 
@@ -61,7 +79,8 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
                 email: data.email,
                 name: data.name,
                 primaryPhone: data.primaryPhone,
-                password: data.password
+                password: data.password,
+                categoryId: data.category,
             });
             if (result) {
                 notifications.show({
@@ -92,7 +111,7 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
     }
 
     return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
-        <Title className="font-bold text-xl"> Edit store owner </Title>
+        <Title className="font-bold text-xl"> Create store owner </Title>
         <Grid grow>
             <Grid.Col span={12} >
                 <TextInput
@@ -101,6 +120,17 @@ const CreateStorePage = ({ opened, close }: CreateStoreProps) => {
                     withAsterisk
                     key={form.key('name')}
                     {...form.getInputProps('name')}
+                />
+            </Grid.Col>
+            <Grid.Col span={12} >
+                <Select
+                    className="mr-2"
+                    placeholder="Categories"
+                    data={categories}
+                    allowDeselect={false}
+                    key={form.key('category')}
+                    {...form.getInputProps('category')}
+                // onChange={(_, option) => onChangeStates(option.value)}
                 />
             </Grid.Col>
             <Grid.Col span={6} >

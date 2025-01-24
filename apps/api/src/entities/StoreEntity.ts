@@ -4,11 +4,13 @@ import {
   Enum,
   ManyToMany,
   OneToMany,
+  OneToOne,
   Property,
+  types,
 } from '@mikro-orm/core';
 import { StoreStatus } from '~/share/consts/enums';
 import { BaseEntity } from './BaseEntity';
-import { UserEntity, LocationEntity } from '.';
+import { UserEntity, LocationEntity, CategoryEntity } from '.';
 
 @Entity({ tableName: 'stores' })
 export class StoreEntity extends BaseEntity<StoreEntity> {
@@ -42,4 +44,9 @@ export class StoreEntity extends BaseEntity<StoreEntity> {
     inverseJoinColumn: 'user_id',
   })
   owners = new Collection<UserEntity>(this);
+
+
+  @Property({ type: types.uuid, nullable: true })
+  categoryId?: string;
+
 }

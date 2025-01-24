@@ -131,7 +131,6 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
             });
             setLocations(_locationData);
         }
-
     }
     const [scrolled, setScrolled] = useState(false);
 
@@ -172,6 +171,7 @@ const CreateProductPage = ({ opened, close }: CreateProductProps) => {
                 }),
                 isActive: form.getValues().status == Status.Active
             });
+
             if (result) {
                 notifications.show({
                     title: `Success`,

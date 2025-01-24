@@ -27,4 +27,9 @@ export class StoreUpdatingDto {
     @IsNotEmpty()
     @IsBoolean()
     isActive!: boolean;
+
+    @ApiProperty({ example: 'store@example.com', required: true })
+    @IsOptional()
+    @IsString()
+    categoryId?: string;
 }

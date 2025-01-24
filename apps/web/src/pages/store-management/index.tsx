@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Container, Pagination, rem, TextInput, Text } from "@mantine/core";
+import { ActionIcon, Button, Container, Pagination, rem, TextInput, Text, Select, ComboboxItem } from "@mantine/core";
 import { AuthLayout } from "../../components/auth-layout";
 import { PATH } from "../../constants/paths";
 import { useEffect, useState } from 'react';
@@ -23,7 +23,8 @@ const StoreManagementPage = () => {
     const [data, setData] = useState<Store[]>([]);
     const [dataFiltered, setDataFiltered] = useState<Store[]>([]);
     const [dataDisplay, setDataDisplay] = useState<Store[]>([]);
-    const { isLoading, getStores, updateStore } = useStore();
+    const [categories, setCategories] = useState<ComboboxItem[]>([]);
+    const { isLoading, getStores, updateStore, getCategories } = useStore();
     const [totalPage, setTotalPage] = useState<number>(0);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
@@ -61,8 +62,20 @@ const StoreManagementPage = () => {
 
 
 
-    const getData = async () => {
-        const stores = await getStores();
+    const getData = async (categoryId?: string) => {
+        const stores = await getStores(categoryId);
+        if (!categoryId) {
+            const categories = await getCategories();
+            const _categoryItems: ComboboxItem[] = categories.map((item) => {
+                return {
+                    value: item.id,
+                    label: item.name
+                };
+            });
+            setCategories([{
+                value: "", label: 'All categories'
+            }, ..._categoryItems]);
+        }
         setData(stores);
         setDataFiltered(stores);
     }
@@ -213,6 +226,10 @@ const StoreManagementPage = () => {
         setShowCreate(false)
     }
 
+    const searchData = (value: string) => {
+        getData(value);
+    }
+
 
 
 
@@ -230,6 +247,13 @@ const StoreManagementPage = () => {
                     />
 
                     <Container className="flex flex-row items-center flex-1 flex-grow justify-end mr-0 px-0">
+                        <Select
+                            className="mr-2"
+                            placeholder="Categories"
+                            data={categories}
+                            allowDeselect={false}
+                            onChange={(_, option) => searchData(option.value)}
+                        />
                         <ActionIcon variant="filled" aria-label="Settings" size="lg" color="grey" onClick={() => {
                             getData();
                         }}>

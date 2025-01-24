@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
@@ -35,7 +36,7 @@ export class UserController {
   constructor(
     private readonly userService: UserService,
     private readonly tokenService: TokenService,
-  ) {}
+  ) { }
 
   @Get('me')
   @UseGuards(JwtGuard)
@@ -47,6 +48,21 @@ export class UserController {
     type: UserResponseDto,
   })
   getMe(@CurrentUser() user: UserResponseDto): UserResponseDto {
+    return user;
+  }
+
+
+  @Delete()
+  @UseGuards(JwtGuard)
+  @ApiOperation({ summary: 'Delete current user info' })
+  @HttpCode(200)
+  @ApiResponse({
+    status: 200,
+    description: 'Current user info',
+    type: UserResponseDto,
+  })
+  async deleteMe(@CurrentUser() user: UserResponseDto) {
+    await this.userService.delete(user);
     return user;
   }
 

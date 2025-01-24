@@ -22,7 +22,7 @@ export default class AdminUserService {
       { populate: ['role', 'stores'] },
     );
 
-    if (!user?.isActive() || !(user?.isSuperAdmin() || user?.isStoreOwner())) {
+    if (!user?.isActive() || !(user?.isSuperAdmin() || user?.isAdmin())) {
       throw new GoneException('User not found!');
     }
 
@@ -50,5 +50,10 @@ export default class AdminUserService {
   async checkIsSuperAdmin(id: string): Promise<boolean> {
     const _user = await this.em.findOne(UserEntity, { id: id });
     return _user?.isSuperAdmin() ?? false;
+  }
+
+  async checkIsAdmin(id: string): Promise<boolean> {
+    const _user = await this.em.findOne(UserEntity, { id: id });
+    return _user?.isAdmin() ?? false;
   }
 }

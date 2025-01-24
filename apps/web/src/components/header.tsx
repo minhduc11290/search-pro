@@ -42,8 +42,8 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
 
     const navigate = useNavigate();
     return (
-        <div className={classes.header}>
-            <div className={`${classes.mainSection} flex flex-1 justify-between w-fit mx-2`}>
+        <div className={`${classes.header} px-2`}>
+            <div className={`${classes.mainSection} flex flex-1 justify-between mx-2 px-2`}>
 
                 <Container className='mx-0 flex flex-row justify-start items-center w-full pl-0 ml-4'>
                     {isBack && <ActionIcon variant='transparent' onClick={onBackPress} className='mr-2'>
@@ -54,7 +54,7 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
                     </Title>
                 </Container>
 
-                <Group justify="space-between">
+                <Container className="space-between w-80">
 
                     <Group gap={7}>
                         <Avatar src={image} alt={user?.fullName} radius="xl" size={30} />
@@ -71,7 +71,7 @@ export function Header({ title, isBack, onBackPress }: HeaderProps) {
                             navigate(PATH.LOGIN);
                         }} />
                     </Group>
-                </Group>
+                </Container>
             </div>
 
         </div >

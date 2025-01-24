@@ -13,7 +13,7 @@ import { QuoteCreationDto } from '~/share/dtos';
 export class QuoteService {
   public defaultPopulate: AutoPath<QuoteEntity, any> = [
     'store',
-    'requestor',
+    // 'requestor',
     'contact',
     'comments',
     // 'productLocation',

@@ -14,7 +14,7 @@ import { MinDto } from '~/share/dtos/min.dto';
 export class StoreQuoteService {
   public defaultPopulate: AutoPath<QuoteEntity, any> = [
     'store',
-    'requestor',
+    // 'requestor',
     'contact',
     'comments',
     'productLocation',

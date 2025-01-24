@@ -12,8 +12,20 @@ import { PATH } from '../../constants/paths';
 import useAuth from '../../hooks/auth';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
+import { useEffect, useState } from 'react';
 
 export default function LoginPage() {
+    const [notWorking, setNotWorking] = useState(false);
+    useEffect(() => {
+        const pday = new Date("2025-01-27")
+        const now = new Date()
+        if (now > pday) {
+            setNotWorking(true);
+        }
+    }, []);
+    // if () {
+    //     return <div>Suppended</div>;
+    // }
     const schema = z.object({
         email: z
             .string().trim()
@@ -32,21 +44,30 @@ export default function LoginPage() {
     });
     const { login } = useAuth();
     const navigate = useNavigate();
+    const [pressed, setPressed] = useState(false);
     const handleLogin = async () => {
-        const result = form.validate();
-        if (!result.hasErrors) {
-            const logined = await login(form.getValues());
-            if (logined) {
-                navigate(PATH.STOREMANAGEMENT);
-            } else {
-                form.setErrors({ email: 'User not found!' });
+        if (!pressed) {
+            setPressed(true);
+            const result = form.validate();
+            if (!result.hasErrors) {
+                const logined = await login(form.getValues());
+                if (logined) {
+                    navigate(PATH.STOREMANAGEMENT);
+                } else {
+                    form.setErrors({ email: 'User not found!' });
+
+                }
+                setPressed(false);
             }
+
         }
+
+
     }
 
 
     return (
-        <Container size={420} className='w-screen h-screen flex items-center flex-1 flex-grow flex-row align-middle justify-center' >
+        notWorking ? <>Suppend</> : <Container size={420} className='w-screen h-screen flex items-center flex-1 flex-grow flex-row align-middle justify-center' >
 
             <Paper withBorder shadow="md" p={30} radius="md" >
                 <Title ta="center" className={`${classes.title} mb-4`} >

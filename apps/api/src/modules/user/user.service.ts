@@ -7,6 +7,7 @@ import { UserResponseMapper } from '~/mappers/responses/UserResponseMapper';
 import { UserRole, UserStatus } from '~/share/consts/enums';
 import { UserCreationDto, UserLoginDto } from '~/share/dtos';
 import TokenService from '../share/auth/token.service';
+import { UserResponseDto } from '~/share/dtos/user-response.dto';
 
 @Injectable()
 export class UserService {
@@ -80,4 +81,15 @@ export class UserService {
       { populate: (populate ? populate : this.defaultPopulate) as never[] },
     );
   }
+
+
+  async delete(userCreationDto: UserResponseDto): Promise<void> {
+    await this.em.nativeDelete(UserEntity, {
+      id: userCreationDto.id,
+    });
+  }
+
+
+
+
 }

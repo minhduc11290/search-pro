@@ -42,4 +42,6 @@ export class ProductEntity extends BaseEntity<ProductEntity> {
 
   @OneToMany(() => AttachmentEntity, 'product')
   attachments = new Collection<AttachmentEntity>(this);
+
+
 }

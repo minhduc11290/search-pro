@@ -12,10 +12,10 @@ const useUsers = () => {
     }, []);
 
     // Hàm login để đặt token và cập nhật trạng thái
-    const getUsers = useCallback(async (): Promise<UserInfo[]> => {
+    const getUsers = useCallback(async (type?: string): Promise<UserInfo[]> => {
         try {
             setIsLoading(true);
-            const response = await apiGetUsers();
+            const response = await apiGetUsers(type ?? 'USER');
 
             // localStorage.setItem('authToken', token);
             if (Array.isArray(response.data)) {
@@ -23,6 +23,7 @@ const useUsers = () => {
                     const user: UserInfo = {
                         no: index + 1,
                         userID: item.userID,
+                        id: item.id,
                         // ownerstore: item.name,
                         // userName: '',
                         // phone: item.primaryPhone,

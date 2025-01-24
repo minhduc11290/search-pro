@@ -30,7 +30,7 @@ import { AttachmentEntity } from '~/entities';
 
 @ApiTags('System - Locations')
 @Controller('admin')
-@RolesGuard('SUPER_ADMIN')
+@RolesGuard('SUPER_ADMIN', 'ADMIN')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class AdminLocationController {

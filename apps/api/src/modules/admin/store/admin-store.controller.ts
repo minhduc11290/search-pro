@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -35,7 +36,7 @@ import { UserService } from '~/modules/user/user.service';
 
 @ApiTags('System - Stores')
 @Controller('admin/stores')
-@RolesGuard('SUPER_ADMIN', 'STORE_OWNER')
+@RolesGuard('SUPER_ADMIN', 'ADMIN')
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class AdminStoreController {
@@ -48,11 +49,18 @@ export class AdminStoreController {
   @Get()
   @ApiOperation({ summary: 'List all stores' })
   @ApiResponse({ status: 200, type: [StoreResponseDto] })
-  async getStores(@CurrentUser() user: UserResponseDto) {
+  async getStores(@CurrentUser() user: UserResponseDto, @Query('category') category: string) {
     const _isSuperAdmin = await this.adminUserService.checkIsSuperAdmin(user.id);
+    const _isAdmin = await this.adminUserService.checkIsAdmin(user.id);
 
     if (_isSuperAdmin) {
-      const stores = await this.adminStoreService.findByCondition({});
+      const stores = await this.adminStoreService.findByCondition(category ? { categoryId: category } : {});
+
+      return new StoreResponseMapper().mapArray(stores);
+    } else if (_isAdmin) {
+      const stores = await this.adminStoreService.findByCondition(
+        category ? { categoryId: category, createdBy: user.id, } : { createdBy: user.id, }
+      );
       return new StoreResponseMapper().mapArray(stores);
     } else {
       // const stores = await this.adminStoreService.findByCondition({storeId: user.id});
@@ -63,6 +71,14 @@ export class AdminStoreController {
     }
 
 
+  }
+
+  @Get("/categories")
+  @ApiOperation({ summary: 'List all categories' })
+  @ApiResponse({ status: 200, type: [StoreResponseDto] })
+  async getCategories() {
+    const categories = await this.adminStoreService.findCategories();
+    return categories;
   }
 
   @Get(':storeId')
@@ -149,6 +165,7 @@ export class AdminStoreController {
       primaryPhone: updateStoreDto.primaryPhone ?? (_store?.primaryPhone ?? ""),
       status: updateStoreDto.isActive ? StoreStatus.ACTIVE : StoreStatus.INACTIVE,
       updatedBy: user.id,
+      categoryId: updateStoreDto.categoryId
     });
     console.log(store);
     return new StoreResponseMapper().map(store);

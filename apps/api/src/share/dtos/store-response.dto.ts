@@ -70,4 +70,7 @@ export class StoreResponseDto {
   @ApiProperty({ example: 'PW' })
   pw?: string;
 
+  @ApiProperty({ example: 'category' })
+  categoryId?: string;
+
 }

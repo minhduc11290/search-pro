@@ -42,6 +42,8 @@ const AddressListPage = () => {
             getDataDisplay();
 
         } else {
+            setTotalPage(0);
+            setCurrentPage(1);
             setDataDisplay([]);
         }
     }, [dataFiltered]);
@@ -54,6 +56,8 @@ const AddressListPage = () => {
             const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
             const _data = [...dataFiltered];
             setDataDisplay(_data.slice(start, end));
+        } else {
+            setDataDisplay([]);
         }
     }
 
@@ -86,7 +90,23 @@ const AddressListPage = () => {
             {/* <Table.Td>{row.locationID}</Table.Td> */}
             <Table.Td>{row.address}</Table.Td>
             <Table.Td>{row.state} {row.zipCode}</Table.Td>
-            <Table.Td>{formatTime(row.openAt)} - {formatTime(row.closeAt)}</Table.Td>
+            {/* <Table.Td>{row.openAt && row.closeAt ? formatTime(row.openAt) + " - " + formatTime(row.closeAt) : ''} </Table.Td> */}
+            <Table.Td> {row.isOpenMon}
+                {'Mon:' + (row.isOpenMon ? formatTime(row.openTimeMon) + " - " + formatTime(row.closeTimeMon) : 'Closed')}
+                <br />
+                {'Tue:' + (row.isOpenTue ? formatTime(row.openTimeTue) + " - " + formatTime(row.closeTimeTue) : 'Closed')}
+                <br />
+                {'Wed:' + (row.isOpenWed ? formatTime(row.openTimeWed) + " - " + formatTime(row.closeTimeWed) : 'Closed')}
+                <br />
+                {'Thu:' + (row.isOpenThu ? formatTime(row.openTimeThu) + " - " + formatTime(row.closeTimeThu) : 'Closed')}
+                <br />
+                {'Fri:' + (row.isOpenFri ? formatTime(row.openTimeFri) + " - " + formatTime(row.closeTimeFri) : 'Closed')}
+                <br />
+                {'Sat:' + (row.isOpenSat ? formatTime(row.openTimeSat) + " - " + formatTime(row.closeTimeSat) : 'Closed')}
+                <br />
+                {'Sun:' + (row.isOpenSun ? formatTime(row.openTimeSun) + " - " + formatTime(row.closeTimeSun) : 'Closed')}
+
+            </Table.Td>
             <Table.Td>
                 <Container className="flex flex-row items-center">
                     <Tooltip label={row.status == Status.Active ? 'Deactive location' : 'Active account'} refProp="rootRef">
@@ -140,7 +160,41 @@ const AddressListPage = () => {
         zipCode: '',
         openAt: '',
         closeAt: '',
-        status: Status.Deactive
+        status: Status.Deactive,
+
+        addressLine1: '',
+        addressLine2: '',
+        city: '',
+        fax: '',
+        isOpenMon: false,
+        openTimeMon: '',
+        closeTimeMon: '',
+
+        isOpenTue: false,
+        openTimeTue: '',
+        closeTimeTue: '',
+
+        isOpenWed: false,
+        openTimeWed: '',
+        closeTimeWed: '',
+
+        isOpenThu: false,
+        openTimeThu: '',
+        closeTimeThu: '',
+
+        isOpenFri: false,
+        openTimeFri: '',
+        closeTimeFri: '',
+
+        isOpenSat: false,
+        openTimeSat: '',
+        closeTimeSat: '',
+
+        isOpenSun: false,
+        openTimeSun: '',
+        closeTimeSun: '',
+        latitude: 0,
+        longitude: 0
     });
 
 
@@ -149,9 +203,9 @@ const AddressListPage = () => {
         setSearch(value);
 
         const dataFilter = data.filter(function (el) {
-            return el.address.includes(value)
-                || el.openAt.includes(value)
-                || el.closeAt.includes(value) || el.locationID?.includes(value);
+            return el.address.toLowerCase().includes(value.toLowerCase())
+                || el.openAt.toLowerCase().includes(value.toLowerCase())
+                || el.closeAt.toLowerCase().includes(value.toLowerCase()) || el.locationID?.toLowerCase().includes(value.toLowerCase());
         });
 
         console.log("dataFilter", dataFilter);
@@ -210,8 +264,8 @@ const AddressListPage = () => {
                     </Container>
                 </div>
                 <div>
-                    <ScrollArea mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
-                        <Table miw={700} className={classes.table} withTableBorder={true}>
+                    <ScrollArea onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
+                        <Table className={classes.table} withTableBorder={true}>
                             <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                                 <Table.Tr>
                                     <Table.Th>No</Table.Th>

@@ -8,6 +8,63 @@ export class ProductLocationResponseMapper extends BaseMapper<
   ProductLocationResponseDto
 > {
   map(source: ProductLocationEntity): ProductLocationResponseDto {
+
+    const d = new Date();
+    let day = d.getDay();
+    let isOpen = false;
+    let openTime = "";
+    let closeTime = "";
+    switch (day) {
+      case 0:
+        // code block
+        isOpen = source.location.isOpenSun ?? false;
+        openTime = source.location.openTimeSun ?? '';
+        closeTime = source.location.closeTimeSun ?? '';
+        break;
+      case 1:
+        isOpen = source.location.isOpenMon ?? false;
+        openTime = source.location.openTimeMon ?? '';
+        closeTime = source.location.closeTimeMon ?? '';
+        // code block
+        break;
+      case 2:
+        isOpen = source.location.isOpenTue ?? false;
+        openTime = source.location.openTimeTue ?? '';
+        closeTime = source.location.closeTimeTue ?? '';
+        // code block
+        break;
+      case 3:
+        isOpen = source.location.isOpenWed ?? false;
+        openTime = source.location.openTimeWed ?? '';
+        closeTime = source.location.closeTimeWed ?? '';
+
+        // code block
+        break;
+      case 4:
+        isOpen = source.location.isOpenThu ?? false;
+        openTime = source.location.openTimeThu ?? '';
+        closeTime = source.location.closeTimeThu ?? '';
+
+        // code block
+        break;
+      case 5:
+        isOpen = source.location.isOpenFri ?? false;
+        openTime = source.location.openTimeFri ?? '';
+        closeTime = source.location.closeTimeFri ?? '';
+
+        // code block
+        break;
+      case 6:
+        isOpen = source.location.isOpenSat ?? false;
+        openTime = source.location.openTimeSat ?? '';
+        closeTime = source.location.closeTimeSat ?? '';
+
+        // code block
+        break;
+      default:
+      // code block
+    }
+
     const productLocationDto: ProductLocationResponseDto = {
       id: source.id,
       productId: source.product.id,
@@ -27,9 +84,13 @@ export class ProductLocationResponseMapper extends BaseMapper<
         zipCode: source.location.geoRef.zipCode,
         steName: source.location.geoRef.steName,
         price: source.price,
-        openTime: source.location.openTime,
-        closeTime: source.location.closeTime,
-        address: source.location.address
+        // openTime: source.location.openTime,
+        // closeTime: source.location.closeTime,
+        openTime: isOpen ? openTime : '00:00',
+        closeTime: isOpen ? closeTime : '00:00',
+        isOpen: isOpen,
+        // address: source.location.address
+        address: (source.location.addressLine1 ?? '') + ' ' + (source.location.addressLine2 ?? '') + ' ' + (source.location.city ?? '') + ', ' + (source.location.geoRef.steName ?? '') + ' ' + (source.location.geoRef.zipCode ?? '')
       },
       //FIXME: This is a temporary solution, we should use a service to get the file
       attachments: source.product.attachments.map((attachment) => {

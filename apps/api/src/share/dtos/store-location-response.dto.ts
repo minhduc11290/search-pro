@@ -43,6 +43,9 @@ export class StoreLocationResponseDto {
   @ApiProperty({ example: '10:30PM' })
   closeTime?: string;
 
+  @ApiProperty({ example: true })
+  isOpen?: boolean;
+
   @ApiProperty({ required: true, type: MinGeoRefDto })
   geoRef!: MinGeoRefDto;
 
@@ -57,4 +60,104 @@ export class StoreLocationResponseDto {
 
   @ApiProperty({ required: false, type: [MinAttachmentDto] })
   attachments?: MinAttachmentDto[];
+
+
+
+  @ApiProperty({ required: true })
+  isOpenMon!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeMon!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeMon!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenTue!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeTue!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeTue!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenWed!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeWed!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeWed!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenThu!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeThu!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeThu!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenFri!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeFri!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeFri!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenSat!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeSat!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeSat!: string;
+
+
+  @ApiProperty({ required: true })
+  isOpenSun!: boolean;
+
+
+  @ApiProperty({ example: '10:30AM' })
+  openTimeSun!: string;
+
+  @ApiProperty({ example: '10:30PM' })
+  closeTimeSun!: string;
+
+  @ApiProperty({ example: 'Addresss' })
+  addressLine1?: string;
+
+  @ApiProperty({ example: '' })
+  addressLine2?: string;
+
+  @ApiProperty({ example: 'NY' })
+  city?: string;
+
+
+  @ApiProperty({ example: '123-123-1234' })
+  fax?: string;
+
+  @ApiProperty({ required: true, example: '12345' })
+  latitude?: number;
+
+
+  @ApiProperty({ required: true, example: '12345' })
+  longitude?: number;
+
+
 }

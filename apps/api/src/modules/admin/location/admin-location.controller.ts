@@ -28,6 +28,8 @@ import { GeoRefService } from '~/modules/share/geo-ref/geo-ref.service';
 import { AttachmentDto } from '~/share/dtos/product-creation.dto';
 import { AttachmentEntity } from '~/entities';
 
+import { latLngToCell } from "h3-js";
+
 @ApiTags('System - Locations')
 @Controller('admin')
 @RolesGuard('SUPER_ADMIN', 'ADMIN')
@@ -77,8 +79,11 @@ export class AdminLocationController {
       locationCreationDto,
       { storeId, createdBy: user.id },
     );
+    const h3Index = latLngToCell(creationData.latitude!, creationData.longitude!, 7);
+
     const location = await this.adminLocationService.create({
       ...creationData,
+      h3Index: h3Index,
       createdBy: user.id,
     }, locationCreationDto.attachments);
 
@@ -107,7 +112,7 @@ export class AdminLocationController {
     if (!geo) {
       return null;
     }
-
+    const h3Index = latLngToCell(locationCreationDto.latitude!, locationCreationDto.longitude!, 7);
     const location = await this.adminLocationService.update(locationId, {
       name: locationCreationDto.name ?? _location.name,
       address: locationCreationDto.address ?? _location.address,
@@ -116,8 +121,45 @@ export class AdminLocationController {
       geoRef: geo,
       status: status,
       updatedBy: user.id,
-      phone: locationCreationDto.phone ?? _location.phone
+      phone: locationCreationDto.phone ?? _location.phone,
+      addressLine1: locationCreationDto.addressLine1 ?? _location.addressLine1,
+      addressLine2: locationCreationDto.addressLine2 ?? _location.addressLine2,
+      city: locationCreationDto.city ?? _location.city,
+
+      isOpenMon: locationCreationDto.isOpenMon ?? _location.isOpenMon,
+      openTimeMon: locationCreationDto.openTimeMon ?? _location.openTimeMon,
+      closeTimeMon: locationCreationDto.closeTimeMon ?? _location.closeTimeMon,
+
+      isOpenTue: locationCreationDto.isOpenTue ?? _location.isOpenTue,
+      openTimeTue: locationCreationDto.openTimeTue ?? _location.openTimeTue,
+      closeTimeTue: locationCreationDto.closeTimeTue ?? _location.closeTimeTue,
+
+      isOpenWed: locationCreationDto.isOpenWed ?? _location.isOpenWed,
+      openTimeWed: locationCreationDto.openTimeWed ?? _location.openTimeWed,
+      closeTimeWed: locationCreationDto.closeTimeWed ?? _location.closeTimeWed,
+
+      isOpenThu: locationCreationDto.isOpenThu ?? _location.isOpenThu,
+      openTimeThu: locationCreationDto.openTimeThu ?? _location.openTimeThu,
+      closeTimeThu: locationCreationDto.closeTimeThu ?? _location.closeTimeThu,
+
+      isOpenFri: locationCreationDto.isOpenFri ?? _location.isOpenFri,
+      openTimeFri: locationCreationDto.openTimeFri ?? _location.openTimeFri,
+      closeTimeFri: locationCreationDto.closeTimeFri ?? _location.closeTimeFri,
+
+      isOpenSat: locationCreationDto.isOpenSat ?? _location.isOpenSat,
+      openTimeSat: locationCreationDto.openTimeSat ?? _location.openTimeSat,
+      closeTimeSat: locationCreationDto.closeTimeSat ?? _location.closeTimeSat,
+
+      isOpenSun: locationCreationDto.isOpenSun ?? _location.isOpenSun,
+      openTimeSun: locationCreationDto.openTimeSun ?? _location.openTimeSun,
+      closeTimeSun: locationCreationDto.closeTimeSun ?? _location.closeTimeSun,
+
+      h3Index: h3Index,
+      latitude: locationCreationDto.latitude ?? _location.latitude,
+      longitude: locationCreationDto.longitude ?? _location.longitude,
     });
+
+    
 
     return new StoreLocationResponseMapper().map(location);
 

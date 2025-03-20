@@ -64,6 +64,11 @@ class MinLocationDto {
 
   @ApiProperty({ required: true, example: 'New Jersey' })
   closeTime!: string;
+
+  @ApiProperty({ required: false, example: 'ACTIVE' })
+  isOpen?: boolean;
+
+
 }
 
 export class MinCommentDto {

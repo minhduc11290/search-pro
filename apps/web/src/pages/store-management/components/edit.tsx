@@ -54,7 +54,7 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
         const result = form.validate();
         if (!result.hasErrors) {
             const data = form.getValues()
-            const { result, errorMessage } = await updateStore(storeInfo.id, {
+            const { result, errorMessage, statusCode } = await updateStore(storeInfo.id, {
                 // ...data,
                 isActive: data.status == Status.Active ? true : false,
                 // userName: data.email,
@@ -74,13 +74,26 @@ const EditStorePage = ({ opened, storeInfo, close }: EditStoreProps) => {
                 close(true);
             } else {
                 console.log("errorMessage", errorMessage);
-                notifications.show({
-                    title: `Error`,
-                    message: errorMessage,
-                    color: 'red',
-                    icon: <IconX />,
-                    position: 'top-right'
-                });
+                // notifications.show({
+                //     title: `Error`,
+                //     message: errorMessage,
+                //     color: 'red',
+                //     icon: <IconX />,
+                //     position: 'top-right'
+                // });
+                if (statusCode != 409) {
+                    console.log("errorMessage", errorMessage);
+                    notifications.show({
+                        title: `Error`,
+                        message: errorMessage,
+                        color: 'red',
+                        icon: <IconX />,
+                        position: 'top-right'
+                    });
+                } else {
+                    // Trùng store
+                    form.setFieldError('email', errorMessage);
+                }
             }
             // close(true);
         }

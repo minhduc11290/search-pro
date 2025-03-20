@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { apiGetProfile, postlogin } from '../api/users';
 import { UserInfo, UserLogin } from '../@types/user-props';
+import { LoginProps } from '../@types/login-props';
 
 // Hàm này trả về một object chứa các hàm và trạng thái xác thực
 const useAuth = () => {
@@ -16,12 +17,16 @@ const useAuth = () => {
     }, []);
 
     // Hàm login để đặt token và cập nhật trạng thái
-    const login = useCallback(async (data: UserLogin): Promise<boolean> => {
+    const login = useCallback(async (data: UserLogin): Promise<LoginProps> => {
         try {
             const response = await postlogin(data);
             if (response.status == 200) {
-                localStorage.setItem('authToken', response.data.accessToken);
-                return true;
+                // localStorage.setItem('authToken', response.data.accessToken);
+                // return true;
+                return {
+                    status: true,
+                    token: response.data.accessToken
+                }
             }
             // localStorage.setItem('authToken', token);
 
@@ -29,7 +34,10 @@ const useAuth = () => {
         } catch (ex) {
             console.log(ex);
         }
-        return false;
+        return {
+            status: false,
+            token: '',
+        }
     }, []);
 
     // Hàm logout để xóa token và cập nhật trạng thái

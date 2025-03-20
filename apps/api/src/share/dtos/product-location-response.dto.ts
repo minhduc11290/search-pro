@@ -26,6 +26,10 @@ export class MinLocationDto {
 
   @ApiProperty({ required: true, example: '12345' })
   closeTime?: string;
+
+  @ApiProperty({ required: false, example: 'ACTIVE' })
+  isOpen?: boolean;
+
 }
 
 export class LocationPriceDto {
@@ -110,4 +114,6 @@ export class ProductLocationResponseDto {
 
   @ApiProperty({ required: true, example: 'ACTIVE' })
   banner?: string;
+
+
 }

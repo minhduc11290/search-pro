@@ -42,6 +42,8 @@ const UserManagementPage = () => {
             const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
             const _data = [...dataFiltered];
             setDataDisplay(_data.slice(start, end));
+        } else {
+            setDataDisplay([]);
         }
     }
 
@@ -121,9 +123,9 @@ const UserManagementPage = () => {
         setSearch(value);
 
         const dataFilter = data.filter(function (el) {
-            return el.fullName.includes(value)
-                || el.email.includes(value)
-                || el.phone.includes(value) || el.userID?.includes(value);
+            return el.fullName.toLowerCase().includes(value.toLowerCase())
+                || el.email.toLowerCase().includes(value.toLowerCase())
+                || el.phone.toLowerCase().includes(value.toLowerCase()) || el.userID?.toLowerCase().includes(value.toLowerCase());
         });
 
         console.log("dataFilter", dataFilter);

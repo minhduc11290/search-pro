@@ -7,6 +7,10 @@ import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
   app.use('/api-docs', new BasicAuthMiddleware().use);
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true, // Cho phép gửi cookie qua trình duyệt
+  });
   const config = new DocumentBuilder()
     .setTitle('Search Pro API')
     .setDescription('The API description')

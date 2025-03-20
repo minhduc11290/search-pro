@@ -146,6 +146,7 @@ const EditAddressPage = ({ opened, productInfo, close }: EditProductProps) => {
     }
 
     useEffect(() => {
+        form.reset();
         init();
         console.log("productInfo", productInfo);
 

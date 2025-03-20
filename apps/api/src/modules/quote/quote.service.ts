@@ -67,7 +67,7 @@ export class QuoteService {
       contact,
       product: productLocation.product.id,
       geoRef: productLocation.location.geoRef.id,
-      locationId: productLocation.id,
+      locationId: productLocation.location.id,
       price: productLocation.price,
       sku: productLocation.product.sku,
       name: productLocation.product.name,

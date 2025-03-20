@@ -98,6 +98,8 @@ const ProductsPage = () => {
             getDataDisplay();
 
         } else {
+            setTotalPage(0);
+            setCurrentPage(1);
             setDataDisplay([]);
         }
     }, [dataFiltered]);
@@ -109,6 +111,8 @@ const ProductsPage = () => {
             const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
             const _data = [...dataFiltered];
             setDataDisplay(_data.slice(start, end));
+        } else {
+            setDataDisplay([]);
         }
     }
 
@@ -209,9 +213,9 @@ const ProductsPage = () => {
         const { value } = event.currentTarget;
         setSearch(value);
         const dataFilter = data.filter(function (el) {
-            return el.SKU.includes(value)
-                || el.description.includes(value)
-                || el.keysword.join(",").includes(value);
+            return el.SKU.toLowerCase().includes(value.toLowerCase())
+                || el.description.toLowerCase().includes(value.toLowerCase())
+                || el.keysword.join(",").toLowerCase().includes(value.toLowerCase());
         });
 
         setDataFiltered(dataFilter);

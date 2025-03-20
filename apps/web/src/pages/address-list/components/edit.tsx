@@ -1,4 +1,4 @@
-import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem, Container, ActionIcon, Image } from "@mantine/core";
+import { Modal, Text, Group, TextInput, Grid, Title, Button, Switch, Select, rem, Container, ActionIcon, Image, Checkbox } from "@mantine/core";
 import { useForm } from '@mantine/form';
 import { zodResolver } from 'mantine-form-zod-resolver';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import { TimeInput } from '@mantine/dates';
 import useGeoRef from "../../../hooks/georef";
 import { GeoProps } from "../../../@types/geo-props";
 import useStoreLocations from "../../../hooks/store-locations";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconPlus, IconX } from "@tabler/icons-react";
 import { Dropzone, FileWithPath, IMAGE_MIME_TYPE } from "@mantine/dropzone";
@@ -23,44 +23,280 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
     const location = useLocation();
     const storeId = location.state.id;
     const schema = z.object({
-        address: z
-            .string().trim()
-            .min(1, { message: 'Required information' }),
+        // address: z
+        //     .string().trim()
+        //     .min(1, { message: 'Required information' }),
         state: z.string().trim().min(1, { message: 'Required information' }),
         zipCode: z.string().min(5, { message: 'Required information' }),
         phone: z.string().regex(phoneRegex, 'Invalid phone').min(1, { message: 'Required information' }),
-        openAt: z.string().trim().min(1, { message: 'Required information' }),
-        closeAt: z.string().trim().min(1, { message: 'Required information' }),
+        // openAt: z.string().trim().min(1, { message: 'Required information' }),
+        // closeAt: z.string().trim().min(1, { message: 'Required information' }),
+        latitude: z.preprocess(
+            (value) => (typeof value === 'string' && value ? Number(value) : value),
+            z.number()
+        ),
+        longitude: z.preprocess(
+            (value) => (typeof value === 'string' && value ? Number(value) : value),
+            z.number()
+        ),
+        addressLine1: z.string().max(1000, { message: 'Only 1000 character' }).min(1, { message: 'Required information' }),
+        addressLine2: z.string().max(1000, { message: 'Only 1000 character' }),
+        city: z.string().max(1000, { message: 'Only 1000 character' }),
+        // fax: z.string().regex(phoneRegex, 'Invalid fax').nullable(),
+        isOpenMon: z.boolean(),
+        openTimeMon: z.string().trim().optional(),
+        closeTimeMon: z.string().trim().optional(),
+
+        isOpenTue: z.boolean(),
+        openTimeTue: z.string().trim().optional(),
+        closeTimeTue: z.string().trim().optional(),
+
+        isOpenWed: z.boolean(),
+        openTimeWed: z.string().trim().optional(),
+        closeTimeWed: z.string().trim().optional(),
+
+        isOpenThu: z.boolean(),
+        openTimeThu: z.string().trim().optional(),
+        closeTimeThu: z.string().trim().optional(),
+
+
+        isOpenFri: z.boolean(),
+        openTimeFri: z.string().trim().optional(),
+        closeTimeFri: z.string().trim().optional(),
+
+        isOpenSat: z.boolean(),
+        openTimeSat: z.string().trim().optional(),
+        closeTimeSat: z.string().trim().optional(),
+
+        isOpenSun: z.boolean(),
+        openTimeSun: z.string().trim().optional(),
+        closeTimeSun: z.string().trim().optional(),
+    }).superRefine((data, ctx) => {
+        if (data.isOpenMon) {
+            if (!data.openTimeMon) {
+                ctx.addIssue({
+                    path: ["openTimeMon"],
+                    message: "Open time is required when Monday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeMon) {
+                ctx.addIssue({
+                    path: ["closeTimeMon"],
+                    message: "Close time is required when Monday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+        if (data.isOpenTue) {
+            if (!data.openTimeTue) {
+                ctx.addIssue({
+                    path: ["openTimeTue"],
+                    message: "Open time is required when Tuesday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeTue) {
+                ctx.addIssue({
+                    path: ["closeTimeTue"],
+                    message: "Close time is required when Tuesday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+        if (data.isOpenWed) {
+            if (!data.openTimeWed) {
+                ctx.addIssue({
+                    path: ["openTimeWed"],
+                    message: "Open time is required when Wednesday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeWed) {
+                ctx.addIssue({
+                    path: ["closeTimeWed"],
+                    message: "Close time is required when Wednesday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+
+        if (data.isOpenThu) {
+            if (!data.openTimeThu) {
+                ctx.addIssue({
+                    path: ["openTimeThu"],
+                    message: "Open time is required when Thursday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeThu) {
+                ctx.addIssue({
+                    path: ["closeTimeThu"],
+                    message: "Close time is required when Thursday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+
+        if (data.isOpenFri) {
+            if (!data.openTimeFri) {
+                ctx.addIssue({
+                    path: ["openTimeFri"],
+                    message: "Open time is required when Friday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeFri) {
+                ctx.addIssue({
+                    path: ["closeTimeFri"],
+                    message: "Close time is required when Friday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+        if (data.isOpenSat) {
+            if (!data.openTimeSat) {
+                ctx.addIssue({
+                    path: ["openTimeSat"],
+                    message: "Open time is required when Saturday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeSat) {
+                ctx.addIssue({
+                    path: ["closeTimeSat"],
+                    message: "Close time is required when Saturday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+
+        if (data.isOpenSun) {
+            if (!data.openTimeSun) {
+                ctx.addIssue({
+                    path: ["openTimeSun"],
+                    message: "Open time is required when Sunday is open",
+                    code: "custom",
+                });
+            }
+            if (!data.closeTimeSun) {
+                ctx.addIssue({
+                    path: ["closeTimeSun"],
+                    message: "Close time is required when Sunday is open",
+                    code: "custom",
+                });
+            }
+        }
+
+
+
     });
 
     const form = useForm<{
-        address: string,
+        // address: string,
         state: string,
         zipCode: string,
-        openAt: string,
-        closeAt: string,
+        // openAt: string,
+        // closeAt: string,
         status: Status,
         images: FileWithPath[]
         phone: string,
+        addressLine1: string,
+        addressLine2: string,
+        fax: string,
+        city: string,
+        isOpenMon: boolean,
+        openTimeMon: string,
+        closeTimeMon: string,
+
+        isOpenTue: boolean,
+        openTimeTue: string,
+        closeTimeTue: string,
+
+        isOpenWed: boolean,
+        openTimeWed: string,
+        closeTimeWed: string,
+
+        isOpenThu: boolean,
+        openTimeThu: string,
+        closeTimeThu: string,
+
+        isOpenFri: boolean,
+        openTimeFri: string,
+        closeTimeFri: string,
+
+        isOpenSat: boolean,
+        openTimeSat: string,
+        closeTimeSat: string,
+
+        isOpenSun: boolean,
+        openTimeSun: string,
+        closeTimeSun: string,
+        longitude: number,
+        latitude: number,
+
     }>({
         mode: 'uncontrolled',
         initialValues: {
-            address: locationInfo.address,
+            // address: locationInfo.address,
             state: locationInfo.state,
             zipCode: locationInfo.zipCode,
-            openAt: locationInfo.openAt,
-            closeAt: locationInfo.closeAt,
+            // openAt: locationInfo.openAt,
+            // closeAt: locationInfo.closeAt,
             status: locationInfo.status,
             phone: locationInfo.phone ?? '',
             images: [],
 
+            addressLine1: locationInfo.addressLine1 ?? '',
+            addressLine2: locationInfo.addressLine2 ?? '',
+            fax: locationInfo.fax ?? '',
+            city: locationInfo.city ?? '',
+            isOpenMon: locationInfo.isOpenMon,
+            openTimeMon: locationInfo.openTimeMon,
+            closeTimeMon: locationInfo.closeTimeMon,
+
+            isOpenTue: locationInfo.isOpenTue,
+            openTimeTue: locationInfo.openTimeTue,
+            closeTimeTue: locationInfo.closeTimeTue,
+
+            isOpenWed: locationInfo.isOpenWed,
+            openTimeWed: locationInfo.openTimeWed,
+            closeTimeWed: locationInfo.closeTimeWed,
+
+            isOpenThu: locationInfo.isOpenThu,
+            openTimeThu: locationInfo.openTimeThu,
+            closeTimeThu: locationInfo.closeTimeThu,
+
+            isOpenFri: locationInfo.isOpenFri,
+            openTimeFri: locationInfo.openTimeFri,
+            closeTimeFri: locationInfo.closeTimeFri,
+
+            isOpenSat: locationInfo.isOpenSat,
+            openTimeSat: locationInfo.openTimeSat,
+            closeTimeSat: locationInfo.closeTimeSat,
+
+            isOpenSun: locationInfo.isOpenSun,
+            openTimeSun: locationInfo.openTimeSun,
+            closeTimeSun: locationInfo.closeTimeSun,
+
+            latitude: locationInfo.latitude,
+            longitude: locationInfo.longitude,
         },
         validate: zodResolver(schema),
 
     });
 
+    // const [allZipCodes, setAllZipCodes] = useState<string[]>([]);
+
     useEffect(() => {
         console.log("locationInfo", locationInfo);
+        form.reset();
         initData();
 
     }, [locationInfo])
@@ -68,14 +304,48 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
     const initData = async () => {
         await getData();
         form.setValues({
-            address: locationInfo.address,
+            // address: locationInfo.address,
             state: locationInfo.state,
             zipCode: locationInfo.zipCode,
-            openAt: locationInfo.openAt,
-            closeAt: locationInfo.closeAt,
+            // openAt: locationInfo.openAt,
+            // closeAt: locationInfo.closeAt,
             status: locationInfo.status,
             phone: locationInfo.phone,
-            images: []
+            images: [],
+            addressLine1: locationInfo.addressLine1 ?? '',
+            addressLine2: locationInfo.addressLine2 ?? '',
+            fax: locationInfo.fax ?? '',
+            city: locationInfo.city ?? '',
+            isOpenMon: locationInfo.isOpenMon,
+            openTimeMon: locationInfo.openTimeMon,
+            closeTimeMon: locationInfo.closeTimeMon,
+
+            isOpenTue: locationInfo.isOpenTue,
+            openTimeTue: locationInfo.openTimeTue,
+            closeTimeTue: locationInfo.closeTimeTue,
+
+            isOpenWed: locationInfo.isOpenWed,
+            openTimeWed: locationInfo.openTimeWed,
+            closeTimeWed: locationInfo.closeTimeWed,
+
+            isOpenThu: locationInfo.isOpenThu,
+            openTimeThu: locationInfo.openTimeThu,
+            closeTimeThu: locationInfo.closeTimeThu,
+
+            isOpenFri: locationInfo.isOpenFri,
+            openTimeFri: locationInfo.openTimeFri,
+            closeTimeFri: locationInfo.closeTimeFri,
+
+            isOpenSat: locationInfo.isOpenSat,
+            openTimeSat: locationInfo.openTimeSat,
+            closeTimeSat: locationInfo.closeTimeSat,
+
+            isOpenSun: locationInfo.isOpenSun,
+            openTimeSun: locationInfo.openTimeSun,
+            closeTimeSun: locationInfo.closeTimeSun,
+            latitude: locationInfo.latitude,
+            longitude: locationInfo.longitude,
+
         })
         setImages(locationInfo.attachments ?? []);
     }
@@ -95,12 +365,14 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
         const _geos = await getGeoRef();
         setGeos(_geos);
         const _states: string[] = [];
+        // const _zips: string[] = [];
         _geos.map((geo) => {
             _states.push(geo.steName);
+            // _zips.push(geo.zipCode);
         });
         const uniqueStates = [...new Set(_states)];
         setStates(uniqueStates);
-
+        // setAllZipCodes(_zips);
         if (locationInfo.state) {
             const _zipCodes: string[] = [];
             const geoFilter = _geos.filter((geo) => geo.steName == locationInfo.state);
@@ -160,10 +432,10 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
 
 
                 const { result, errorMessage } = await updateLocation(storeId, locationInfo.locationID, {
-                    name: form.getValues().address,
-                    address: form.getValues().address,
-                    openTime: form.getValues().openAt,
-                    closeTime: form.getValues().closeAt,
+                    name: (form.getValues().addressLine1 ?? '') + (form.getValues().addressLine2 ?? '') + (form.getValues().city ?? ''),
+                    address: (form.getValues().addressLine1 ?? '') + (form.getValues().addressLine2 ?? '') + (form.getValues().city ?? ''),
+                    openTime: '',
+                    closeTime: '',
                     geoRefId: geoRefId?.id ?? "",
                     isActive: form.getValues().status == Status.Active,
                     phone: form.getValues().phone,
@@ -173,6 +445,40 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
                             url: image.fileName,
                         }
                     }),
+
+                    addressLine1: form.getValues().addressLine1,
+                    addressLine2: form.getValues().addressLine2,
+                    city: form.getValues().city,
+                    fax: form.getValues().fax,
+                    isOpenMon: form.getValues().isOpenMon,
+                    openTimeMon: form.getValues().openTimeMon,
+                    closeTimeMon: form.getValues().closeTimeMon,
+
+                    isOpenTue: form.getValues().isOpenTue,
+                    openTimeTue: form.getValues().openTimeTue,
+                    closeTimeTue: form.getValues().closeTimeTue,
+
+                    isOpenWed: form.getValues().isOpenWed,
+                    openTimeWed: form.getValues().openTimeWed,
+                    closeTimeWed: form.getValues().closeTimeWed,
+
+                    isOpenThu: form.getValues().isOpenThu,
+                    openTimeThu: form.getValues().openTimeThu,
+                    closeTimeThu: form.getValues().closeTimeThu,
+
+                    isOpenFri: form.getValues().isOpenFri,
+                    openTimeFri: form.getValues().openTimeFri,
+                    closeTimeFri: form.getValues().closeTimeFri,
+
+                    isOpenSat: form.getValues().isOpenSat,
+                    openTimeSat: form.getValues().openTimeSat,
+                    closeTimeSat: form.getValues().closeTimeSat,
+
+                    isOpenSun: form.getValues().isOpenSun,
+                    openTimeSun: form.getValues().openTimeSun,
+                    closeTimeSun: form.getValues().closeTimeSun,
+                    latitude: form.getValues().latitude,
+                    longitude: form.getValues().longitude,
                 });
                 if (result) {
                     notifications.show({
@@ -200,146 +506,423 @@ const EditAddressPage = ({ opened, locationInfo, close }: EditLocationProps) => 
     }
 
 
-    return (<Modal opened={opened} onClose={() => { }} size="md" centered withCloseButton={false}>
+    return (<Modal opened={opened} onClose={() => { }} size="2xl" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> Edit location </Title>
         <Grid grow>
-            <Grid.Col span={12} >
-                <TextInput
-                    label="Address"
-                    placeholder="Enter address"
-                    withAsterisk
-                    key={form.key('address')}
-                    {...form.getInputProps('address')}
-                />
-            </Grid.Col>
-            <Grid.Col span={8} >
-                <Select
-                    label="State"
-                    placeholder="State"
-                    data={states}
-                    key={form.key('state')}
-                    {...form.getInputProps('state')}
-                    onChange={(_value, option) => onChangeStates(option?.value)}
-                    searchable
-                />
-            </Grid.Col>
-            <Grid.Col span={4} >
-                {/* <TextInput
-                    label="Zip code"
-                    placeholder="Zip code"
-                    withAsterisk
-                    key={form.key('zipCode')}
-                    {...form.getInputProps('zipCode')}
-                /> */}
+            <Grid.Col span={6} >
+                <Grid grow>
+                    <Grid.Col span={6} >
+                        <TextInput
+                            label="Address Line 1"
+                            placeholder="Enter address line 1"
+                            withAsterisk
+                            key={form.key('addressLine1')}
+                            {...form.getInputProps('addressLine1')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6} >
+                        <TextInput
+                            label="Address Line 2"
+                            placeholder="Enter address line 2"
 
-                <Select
-                    label="Zip code"
-                    placeholder="Zip code"
-                    data={zipCodes}
-                    searchable
-                    key={form.key('zipCode')}
-                    {...form.getInputProps('zipCode')}
-                />
-            </Grid.Col>
-            <Grid.Col span={12} >
-                <TextInput
-                    label="Phone"
-                    placeholder="Enter phone"
-                    key={form.key('phone')}
-                    {...form.getInputProps('phone')}
-                />
-            </Grid.Col>
-            <Grid.Col span={12} className="flex flex-row">
-                <Title order={4}>Open time</Title><Text className="text-red">*</Text>
-            </Grid.Col>
-            <Grid.Col span={6} className="flex flex-row items-center">
-                <Text className="pr-2" >From</Text>
-                <TimeInput
-                    style={{ width: '100%' }}
+                            key={form.key('addressLine2')}
+                            {...form.getInputProps('addressLine2')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={4} >
+                        <TextInput
+                            label="City"
+                            placeholder="Enter city"
+                            withAsterisk
+                            key={form.key('city')}
+                            {...form.getInputProps('city')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={4} >
+                        <Select
+                            label="State"
+                            placeholder="State"
+                            data={states}
+                            withAsterisk
+                            searchable
+                            key={form.key('state')}
+                            {...form.getInputProps('state')}
+                            onChange={(_, option) => onChangeStates(option.value)}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={4} >
+                        {/* <TextInput
+                            label="Zip code"
+                            placeholder="Zip code"
+                            withAsterisk
+                            key={form.key('zipCode')}
+                            {...form.getInputProps('zipCode')}
+                        /> */}
+                        <Select
+                            label="Zip code"
+                            placeholder="Zip code"
+                            data={zipCodes}
+                            withAsterisk
+                            key={form.key('zipCode')}
+                            {...form.getInputProps('zipCode')}
+                            searchable
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6} >
+                        <TextInput
+                            label="Phone"
+                            placeholder="Enter phone"
+                            key={form.key('phone')}
+                            {...form.getInputProps('phone')}
+                        />
+                    </Grid.Col>
+                    <Grid.Col span={6} >
+                        <TextInput
+                            label="Fax"
+                            placeholder="Enter fax"
+                            key={form.key('fax')}
+                            {...form.getInputProps('fax')}
+                        />
+                    </Grid.Col>
 
-                    key={form.key('openAt')}
-                    {...form.getInputProps('openAt')}
-                />
+                    <Grid.Col span={6} className="flex flex-col" >
+                        <Link to="https://www.latlong.net/convert-address-to-lat-long.html" target="blank" className="text-sm leading-[21.7px] text-blue-500">Latitude <label className="text-red-500">*</label>
+                        </Link>
+                        <TextInput
+                            placeholder="Latitude"
+                            withAsterisk
+                            key={form.key('latitude')}
+                            {...form.getInputProps('latitude')}
+                        />
+                        {/* <TextInput
+                                label="Zip code"
+                                placeholder="Zip code"
+                                withAsterisk
+                                key={form.key('zipCode')}
+                                {...form.getInputProps('zipCode')}
+                            /> */}
+                        {/* <MultiSelect
+                                multiple
+                                searchable
+                                label="User can search at zipCode"
+                                placeholder="User can search at zipCode"
+                                limit={20}
+                                data={allZipCodes}
+                            /> */}
+                    </Grid.Col>
+                    <Grid.Col span={6} className="flex flex-col" >
+                        <Link to="https://www.latlong.net/convert-address-to-lat-long.html" target="blank" className="text-sm leading-[21.7px] text-blue-500">Longitude <label className="text-red-500">*</label></Link>
+                        <TextInput
+                            placeholder="Longitude"
+                            withAsterisk
+                            key={form.key('longitude')}
+                            {...form.getInputProps('longitude')}
+                        />
+                    </Grid.Col>
+                </Grid>
             </Grid.Col>
-            <Grid.Col span={6} className="flex flex-row items-center">
-                <Text className="pr-2">To</Text>
+            <Grid.Col span={6} >
+                <Grid grow>
+                    <Grid.Col span={12} className="flex flex-row">
+                        <Title order={4}>Open time</Title><Text className="text-red">*</Text>
+                    </Grid.Col>
 
-                <TimeInput
-                    width={500}
-                    placeholder="Opt"
-                    style={{ width: '100%' }}
-                    key={form.key('closeAt')}
-                    {...form.getInputProps('closeAt')}
-                />
-            </Grid.Col>
-            <Grid.Col span={12} className="flex flex-row items-center">
-                <Switch checked={form.getValues().status == Status.Active} onChange={(event) => {
-                    form.setFieldValue('status', event.currentTarget.checked ? Status.Active : Status.Deactive)
-                }} ></Switch>
-                <Text className="ml-2 font-normal text-sm">Active/ Deactive location</Text>
-            </Grid.Col>
-            <Grid.Col span={12} className="flex flex-row pt-0">
-                {
-                    images && images.map((file, index) =>
-                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={`image_${index}`}>
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Monday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
 
-                            <Image className="w-full h-full" radius="md" fit="contain"
-                                src={getLink(file.name)}></Image>
-                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
-                                () => {
-                                    // form.removeListItem('images', index);
-                                    // setImageDelete([...imageDelete, file.id]);
-                                    // setImages([...images.slice(index)]);
-                                    setImageDelete([...imageDelete, file.id!]);
-                                    console.log("index", index);
-                                    images.splice(index, 1);
-                                    setImages([...images]);
-                                }
-                            }>
-                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
-                            </ActionIcon>
+                                key={form.key('isOpenMon')}
+                                {...form.getInputProps('isOpenMon')}
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenMon', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenMon}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeMon')}
+                                {...form.getInputProps('openTimeMon')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeMon')}
+                                {...form.getInputProps('closeTimeMon')}
+                            />
                         </Container>
-                    )
-                }
+                    </Grid.Col>
 
-                {
-                    form.getValues().images.map((file, index) =>
-                        <Container className="w-20 h-20 mx-2  rounded-lg relative" key={index}>
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Tuesday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
 
-                            <Image className="w-full h-full" radius="md" fit="contain"
-                                src={typeof file === "string" ? file : (URL.createObjectURL(file) ?? '')}></Image>
-                            <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
-                                () => {
-                                    form.removeListItem('images', index);
-                                }
-                            }>
-                                <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
-                            </ActionIcon>
+                                key={form.key('isOpenTue')}
+                                {...form.getInputProps('isOpenTue')}
+
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenTue', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenTue}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeTue')}
+                                {...form.getInputProps('openTimeTue')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeTue')}
+                                {...form.getInputProps('closeTimeTue')}
+                            />
                         </Container>
-                    )
+                    </Grid.Col>
 
-                }
-                <Dropzone
-                    multiple
-                    onDrop={(files) => {
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Wednesday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
 
-                        const _files = form.getValues().images;
-                        form.setFieldValue('images', [..._files, ...files]);
-                    }}
-                    maxSize={5 * 1024 ** 2}
-                    accept={IMAGE_MIME_TYPE}
-                >
-                    <Container className="w-20 h-20 flex items-center justify-center border rounded-lg">
-                        <Group justify="center" gap="xl" mih={48} style={{ pointerEvents: 'none' }}>
-                            <Dropzone.Idle>
-                                <IconPlus
-                                    style={{ width: rem(20), height: rem(20), color: 'var(--mantine-color-dimmed)' }}
-                                    stroke={1.5}
-                                />
-                            </Dropzone.Idle>
-                        </Group>
-                    </Container>
-                </Dropzone>
+                                key={form.key('isOpenWed')}
+                                {...form.getInputProps('isOpenWed')}
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenWed', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenWed}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeWed')}
+                                {...form.getInputProps('openTimeWed')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeWed')}
+                                {...form.getInputProps('closeTimeWed')}
+                            />
+                        </Container>
+                    </Grid.Col>
+
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Thursday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
+                                key={form.key('isOpenThu')}
+                                {...form.getInputProps('isOpenThu')}
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenThu', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenThu}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeThu')}
+                                {...form.getInputProps('openTimeThu')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeThu')}
+                                {...form.getInputProps('closeTimeThu')}
+                            />
+                        </Container>
+                    </Grid.Col>
+
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Friday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
+                                key={form.key('isOpenFri')}
+                                {...form.getInputProps('isOpenFri')}
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenFri', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenFri}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeFri')}
+                                {...form.getInputProps('openTimeFri')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeFri')}
+                                {...form.getInputProps('closeTimeFri')}
+                            />
+                        </Container>
+                    </Grid.Col>
+
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Saturday</Text>
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
+                                key={form.key('isOpenSat')}
+                                {...form.getInputProps('isOpenSat')}
+
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenSat', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenSat}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeSat')}
+                                {...form.getInputProps('openTimeSat')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeSat')}
+                                {...form.getInputProps('closeTimeSat')}
+                            />
+                        </Container>
+                    </Grid.Col>
+
+                    <Grid.Col span={12} className="px-2 flex flex-row items-center justify-between">
+                        <Text className="px-2 w-[94px]">Sunday</Text>
+
+                        <Container className="flex flex-1 items-center flex-row">
+                            <Checkbox
+                                className="pr-2"
+                                key={form.key('isOpenSun')}
+                                {...form.getInputProps('isOpenSun')}
+                                onChange={(event) => {
+                                    form.setFieldValue('isOpenSun', event.currentTarget.checked);
+                                }}
+                                checked={form.getValues().isOpenSun}
+                            />
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('openTimeSun')}
+                                {...form.getInputProps('openTimeSun')}
+                            />
+
+                            <Text className="px-2"> ~ </Text>
+
+                            <TimeInput
+                                style={{ width: '100%' }}
+
+                                key={form.key('closeTimeSun')}
+                                {...form.getInputProps('closeTimeSun')}
+                            />
+                        </Container>
+                    </Grid.Col>
+
+
+                    <Grid.Col span={12} className="flex flex-row items-center">
+                        <Switch checked={form.getValues().status == Status.Active} onChange={(event) => {
+                            form.setFieldValue('status', event.currentTarget.checked ? Status.Active : Status.Deactive)
+                        }} ></Switch>
+                        <Text className="ml-2 font-normal text-sm">Active/ Deactive location</Text>
+                    </Grid.Col>
+                    <Grid.Col span={12} className="flex flex-row pt-0">
+                        {
+                            images && images.map((file, index) =>
+                                <Container className="w-20 h-20 mx-2  rounded-lg relative" key={`image_${index}`}>
+
+                                    <Image className="w-full h-full" radius="md" fit="contain"
+                                        src={getLink(file.name)}></Image>
+                                    <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                        () => {
+                                            // form.removeListItem('images', index);
+                                            // setImageDelete([...imageDelete, file.id]);
+                                            // setImages([...images.slice(index)]);
+                                            setImageDelete([...imageDelete, file.id!]);
+                                            console.log("index", index);
+                                            images.splice(index, 1);
+                                            setImages([...images]);
+                                        }
+                                    }>
+                                        <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                                    </ActionIcon>
+                                </Container>
+                            )
+                        }
+                        {
+                            form.getValues().images.map((file, index) =>
+                                <Container className="w-20 h-20 mx-2  rounded-lg relative" key={index}>
+
+                                    <Image className="w-full h-full" radius="md" fit="contain"
+                                        src={typeof file === "string" ? file : (URL.createObjectURL(file) ?? '')}></Image>
+                                    <ActionIcon style={{ top: '-12px', right: '-12px' }} className="absolute right-0 top-0 w-4 h-4 rounded-full border" variant="transparent" onClick={
+                                        () => {
+                                            form.removeListItem('images', index);
+                                        }
+                                    }>
+                                        <IconX className="w-4 stroke-[#e5e7eb]"></IconX>
+                                    </ActionIcon>
+                                </Container>
+                            )
+
+                        }
+                        <Dropzone
+                            multiple
+                            onDrop={(files) => {
+                                console.log(files);
+                                const _files = form.getValues().images;
+                                if (_files.length + files.length + images.length > 10) {
+                                    form.setFieldError('images', 'Only upload 10 files for every product');
+                                    return;
+                                }
+
+                                form.setFieldValue('images', [..._files, ...files]);
+                            }}
+                            maxSize={5 * 1024 ** 2}
+                            accept={IMAGE_MIME_TYPE}
+                        >
+                            <Container className="w-20 h-20 flex items-center justify-center border rounded-lg">
+                                <Group justify="center" gap="xl" mih={48} style={{ pointerEvents: 'none' }}>
+                                    <Dropzone.Idle>
+                                        <IconPlus
+                                            style={{ width: rem(20), height: rem(20), color: 'var(--mantine-color-dimmed)' }}
+                                            stroke={1.5}
+                                        />
+                                    </Dropzone.Idle>
+                                </Group>
+                            </Container>
+                        </Dropzone>
+                        {form.errors.files && (
+                            <Text c="red" mt={5}>
+                                {form.errors.files}
+                            </Text>
+                        )}
+                    </Grid.Col>
+                </Grid>
             </Grid.Col>
         </Grid>
 

@@ -107,7 +107,7 @@ export class AdminStoreController {
     //   password: storeCreationDto.password,
     //   phone: storeCreationDto.primaryPhone
     // });
-    const exsistEmail = await this.adminUserService.findByEmail(storeCreationDto.email);
+    const exsistEmail = await this.adminUserService.findByEmailStore(storeCreationDto.email);
     if (exsistEmail) {
       throw new ConflictException('User with provided email already exists');
     }
@@ -137,7 +137,7 @@ export class AdminStoreController {
     @Param('storeId') storeId: string,
     @Body() storeOwnerDto: StoreOwnerCreationDto,
   ): Promise<StoreResponseDto> {
-    const owner = await this.adminUserService.findByEmail(storeOwnerDto.email);
+    const owner = await this.adminUserService.findByEmailStore(storeOwnerDto.email);
     if (owner) {
       throw new ConflictException('User with provided email already exists');
     }
@@ -158,7 +158,24 @@ export class AdminStoreController {
     @Param('id') id: string,
     @Body() updateStoreDto: StoreUpdatingDto,
   ): Promise<StoreResponseDto> {
+
     const _store = await this.adminStoreService.findById(id);
+    if (updateStoreDto.email) {
+      const exsistEmail = await this.adminUserService.findByEmailStore(updateStoreDto.email);
+      if (exsistEmail && (_store?.owners.length ?? 0) > 0 && exsistEmail.id != _store?.owners[0].id) {
+        throw new ConflictException('User with provided email already exists');
+      }
+      if (_store && _store.owners.length > 0) {
+        let userId = _store.owners[0].id;
+        await this.adminUserService.updateEmailStore(userId, updateStoreDto.email);
+      }
+
+    }
+
+    // _store?.owners[0].id
+
+
+
     const store = await this.adminStoreService.update(id, {
       email: updateStoreDto.email ?? (_store?.email ?? ""),
       name: updateStoreDto.name ?? (_store?.name ?? ""),

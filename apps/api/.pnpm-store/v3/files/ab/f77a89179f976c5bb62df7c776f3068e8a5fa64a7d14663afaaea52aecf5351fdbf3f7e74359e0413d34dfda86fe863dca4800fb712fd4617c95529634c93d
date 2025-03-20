@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.forRoutesPath = forRoutesPath;
+function forRoutesPath(options, consumer) {
+    const isNestMiddleware = (consumer) => {
+        return typeof consumer.httpAdapter === 'object';
+    };
+    const usingFastify = (consumer) => {
+        return consumer.httpAdapter.constructor.name.toLowerCase().startsWith('fastify');
+    };
+    return options.forRoutesPath ??
+        (isNestMiddleware(consumer) && usingFastify(consumer) ? '(.*)' : '*');
+}

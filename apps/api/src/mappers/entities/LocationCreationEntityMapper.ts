@@ -27,7 +27,42 @@ export class LocationCreationEntityMapper extends CreateEntityMapper<
       store: options.storeId,
       createdBy: options.createdBy,
       status: source.isActive ? LocationStatus.ACTIVE : LocationStatus.INACTIVE,
-      phone: source.phone
+      phone: source.phone,
+      addressLine1: source.addressLine1,
+      addressLine2: source.addressLine2,
+      city: source.city,
+      isOpenMon: source.isOpenMon,
+      openTimeMon: source.openTimeMon,
+      closeTimeMon: source.closeTimeMon,
+
+      isOpenTue: source.isOpenTue,
+      openTimeTue: source.openTimeTue,
+      closeTimeTue: source.closeTimeTue,
+
+      isOpenWed: source.isOpenWed,
+      openTimeWed: source.openTimeWed,
+      closeTimeWed: source.closeTimeWed,
+
+      isOpenThu: source.isOpenThu,
+      openTimeThu: source.openTimeThu,
+      closeTimeThu: source.closeTimeThu,
+
+      isOpenFri: source.isOpenFri,
+      openTimeFri: source.openTimeFri,
+      closeTimeFri: source.closeTimeFri,
+
+      isOpenSat: source.isOpenSat,
+      openTimeSat: source.openTimeSat,
+      closeTimeSat: source.closeTimeSat,
+
+
+      isOpenSun: source.isOpenSun,
+      openTimeSun: source.openTimeSun,
+      closeTimeSun: source.closeTimeSun,
+
+      latitude: source.latitude,
+      longitude: source.longitude
+
     };
   }
 }

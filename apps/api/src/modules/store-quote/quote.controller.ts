@@ -28,6 +28,7 @@ import { StoreQuoteService } from './quote.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { JwtGuard } from '../share/auth/guard';
 import { QuoteStatus } from '~/share/consts/enums';
+import { AdminLocationService } from '../admin/location/admin-location.service';
 
 @ApiTags('Store - Quotes')
 @Controller('store-quotes')
@@ -35,7 +36,7 @@ import { QuoteStatus } from '~/share/consts/enums';
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class StoreQuoteController {
-  constructor(private readonly quoteService: StoreQuoteService) { }
+  constructor(private readonly quoteService: StoreQuoteService, private readonly locationService: AdminLocationService) { }
 
   @Put(":quoteId")
   @ApiOperation({ summary: 'Respond quote' })
@@ -79,13 +80,21 @@ export class StoreQuoteController {
     }
     console.log("findByQuoteIdAndStore", quoteId);
     console.log("store", user.stores);
+
     const quote = await this.quoteService.findByQuoteIdAndStore(quoteId, user.stores);
     if (!quote) {
       throw new NotFoundException('Product not found');
     }
+
+    let store = null;
+    if (quote.locationId) {
+      store = await this.locationService.findById(quote.locationId);
+    }
+
+
     // if (quote.status !== QuoteStatus.WAITING) {
     //   throw new BadRequestException('Quote is waiting for response');
     // }
-    return new QuoteResponseMapper().map(quote);
+    return new QuoteResponseMapper().map(quote, store);
   }
 }

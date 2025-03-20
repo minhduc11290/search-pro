@@ -1,7 +1,7 @@
 import {
     TextInput,
     PasswordInput,
-    Paper,
+    // Paper,
     Container,
     Button,
     Title
@@ -12,20 +12,9 @@ import { PATH } from '../../constants/paths';
 import useAuth from '../../hooks/auth';
 import { useForm, zodResolver } from '@mantine/form';
 import { z } from 'zod';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function LoginPage() {
-    const [notWorking, setNotWorking] = useState(false);
-    useEffect(() => {
-        const pday = new Date("2025-01-27")
-        const now = new Date()
-        if (now > pday) {
-            setNotWorking(true);
-        }
-    }, []);
-    // if () {
-    //     return <div>Suppended</div>;
-    // }
     const schema = z.object({
         email: z
             .string().trim()
@@ -50,7 +39,7 @@ export default function LoginPage() {
             setPressed(true);
             const result = form.validate();
             if (!result.hasErrors) {
-                const logined = await login(form.getValues());
+                const { status, token } = await login(form.getValues());
                 if (logined) {
                     navigate(PATH.STOREMANAGEMENT);
                 } else {
@@ -67,23 +56,40 @@ export default function LoginPage() {
 
 
     return (
-        notWorking ? <>Suppend</> : <Container size={420} className='w-screen h-screen flex items-center flex-1 flex-grow flex-row align-middle justify-center' >
-
-            <Paper withBorder shadow="md" p={30} radius="md" >
-                <Title ta="center" className={`${classes.title} mb-4`} >
-                    Admin system
+        <Container fluid className='w-screen h-screen flex items-center flex-1 flex-grow flex-row align-middle justify-center px-0' >
+            <Container className={`${classes.backgroundLeft} h-full hidden sm:flex sm:w-8/12 relative px-0`} >
+                <Container className={`w-full h-full flex items-center flex-1 justify-center px-0`}>
+                    <img src="/home.svg" height="500" width="500"></img>
+                </Container>
+            </Container>
+            <Container className='w-full flex flex-col md:w-4/12'>
+                {/* <Paper withBorder shadow="md" p={30} radius="md" > */}
+                <Title className={`${classes.title} mb-1`} >
+                    Welcome to DBS
+                </Title>
+                <Title className={`${classes.subtitle} mb-4`} >
+                    Your Admin Dashboard
                 </Title>
                 <TextInput placeholder="Enter email" required
+                    label={<span className={`${classes.labelInput}`}>Email</span>}
+                    withAsterisk={false}
                     key={form.key('email')}
+                    styles={{ input: { height: 44, borderRadius: 7 } }}
                     {...form.getInputProps('email')} />
                 <PasswordInput placeholder="Enter password" required mt="md"
+                    label={<span className={`${classes.labelInput}`}>Password</span>}
+                    withAsterisk={false}
                     key={form.key('password')}
+                    styles={{ input: { height: 44, borderRadius: 7 } }}
                     {...form.getInputProps('password')} />
 
-                <Button fullWidth mt="xl" onClick={handleLogin}>
-                    Sign in
+                <Button fullWidth mt="xl" onClick={handleLogin} className='h-10 rounded-lg bg-[#5D87FF] hover:bg-[#4570EA]'>
+                    Sign In
                 </Button>
-            </Paper>
+                {/* </Paper> */}
+            </Container>
+
+
         </Container>
     );
 }

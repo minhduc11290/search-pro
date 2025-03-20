@@ -18,17 +18,19 @@ export class UserService {
   ) { }
 
   async createUser(userCreationDto: UserCreationDto): Promise<UserEntity> {
+    const role = await this.em.findOneOrFail(RoleEntity, {
+      role: UserRole.APP_USER,
+    });
     const existedUser = await this.em.findOne(UserEntity, {
       email: userCreationDto.email,
+      role: role.id,
     });
     if (existedUser) {
       throw new ConflictException('User already exists!');
     }
 
     const password = await argon.hash(userCreationDto.password);
-    const role = await this.em.findOneOrFail(RoleEntity, {
-      role: UserRole.APP_USER,
-    });
+
     const requiredData: RequiredEntityData<UserEntity> = {
       ...userCreationDto,
       userName: userCreationDto.email,

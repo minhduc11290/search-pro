@@ -3,25 +3,25 @@ import logo from '../../assets/logo.png';
 import { useNavigate } from "react-router-dom";
 import useAuth from '../../hooks/auth';
 import { PATH } from "../../constants/paths";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function HomePage() {
-    const [notWorking, setNotWorking] = useState(false);
-    useEffect(() => {
-        const pday = new Date("2025-01-27")
-        const now = new Date()
-        if (now > pday) {
-            setNotWorking(true);
-        }
-    }, []);
+    // const [notWorking, setNotWorking] = useState(false);
+    // useEffect(() => {
+    //     const pday = new Date("2025-01-27")
+    //     const now = new Date()
+    //     if (now > pday) {
+    //         setNotWorking(true);
+    //     }
+    // }, []);
     const { isLoading, isAuthenticated, logout, getProfile } = useAuth();
     const navigate = useNavigate();
 
 
     useEffect(() => {
-        if (notWorking) {
-            return;
-        }
+        // if (notWorking) {
+        //     return;
+        // }
         handleLogin();
         // logout();
         // navigate(PATH.LOGIN);

@@ -42,6 +42,8 @@ const StoreManagementPage = () => {
             getDataDisplay();
 
         } else {
+            setTotalPage(0);
+            setCurrentPage(1);
             setDataDisplay([]);
         }
     }, [dataFiltered]);
@@ -53,6 +55,8 @@ const StoreManagementPage = () => {
             const end = dataFiltered.length > (start + PAGINATION.ITEMPERPAGE) ? start + PAGINATION.ITEMPERPAGE : dataFiltered.length;
             const _data = [...dataFiltered];
             setDataDisplay(_data.slice(start, end));
+        } else {
+            setDataDisplay([]);
         }
     }
 
@@ -204,9 +208,9 @@ const StoreManagementPage = () => {
         const { value } = event.currentTarget;
         setSearch(value);
         const dataFilter = data.filter(function (el) {
-            return el.ownerstore.includes(value)
-                || el.email.includes(value)
-                || el.phone.includes(value);
+            return el.ownerstore.toLowerCase().includes(value.toLowerCase())
+                || el.email.toLowerCase().includes(value.toLowerCase())
+                || el.phone.toLowerCase().includes(value.toLowerCase());
         });
 
         setDataFiltered(dataFilter);

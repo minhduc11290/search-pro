@@ -27,6 +27,7 @@ import { QuoteService } from './quote.service';
 import { RolesGuard } from '~/decorators/role-guard.decorator';
 import { JwtGuard } from '../share/auth/guard';
 import { QuoteStatus } from '~/share/consts/enums';
+import { AdminLocationService } from '../admin/location/admin-location.service';
 
 @ApiTags('App - Quotes')
 @Controller('quotes')
@@ -34,7 +35,7 @@ import { QuoteStatus } from '~/share/consts/enums';
 @UseGuards(JwtGuard)
 @ApiBearerAuth()
 export class QuoteController {
-  constructor(private readonly quoteService: QuoteService) { }
+  constructor(private readonly quoteService: QuoteService, private readonly locationService: AdminLocationService) { }
 
   @Post()
   @ApiOperation({ summary: 'Quote a product' })
@@ -46,7 +47,7 @@ export class QuoteController {
     const quote = await this.quoteService.createQuote(user.id, quoteData);
 
     const updatedQuote = await this.quoteService.findById(quote.id, user.id);
-    
+
     if (!updatedQuote) {
       throw new NotFoundException('Product not found');
     }
@@ -61,7 +62,21 @@ export class QuoteController {
     @Query() query: QuoteFilterDto,
   ): Promise<QuoteResponseDto[]> {
     const quotes = await this.quoteService.findByStatus(user.id, query.status);
-    return new QuoteResponseMapper().mapArray(quotes);
+
+    // return new QuoteResponseMapper().mapArray(quotes);
+    let data: QuoteResponseDto[] = [];
+    for (const quote of quotes) {
+      let store = null;
+      if (quote.locationId) {
+        store = await this.locationService.findById(quote.locationId);
+      }
+
+      data.push(new QuoteResponseMapper().map(quote, store));
+    }
+    return data;
+
+    // return new QuoteResponseMapper().mapArray(quotes);
+
   }
 
   @Get(':quoteId')
@@ -78,6 +93,11 @@ export class QuoteController {
     // if (quote.status !== QuoteStatus.WAITING) {
     //   throw new BadRequestException('Quote is waiting for response');
     // }
-    return new QuoteResponseMapper().map(quote);
+    let store = null;
+    if (quote.locationId) {
+      store = await this.locationService.findById(quote.locationId);
+    }
+
+    return new QuoteResponseMapper().map(quote, store);
   }
 }

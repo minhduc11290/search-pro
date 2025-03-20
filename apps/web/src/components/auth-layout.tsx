@@ -55,7 +55,7 @@ export function AuthLayout({ children, currentLink, isLoading = false }: MainLay
                     setActive(item.label);
                 }}
             >
-                <item.icon className={classes.linkIcon} stroke={1.5} />
+                {/* <item.icon className={classes.linkIcon} stroke={1.5} /> */}
                 <span>{item.label}</span>
             </a>
         ));
@@ -63,21 +63,22 @@ export function AuthLayout({ children, currentLink, isLoading = false }: MainLay
 
     return (
         <div className='w-screen h-screen flex flex-row relative'>
-            <nav className={classes.navbar}>
-                <div className={classes.navbarMain}>
-                    <Group className={classes.header} justify="space-between">
-                        {/* <MantineLogo size={28} /> */}
-                        {/* <Code fw={700}>v3.1.2</Code> */}
-                        <Image
-                            radius="md"
-                            h={48}
-                            src={logo}
-                        />
-                    </Group>
-                    {user && links()}
-                </div>
-            </nav>
-            <div className='flex flex-col flex-1'>
+
+            <div className='flex w-full flex-col '>
+                <nav className={classes.navbar}>
+                    <div className={classes.navbarMain}>
+                        <Group className={classes.header} justify="space-between">
+                            {/* <MantineLogo size={28} /> */}
+                            {/* <Code fw={700}>v3.1.2</Code> */}
+                            <Image
+                                radius="md"
+                                h={48}
+                                src={logo}
+                            />
+                        </Group>
+                        {user && links()}
+                    </div>
+                </nav>
                 {children}
             </div>
             {isLoading ? <div className='absolute top-0 w-full h-screen z-[999] bg-[#00000080]'>

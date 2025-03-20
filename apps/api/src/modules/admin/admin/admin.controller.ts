@@ -98,7 +98,8 @@ export class AdminAdminController {
     //   password: storeCreationDto.password,
     //   phone: storeCreationDto.primaryPhone
     // });
-    const exsistEmail = await this.adminUserService.findByEmail(storeCreationDto.email);
+
+    const exsistEmail = await this.adminUserService.findByEmailAdmin(storeCreationDto.email);
     if (exsistEmail) {
       throw new ConflictException('User with provided email already exists');
     }
@@ -149,7 +150,7 @@ export class AdminAdminController {
     const _store = await this.adminAdminService.findById(id);
 
     if (updateStoreDto.email) {
-      const exsistEmail = await this.adminUserService.findByEmail(updateStoreDto.email);
+      const exsistEmail = await this.adminUserService.findByEmailAdmin(updateStoreDto.email);
       if (exsistEmail) {
         if (exsistEmail.id != id) {
           throw new ConflictException('User with provided email already exists');

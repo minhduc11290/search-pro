@@ -17,7 +17,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UserEntity extends BaseEntity<UserEntity> {
   @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
   @Property({ length: 100 })
-  @Unique()
+  // @Unique()
   userName!: string;
 
   @ApiProperty({ maxLength: 255, required: false })
@@ -40,10 +40,11 @@ export class UserEntity extends BaseEntity<UserEntity> {
   @Property({ length: 100, nullable: true })
   pw?: string;
 
-  @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
+  // @ApiProperty({ required: true, maxLength: 100, uniqueItems: true })
+  @ApiProperty({ required: true, maxLength: 100 })
   @Property({ length: 100, nullable: false })
   @IsEmail()
-  @Unique()
+  // @Unique()
   email!: string;
 
   @ApiProperty({ maxLength: 25, required: false })

@@ -8,24 +8,24 @@ import { ListLocationProps } from "../../../@types/list-location-products";
 const ListLocationPage = ({ opened, close, locationPrice }: ListLocationProps) => {
     console.log("locationPrice", locationPrice);
     const [scrolled, setScrolled] = useState(false);
-   
+
 
     const rows = locationPrice.map((row, index) => (
         <Table.Tr key={index}>
-            <Table.Td style={{ maxWidth: '80' }}>{row.locationID}</Table.Td>
+            {/* <Table.Td style={{ maxWidth: '80' }}>{row.locationID}</Table.Td> */}
             <Table.Td>{row.address}</Table.Td>
             <Table.Td>{row.steName} {row.zipCode}</Table.Td>
             <Table.Td>{row.price}</Table.Td>
         </Table.Tr>));
 
-    return (<Modal opened={opened} onClose={() => { }} size="lg" centered withCloseButton={false}>
+    return (<Modal opened={opened} onClose={() => { }} size="xl" centered withCloseButton={false}>
         <Title className="font-bold text-xl"> List location </Title>
 
         <ScrollArea style={{ width: '100%' }} mah={300} onScrollPositionChange={({ y }) => setScrolled(y !== 0)}>
             <Table className={classes.table} withTableBorder={true}>
                 <Table.Thead className={cx(classes.header, { [classes.scrolled]: scrolled })}>
                     <Table.Tr>
-                        <Table.Th>Location ID</Table.Th>
+                        {/* <Table.Th>Location ID</Table.Th> */}
                         <Table.Th>Address</Table.Th>
                         <Table.Th>State/Zip</Table.Th>
                         <Table.Th>Product price</Table.Th>

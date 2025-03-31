@@ -1,0 +1,198 @@
+import { useCallback, useEffect, useState } from "react";
+import { apiGetCategories, apiGetStoreById, apiGetStores, apiPostStore, apiPutStore } from "../api/stores";
+import { Category, Store, StoreRequest, UpdateStoreRequest } from "../@types/store-props";
+import { Status } from "../@types/enum/status";
+import { AxiosError } from "axios";
+
+const useStore = () => {
+
+    const [isLoading, setIsLoading] = useState(true);
+
+
+    // Kiểm tra trạng thái đăng nhập từ localStorage khi hook khởi tạo
+    useEffect(() => {
+        setIsLoading(false);
+    }, []);
+
+
+
+    const getStores = useCallback(async (categoryId?: string): Promise<Store[]> => {
+        try {
+            setIsLoading(true);
+            const response = await apiGetStores(categoryId);
+
+            // localStorage.setItem('authToken', token);
+            if (Array.isArray(response.data)) {
+                return response.data.map((item, index) => {
+                    const store: Store = {
+                        no: index + 1,
+                        id: item.id,
+                        ownerstore: item.name,
+                        userName: item.userName,
+                        phone: item.primaryPhone,
+                        email: item.email,
+                        status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                        category: item.categoryId
+                    }
+                    return store;
+                });
+            }
+            // setIsAuthenticated(true);
+            return [];
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return [];
+    }, []);
+
+    const getStore = useCallback(async (id: string): Promise<Store | null> => {
+        try {
+            setIsLoading(true);
+            const response = await apiGetStoreById(id);
+
+            // localStorage.setItem('authToken', token);
+            if (response.data) {
+                let item = response.data
+                const store: Store = {
+                    no: 1,
+                    id: item.id,
+                    ownerstore: item.name,
+                    userName: item.userName,
+                    phone: item.primaryPhone,
+                    email: item.email,
+                    status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                    category: item.categoryId,
+                    pw: item.pw
+                }
+                return store;
+
+            }
+            // setIsAuthenticated(true);
+            return null;
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return null;
+    }, []);
+
+
+    const getCategories = useCallback(async (): Promise<Category[]> => {
+        try {
+            setIsLoading(true);
+            const response = await apiGetCategories();
+
+            // localStorage.setItem('authToken', token);
+            if (Array.isArray(response.data)) {
+                return response.data.map((item) => {
+                    const store: Category = {
+                        id: item.id,
+                        name: item.name,
+                    }
+                    return store;
+                });
+            }
+            // setIsAuthenticated(true);
+            return [];
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return [];
+    }, []);
+
+
+
+
+    const createStore = useCallback(async (store: StoreRequest) => {
+        let result = false;
+        let errorMessage = "";
+        let data = null;
+        let statusCode = 201;
+        try {
+            setIsLoading(true);
+            // let storeRequest: StoreRequest = {
+            //     name: store.userName,
+            //     primaryPhone: store.phone,
+            //     password: store.password ?? '',
+            //     email: store.email,
+            //     isActive: store.status == Status.Active ? true : false
+            // };
+            const response = await apiPostStore(store);
+            if (response.status == 201) {
+                data = response.data;
+                result = true;
+            }
+        } catch (ex) {
+
+            if (ex instanceof AxiosError) {
+                statusCode = ex.response?.status ?? 0;
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { data, result, errorMessage, statusCode };
+    }, []);
+
+    const updateStore = useCallback(async (id: string, store: UpdateStoreRequest) => {
+        let result = false;
+        let errorMessage = "";
+        let statusCode = 200;
+        try {
+            setIsLoading(true);
+            const response = await apiPutStore(id, store);
+            if (response.status == 200) {
+                result = true;
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                statusCode = ex.response?.status ?? 0;
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage, statusCode };
+    }, []);
+
+    // const updateStatus = useCallback(async (id: string, status: boolean) => {
+    //     let result = false;
+    //     let errorMessage = "";
+    //     try {
+    //         setIsLoading(true);
+    //         const response = await apiPutStore(id, store);
+    //         if (response.status == 200) {
+    //             result = true;
+    //         }
+    //     } catch (ex) {
+    //         if ((ex instanceof Error)) {
+    //             errorMessage = ex.message;
+    //         } else if (ex instanceof AxiosError) {
+    //             errorMessage = ex.message;
+    //         }
+
+    //         console.log(ex);
+    //     } finally {
+    //         setIsLoading(false);
+    //     }
+    //     return { result, errorMessage };
+    // }, []);
+
+
+    return { isLoading, getStores, createStore, updateStore, getCategories, getStore };
+};
+
+export default useStore;

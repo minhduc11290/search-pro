@@ -28,6 +28,7 @@ import {
   TableFooter,
   useTheme,
   TableContainer,
+  Autocomplete,
 } from "@mui/material";
 import Link from "next/link";
 import EditIcon from "@mui/icons-material/Edit";
@@ -56,10 +57,10 @@ import { StoreContext } from "@/app/context/StoreContext";
 import { Category, Store } from "@/@types/store-props";
 import BlankCard from "@/app/components/shared/BlankCard";
 import useStore from "@/hooks/stores";
+import DialogImportStore from "./DialogImportStore";
 
 function StoreList() {
   const { data, deleteInvoice, fetchData } = useContext(StoreContext);
-
 
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("All");
@@ -69,7 +70,6 @@ function StoreList() {
 
   const tabItem = ["All", "Shipped", "Delivered", "Pending"];
   const [currentIndex, setCurrentIndex] = useState(0);
-
 
   // Handle status filter change
   const handleClick = (status: string) => {
@@ -81,7 +81,7 @@ function StoreList() {
   const [dataFiltered, setDataFiltered] = useState<Store[]>([]);
   const [dataDisplay, setDataDisplay] = useState<Store[]>([]);
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   // const { updateAdmin } = useAdmin();
 
   useEffect(() => {
@@ -93,7 +93,7 @@ function StoreList() {
       getDataDisplay();
     } else {
       setTotalPage(0);
-      setCurrentPage(1);
+      setCurrentPage(0);
       setDataDisplay([]);
     }
   }, [dataFiltered]);
@@ -102,7 +102,8 @@ function StoreList() {
     console.log("currentPage", currentPage);
     if (dataFiltered && dataFiltered.length > 0) {
       // const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
-      const start = (currentPage - 1) * rowsPerPage;
+      // const start = (currentPage - 1) * rowsPerPage;
+      const start = (currentPage) * rowsPerPage;
 
       const end = dataFiltered.length > (start + rowsPerPage) ? start + rowsPerPage : dataFiltered.length;
       const _data = [...dataFiltered];
@@ -179,17 +180,35 @@ function StoreList() {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
     setSearchTerm(value);
+    onChangeSearch(value);
 
-    const dataFilter = data.filter(function (el: UserInfo) {
-      return el.fullName.toLowerCase().includes(value.toLowerCase())
+  };
+
+  const onChangeSearch = (value: string) => {
+
+    const dataFilter = data.filter(function (el: Store) {
+      return el.ownerstore.toLowerCase().includes(value.toLowerCase())
         || el.email.toLowerCase().includes(value.toLowerCase())
-        || el.phone.toLowerCase().includes(value.toLowerCase()) || el.userID?.toLowerCase().includes(value.toLowerCase());
+        || el.phone.toLowerCase().includes(value.toLowerCase());
     });
 
     console.log("dataFilter", dataFilter);
 
     setDataFiltered(dataFilter);
-  };
+
+  }
+
+  const onChangeSearchCategory = (value: string) => {
+
+    const dataFilter = data.filter(function (el: Store) {
+      return el.category?.toLowerCase().includes(value.toLowerCase());
+    });
+
+    console.log("dataFilter", dataFilter);
+
+    setDataFiltered(dataFilter);
+
+  }
 
   const handleChangePage = (event: any, newPage: any) => {
     setCurrentPage(newPage);
@@ -198,11 +217,19 @@ function StoreList() {
   const [rowsPerPage, setRowsPerPage] = useState(PAGINATION.ITEMPERPAGE);
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, PAGINATION.ITEMPERPAGE));
-    setCurrentPage(1);
+    setCurrentPage(0);
   };
   const theme = useTheme();
   const borderColor = theme.palette.divider;
+  const [openImport, setOpenImport] = useState(false);
+  const handleCloseImport = (isRefresh?: boolean) => {
+    setOpenImport(false);
+    if (isRefresh) {
+      fetchData();
+    }
+  };
 
+  const [categoryId, setCategoryId] = useState<Category | null>(null);
   return (
     (<Box>
       <Stack
@@ -211,26 +238,47 @@ function StoreList() {
         direction={{ xs: "column", sm: "row" }}
         spacing={{ xs: 1, sm: 2, md: 4 }}
       >
-        <TextField
-          id="search"
-          type="text"
-          size="small"
-          variant="outlined"
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e: any) => // setSearchTerm(e.target.value)
-            handleSearchChange(e)
-          }
-          slotProps={{
-            input: {
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconSearch size={"16"} />
-                </InputAdornment>
-              ),
+        <Box display="flex" gap={1}>
+          <TextField
+            id="search"
+            type="text"
+            size="small"
+            variant="outlined"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(e: any) => // setSearchTerm(e.target.value)
+              handleSearchChange(e)
             }
-          }}
-        />
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconSearch size={"16"} />
+                  </InputAdornment>
+                ),
+              }
+            }}
+          />
+
+          <Autocomplete
+            size="small"
+            value={categoryId}
+            options={categories}
+            getOptionLabel={(option) => option.name}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Select Category" variant="outlined" />
+            )}
+            onChange={(event, newValue) => {
+              // formik.handleChange(e);
+              onChangeSearchCategory(newValue?.id ?? "");
+              setCategoryId(newValue)
+            }}
+            sx={{
+              width: '250px',
+            }}
+          />
+        </Box>
+
         <Box display="flex" gap={1}>
           {selectAll && (
             <Button
@@ -242,6 +290,13 @@ function StoreList() {
               Delete All
             </Button>
           )}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => setOpenImport(true)}
+          >
+            Import store
+          </Button>
           <Button
             variant="contained"
             color="primary"
@@ -289,6 +344,21 @@ function StoreList() {
                       Category
                     </Typography>
                   </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" fontSize="14px">
+                      Type
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" fontSize="14px">
+                      Created by
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" fontSize="14px">
+                      Created at
+                    </Typography>
+                  </TableCell>
                   <TableCell align="center">
                     <Typography variant="h6" fontSize="14px">
                       Action
@@ -319,7 +389,7 @@ function StoreList() {
                       </TableCell> */}
                       <TableCell>
                         <Typography variant="body1" fontSize="14px">
-                          {index + 1}
+                          {(rowsPerPage * currentPage) + (index + 1)}
                         </Typography>
                       </TableCell>
 
@@ -338,6 +408,17 @@ function StoreList() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body1" fontSize="14px">{categories.find((_category: Category) => _category.id == store.category)?.name}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1" fontSize="14px" sx={{
+                          textTransform: 'capitalize',
+                        }}>{store.type?.toLowerCase()}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1" fontSize="14px">{store.createdBy}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body1" fontSize="14px">{store.createdAt}</Typography>
                       </TableCell>
                       {/* <TableCell>
                     <Typography fontSize="14px">{invoice.totalCost}</Typography>
@@ -419,7 +500,7 @@ function StoreList() {
                     colSpan={7}
                     count={dataFiltered.length}
                     rowsPerPage={rowsPerPage}
-                    page={currentPage - 1}
+                    page={currentPage}
                     SelectProps={{
                       native: true,
                     }}
@@ -451,6 +532,7 @@ function StoreList() {
           </Button>
         </DialogActions>
       </Dialog>
+      <DialogImportStore state={openImport} handleCloseDialog={handleCloseImport} categories={categories} ></DialogImportStore>
     </Box >)
   );
 }

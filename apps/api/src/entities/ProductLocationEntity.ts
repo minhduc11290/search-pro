@@ -24,5 +24,5 @@ export class ProductLocationEntity {
   @ManyToOne(() => LocationEntity)
   location!: LocationEntity;
 
-  
+
 }

@@ -51,4 +51,8 @@ export class UserResponseDto {
 
   @ApiProperty({ required: true, example: 'ACTIVE' })
   status!: UserStatus;
+
+  @ApiProperty({ example: 'Doe' })
+  pw?: string;
 }
+

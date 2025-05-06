@@ -30,6 +30,9 @@ class MinStoreDto {
 
   @ApiProperty({ required: true, example: 'Store Name' })
   name!: string;
+
+  @ApiProperty({ required: true, example: 'Store link' })
+  website?: string;
 }
 
 export class MinAttachmentDto {

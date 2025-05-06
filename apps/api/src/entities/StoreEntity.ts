@@ -49,4 +49,7 @@ export class StoreEntity extends BaseEntity<StoreEntity> {
   @Property({ type: types.uuid, nullable: true })
   categoryId?: string;
 
+  @Property({ type: types.string, nullable: true })
+  type?: string;
+
 }

@@ -11,6 +11,7 @@ export class GeoRefResponseMapper extends BaseMapper<
       id: source.id,
       zipCode: source.zipCode,
       steName: source.steName,
+      city: source.uspsCity
     };
     return geoRefResponseDto;
   }

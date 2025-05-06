@@ -8,6 +8,7 @@ import { Injectable } from '@nestjs/common';
 import { AttachmentEntity, LocationEntity } from '~/entities';
 import { LocationStatus } from '~/share/consts/enums';
 import { AttachmentDto } from '~/share/dtos/product-creation.dto';
+import axios from 'axios';
 
 @Injectable()
 export class AdminLocationService {
@@ -112,4 +113,36 @@ export class AdminLocationService {
     await this.em.persistAndFlush(productAttachments);
     return productAttachments;
   }
+
+  private readonly NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
+
+  async getLatLng(address: string): Promise<{ lat: number; lng: number }> {
+    try {
+      const response = await axios.get(this.NOMINATIM_URL, {
+        params: {
+          q: address,
+          format: 'json',
+          limit: 1,
+        },
+      });
+
+      if (response.data.length > 0) {
+        return {
+          lat: parseFloat(response.data[0].lat),
+          lng: parseFloat(response.data[0].lon),
+        };
+      }
+      return {
+        lat: 0,
+        lng: 0
+      };
+    } catch (error) {
+      console.error('Nominatim API error:', error);
+      return {
+        lat: 0,
+        lng: 0
+      };
+    }
+  }
+
 }

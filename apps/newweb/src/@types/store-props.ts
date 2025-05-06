@@ -2,7 +2,9 @@ import { Status } from "./enum/status";
 
 export interface Category {
     name: string,
-    id: string
+    id: string,
+    url: string,
+    productUrl: string,
 }
 
 export interface Store {
@@ -16,6 +18,10 @@ export interface Store {
     password?: string;
     pw?: string,
     category?: string,
+    website?: string,
+    createdAt?: string,
+    createdBy?: string,
+    type?: string
 
 }
 
@@ -26,6 +32,8 @@ export interface StoreRequest {
     email: string;
     isActive: boolean;
     categoryId: string;
+    website: string;
+    type?: string;
 }
 
 export interface UpdateStoreRequest {
@@ -34,4 +42,6 @@ export interface UpdateStoreRequest {
     email?: string;
     isActive: boolean;
     categoryId?: string;
+    website?: string;
+    type?: string;
 }

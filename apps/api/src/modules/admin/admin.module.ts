@@ -25,6 +25,12 @@ import { FileModule } from './file/file.module';
 import { AdminAdminModule } from './admin/admin.module';
 import { AdminAdminController } from './admin/admin.controller';
 import { AdminAdminService } from './admin/admin.service';
+import { AdminLocationSearchableModule } from './location-searchable/admin-location-searchable.module';
+import { AdminLocationSearchableController } from './location-searchable/admin-location-searchable.controller';
+import { AdminLocationSearchableService } from './location-searchable/admin-location-searchable.service';
+import { CategoriesModule } from './categories/categories.module';
+import { CategoriesController } from './categories/categories.controller';
+import { CategoriesService } from './categories/categories.service';
 
 @Module({
   imports: [
@@ -36,7 +42,9 @@ import { AdminAdminService } from './admin/admin.service';
     AdminProductModule,
     ConfigModule.forRoot({ isGlobal: true }),
     FileModule,
-    AdminAdminModule
+    AdminAdminModule,
+    AdminLocationSearchableModule,
+    CategoriesModule
   ],
   controllers: [
     AdminUserController,
@@ -45,7 +53,9 @@ import { AdminAdminService } from './admin/admin.service';
     AdminProductController,
     UsersController,
     FileController,
-    AdminAdminController
+    AdminAdminController,
+    AdminLocationSearchableController,
+    CategoriesController
   ],
   providers: [
     TokenService,
@@ -57,7 +67,10 @@ import { AdminAdminService } from './admin/admin.service';
     AdminProductService,
     UsersService,
     GeoRefService,
-    AdminAdminService
+    AdminAdminService,
+    AdminLocationSearchableService,
+    CategoriesService
+
   ],
 })
 export class AdminModule { }

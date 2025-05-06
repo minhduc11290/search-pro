@@ -8,9 +8,10 @@ type Props = {
   className?: string;
   children: React.JSX.Element | React.JSX.Element[];
   sx?: any;
+  height?: string;
 };
 
-const BlankCard = ({ children, className, sx }: Props) => {
+const BlankCard = ({ children, className, sx, height }: Props) => {
   const customizer = useSelector((state: AppState) => state.customizer);
 
   const theme = useTheme();
@@ -18,7 +19,7 @@ const BlankCard = ({ children, className, sx }: Props) => {
 
   return (
     <Card
-      sx={{ p: 0, border: !customizer.isCardShadow ? `1px solid ${borderColor}` : 'none', position: 'relative', sx }}
+      sx={{ p: 0, border: !customizer.isCardShadow ? `1px solid ${borderColor}` : 'none', position: 'relative', sx, height: height }}
       className={className}
       elevation={customizer.isCardShadow ? 9 : 0}
       variant={!customizer.isCardShadow ? 'outlined' : undefined}

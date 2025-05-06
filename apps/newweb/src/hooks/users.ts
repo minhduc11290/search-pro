@@ -34,7 +34,8 @@ const useUsers = () => {
                         phone: item.phone,
                         email: item.email,
                         state: "",
-                        status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive
+                        status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
+                        pw: item.pw,
                     }
                     return user;
                 });

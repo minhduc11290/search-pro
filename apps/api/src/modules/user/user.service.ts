@@ -84,6 +84,17 @@ export class UserService {
     );
   }
 
+  async findByEmailAndRole(email: string, role: string, populate?: string[]) {
+    const roles = await this.em.findOneOrFail(RoleEntity, {
+      role: role as UserRole,
+    });
+    return this.em.findOne(
+      UserEntity,
+      { email, role: roles },
+      { populate: (populate ? populate : this.defaultPopulate) as never[] },
+    );
+  }
+
 
   async delete(userCreationDto: UserResponseDto): Promise<void> {
     await this.em.nativeDelete(UserEntity, {

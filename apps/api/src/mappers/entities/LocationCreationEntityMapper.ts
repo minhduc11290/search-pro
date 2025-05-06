@@ -63,6 +63,7 @@ export class LocationCreationEntityMapper extends CreateEntityMapper<
       latitude: source.latitude,
       longitude: source.longitude
 
+      
     };
   }
 }

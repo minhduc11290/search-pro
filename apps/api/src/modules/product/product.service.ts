@@ -1,6 +1,6 @@
 import { AutoPath, EntityManager, FilterQuery } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { ProductLocationEntity } from '~/entities';
+import { ProductLocationEntity, LocationEntity, LocationSearchableEntity } from '~/entities';
 
 @Injectable()
 export class ProductService {
@@ -60,4 +60,40 @@ export class ProductService {
     );
     return productLocations;
   }
+
+  async findByConditionWithPagination(
+    condition: FilterQuery<ProductLocationEntity>,
+    options: { page: number; limit: number },
+    populate?: string[],
+  ): Promise<ProductLocationEntity[]> {
+    const { page, limit } = options;
+    const [productLocations] = await this.em.findAndCount(
+      ProductLocationEntity,
+      condition,
+      {
+        limit,
+        offset: (page - 1) * limit,
+        populate: this.getPopulates(populate),
+      },
+    );
+    return productLocations;
+  }
+
+  milesToH3Ring(miles: number): number {
+    const diameterMiles = 1.06; // Resolution 7
+    return Math.ceil(miles / diameterMiles);
+  }
+
+  async getAllLocation() {
+    return this.em.find(LocationEntity, { h3Index: { $ne: null } });
+  }
+
+  async getLocationSearchable(steName: string, city: string) {
+    return this.em.find(LocationSearchableEntity, {
+      steName: steName,
+      cities: { $contains: [city] }
+    });
+  }
+
+
 }

@@ -61,4 +61,58 @@ export class GeoRefController {
     }
     return new GeoRefResponseMapper().map(geoRef);
   }
+
+  // @Get("/mobile")
+  // @ApiOperation({ summary: 'GeoRef list by condition' })
+  // @ApiResponse({ status: 200, type: [GeoRefResponseDto] })
+  // async getMobileGeoRefs(
+  //   // @Query() query: GeoRefFilterDto,
+  // ): Promise<GeoRefMobileResponseDto[]> {
+
+  //   const geoRefs = await this.geoRefService.findByCondition({});
+  //   return new GeoRefMobileResponseMapper().mapArray(geoRefs);
+  // }
+
+  // @Get(':geoRefId')
+  // @ApiOperation({ summary: 'Geo Reft detail' })
+  // @ApiResponse({ status: 200, type: GeoRefResponseDto })
+  // async getLocation(
+  //   @Param('geoRefId') geoRefId: string,
+  // ): Promise<GeoRefResponseDto | null> {
+  //   const geoRef = await this.geoRefService.findById(geoRefId);
+  //   if (!geoRef) {
+  //     return null;
+  //   }
+  //   return new GeoRefResponseMapper().map(geoRef);
+  // }
+
+
+  @Get("/mobile/state")
+  @ApiOperation({ summary: 'GeoRef list by condition' })
+  @ApiResponse({ status: 200, type: [GeoRefResponseDto] })
+  async getMobileState(
+    // @Query() query: GeoRefFilterDto,
+  ): Promise<String[]> {
+
+    const geoRefs = await this.geoRefService.findByCondition({});
+
+    // return new GeoRefMobileResponseMapper().mapArray(geoRefs);
+    return geoRefs.map((geoRef) => geoRef.steName).filter((value, index, self) => self.indexOf(value) === index);
+  }
+
+
+  @Get("/mobile/city/state/:stateId")
+  @ApiOperation({ summary: 'GeoRef list by condition' })
+  @ApiResponse({ status: 200, type: [GeoRefResponseDto] })
+  async getMobileCity(
+    // @Query() query: GeoRefFilterDto,
+    @Query() query: GeoRefFilterDto,
+  ): Promise<GeoRefMobileResponseDto[]> {
+
+    const geoRefs = await this.geoRefService.findByCondition({
+      steName: query.steName,
+    });
+
+    return new GeoRefMobileResponseMapper().mapArray(geoRefs);
+  }
 }

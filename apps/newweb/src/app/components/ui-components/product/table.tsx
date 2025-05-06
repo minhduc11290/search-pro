@@ -12,18 +12,21 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import { Product } from "@/@types/product-props";
 import BlankCard from "../../shared/BlankCard";
+import { CategoryInfo } from "@/@types/category-props";
+import { getLink } from "@/utils/image";
 
 interface ProductTableProps {
     data: Product[];
     onEditProduct: (product: Product) => void
+    categories: CategoryInfo[];
 }
 
-const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
+const ProductTable = ({ categories, data, onEditProduct }: ProductTableProps) => {
     const [dataDisplay, setDataDisplay] = useState<Product[]>([]);
     const [dataFiltered, setDataFiltered] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentPage, setCurrentPage] = useState<number>(0);
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearchTerm(value);
@@ -40,13 +43,14 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
     };
 
     const handleChangePage = (event: any, newPage: any) => {
+        console.log(newPage);
         setCurrentPage(newPage);
     };
 
     const [rowsPerPage, setRowsPerPage] = useState(PAGINATION.ITEMPERPAGE);
     const handleChangeRowsPerPage = (event: any) => {
         setRowsPerPage(parseInt(event.target.value, PAGINATION.ITEMPERPAGE));
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
 
     const theme = useTheme();
@@ -61,7 +65,7 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
             getDataDisplay();
         } else {
             setTotalPage(0);
-            setCurrentPage(1);
+            setCurrentPage(0);
             setDataDisplay([]);
         }
     }, [dataFiltered]);
@@ -70,7 +74,8 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
         console.log("currentPage", currentPage);
         if (dataFiltered && dataFiltered.length > 0) {
             // const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
-            const start = (currentPage - 1) * rowsPerPage;
+            // const start = ((currentPage - 1) >= 0 ? (currentPage - 1) : 0) * rowsPerPage;
+            const start = currentPage * rowsPerPage;
 
             const end = dataFiltered.length > (start + rowsPerPage) ? start + rowsPerPage : dataFiltered.length;
             const _data = [...dataFiltered];
@@ -93,15 +98,15 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
     return <Box sx={{ overflowX: "auto", width: '100%' }}>
         <BlankCard>
             <TableContainer>
-                <Table sx={{ whiteSpace: { xs: "nowrap", md: "unset" } }}>
+                <Table sx={{ whiteSpace: { xs: "nowrap", md: "unset" } }} size={'small'}>
                     <TableHead>
                         <TableRow>
-                            <TableCell>
+                            <TableCell sx={{ width: '80px' }}>
                                 <Typography variant="h6" fontSize="14px">
                                     No
                                 </Typography>
                             </TableCell>
-                            <TableCell align="center">
+                            <TableCell align="center" sx={{ width: '50px' }}>
                                 <Typography variant="h6" fontSize="14px">
                                     Image
                                 </Typography>
@@ -148,13 +153,12 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
 
                                     <TableCell>
                                         <Typography variant="body1" fontSize="12px">
-                                            {index + 1}
+                                            {(rowsPerPage * currentPage) + (index + 1)}
+
                                         </Typography>
                                     </TableCell>
-
-
                                     <TableCell>
-                                        <Avatar src={product.image} />
+                                        <Avatar src={product.image == "" ? (categories.length > 0 ? getLink(categories[0].productUrl) : "") : product.image} />
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body1" fontSize="14px">
@@ -163,9 +167,9 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body1" fontSize="14px">
-                                            {product.locationInfo.map((location) => {
+                                            {product.locationInfo.map((location, index) => {
                                                 return (
-                                                    "$" + location.price + ";"
+                                                    "$" + location.price + (index != product.locationInfo.length - 1 ? ";" : "")
                                                 )
                                             })
                                             }
@@ -206,7 +210,7 @@ const ProductTable = ({ data, onEditProduct }: ProductTableProps) => {
                                 colSpan={7}
                                 count={dataFiltered.length}
                                 rowsPerPage={rowsPerPage}
-                                page={currentPage - 1}
+                                page={currentPage}
                                 SelectProps={{
                                     native: true,
                                 }}

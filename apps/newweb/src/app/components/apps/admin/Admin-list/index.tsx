@@ -53,6 +53,9 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import BlankCard from "@/app/components/shared/BlankCard";
+import AddAdminDialog from "./AddDialog";
+import DialogShowPass from "./DialogShowPassword";
+
 
 function AdminList() {
   const { data, deleteInvoice, fetchData } = useContext(AdminContext);
@@ -89,7 +92,7 @@ function AdminList() {
 
     } else {
       setTotalPage(0);
-      setCurrentPage(1);
+      setCurrentPage(0);
       setDataDisplay([]);
     }
   }, [dataFiltered]);
@@ -98,7 +101,7 @@ function AdminList() {
     console.log("currentPage", currentPage);
     if (dataFiltered && dataFiltered.length > 0) {
       // const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
-      const start = (currentPage - 1) * rowsPerPage;
+      const start = (currentPage) * rowsPerPage;
 
       const end = dataFiltered.length > (start + rowsPerPage) ? start + rowsPerPage : dataFiltered.length;
       const _data = [...dataFiltered];
@@ -118,68 +121,7 @@ function AdminList() {
 
   }, [data]);
 
-  // const getData = async () => {
-  //   // const users = await getUsers("ADMIN");
-  //   // setData(users);
-  //   // setDataFiltered(users);
-  //   setAdmin(admins);
-  // }
 
-  // const { isLoading, getUsers } = useUsers();
-  // const { getAdmin } = useAdmin();
-
-
-  // Filter invoices based on search term
-  // const filteredInvoices = data.filter(
-  //   (invoice: { billFrom: string; billTo: string; status: string }) => {
-  //     return (
-  //       (invoice.billFrom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //         invoice.billTo.toLowerCase().includes(searchTerm.toLowerCase())) &&
-  //       (activeTab === "All" || invoice.status === activeTab)
-  //     );
-  //   }
-  // );
-
-
-
-  // Calculate the counts for different statuses
-  // const Shipped = invoices.filter(
-  //   (t: { status: string }) => t.status === "Shipped"
-  // ).length;
-  // const Delivered = invoices.filter(
-  //   (t: { status: string }) => t.status === "Delivered"
-  // ).length;
-  // const Pending = invoices.filter(
-  //   (t: { status: string }) => t.status === "Pending"
-  // ).length;
-
-  // Toggle all checkboxes
-  const toggleSelectAll = () => {
-    const selectAllValue = !selectAll;
-    setSelectAll(selectAllValue);
-    // if (selectAllValue) {
-    //   setSelectedProducts(invoices.map((invoice: { id: any }) => invoice.id));
-    // } else {
-    //   setSelectedProducts([]);
-    // }
-  };
-
-  // Toggle individual product selection
-  const toggleSelectProduct = (productId: any) => {
-    const index = selectedProducts.indexOf(productId);
-    if (index === -1) {
-      setSelectedProducts([...selectedProducts, productId]);
-    } else {
-      setSelectedProducts(
-        selectedProducts.filter((id: any) => id !== productId)
-      );
-    }
-  };
-
-  // Handle opening delete confirmation dialog
-  const handleDelete = () => {
-    setOpenDeleteDialog(true);
-  };
 
   // Handle confirming deletion of selected products
   const handleConfirmDelete = async () => {
@@ -219,9 +161,22 @@ function AdminList() {
   const [rowsPerPage, setRowsPerPage] = useState(PAGINATION.ITEMPERPAGE);
   const handleChangeRowsPerPage = (event: any) => {
     setRowsPerPage(parseInt(event.target.value, PAGINATION.ITEMPERPAGE));
-    setCurrentPage(1);
+    setCurrentPage(0);
   };
 
+  const [addDialog, setAddDialog] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+
+  const [user, setUser] = useState<UserInfo | undefined>(undefined);
+
+  const handleCloseOpenDialog = (refresh?: boolean) => {
+    if (refresh) {
+      fetchData();
+    }
+
+    setAddDialog(false);
+
+  }
 
   return (
     (<Box>
@@ -230,6 +185,7 @@ function AdminList() {
         justifyContent="space-between"
         direction={{ xs: "column", sm: "row" }}
         spacing={{ xs: 1, sm: 2, md: 4 }}
+        paddingBottom={1}
       >
         <TextField
           id="search"
@@ -252,21 +208,15 @@ function AdminList() {
           }}
         />
         <Box display="flex" gap={1}>
-          {selectAll && (
-            <Button
-              variant="outlined"
-              color="error"
-              onClick={handleDelete}
-              startIcon={<IconTrash width={18} />}
-            >
-              Delete All
-            </Button>
-          )}
           <Button
             variant="contained"
             color="primary"
-            component={Link}
-            href="/apps/admin/create"
+            // component={Link}
+            // href="/apps/admin/create"
+            onClick={() => {
+              setUser(undefined);
+              setAddDialog(true);
+            }}
           >
             New Admin
           </Button>
@@ -278,12 +228,12 @@ function AdminList() {
             <Table sx={{ whiteSpace: { xs: "nowrap", md: "unset" } }}>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
+                  {/* <TableCell padding="checkbox">
                     <CustomCheckbox
                       checked={selectAll}
                       onChange={toggleSelectAll}
                     />
-                  </TableCell>
+                  </TableCell> */}
                   <TableCell>
                     <Typography variant="h6" fontSize="14px">
                       No
@@ -315,7 +265,7 @@ function AdminList() {
               <TableBody>
                 {dataDisplay.map(
                   (
-                    user: UserInfo
+                    user: UserInfo, index: number
                     //   invoice: {
                     //   id: any;
                     //   billFrom: any;
@@ -326,15 +276,15 @@ function AdminList() {
 
                   ) => (
                     <TableRow key={user.id}>
-                      <TableCell padding="checkbox">
+                      {/* <TableCell padding="checkbox">
                         <CustomCheckbox
                           checked={selectedProducts.includes(user.id)}
                           onChange={() => toggleSelectProduct(user.id)}
                         />
-                      </TableCell>
+                      </TableCell> */}
                       <TableCell>
                         <Typography variant="h6" fontSize="14px">
-                          {user.id}
+                          {(rowsPerPage * currentPage) + (index + 1)}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -358,60 +308,28 @@ function AdminList() {
                           size="small"
                         />}
                       </TableCell>
-                      {/* <TableCell>
-                    <Typography fontSize="14px">{invoice.totalCost}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    {invoice.status === "Shipped" ? (
-                      <Chip
-                        color="primary"
-                        label={invoice.status}
-                        size="small"
-                      />
-                    ) : invoice.status === "Delivered" ? (
-                      <Chip
-                        color="success"
-                        label={invoice.status}
-                        size="small"
-                      />
-                    ) : invoice.status === "Pending" ? (
-                      <Chip
-                        color="warning"
-                        label={invoice.status}
-                        size="small"
-                      />
-                    ) : (
-                      ""
-                    )}
-                  </TableCell> */}
+
                       <TableCell align="center">
                         <Tooltip title="Edit Admin">
                           <IconButton
                             color="success"
-                            component={Link}
-                            href={`/apps/admins/edit/${user.id}`}
+                            onClick={() => {
+                              setUser(user);
+                              setAddDialog(true);
+                            }}
                           >
                             <IconEdit width={22} />
                           </IconButton>
                         </Tooltip>
-                        {/* <Tooltip title="View Invoice">
-                      <IconButton
-                        color="primary"
-                        component={Link}
-                        href={`/apps/invoice/detail/${invoice.billFrom}`}
-                      >
-                        <IconEye width={22} />
-                      </IconButton>
-                    </Tooltip> */}
-                        <Tooltip title="Delete Invoice">
+                        <Tooltip title="Show password">
                           <IconButton
-                            color="error"
+                            color="success"
                             onClick={() => {
-                              // setSelectedProducts([invoice.id]);
-                              // handleDelete();
+                              setUser(user);
+                              setShowPass(true);
                             }}
                           >
-                            <IconTrash width={22} />
+                            <IconEye width={22} />
                           </IconButton>
                         </Tooltip>
                       </TableCell>
@@ -458,6 +376,16 @@ function AdminList() {
           </Button>
         </DialogActions>
       </Dialog>
+      <AddAdminDialog state={addDialog} handleCloseDialog={handleCloseOpenDialog} user={user} >
+
+      </AddAdminDialog>
+
+      <DialogShowPass state={showPass} handleCloseDialog={() => {
+        setShowPass(false);
+      }} user={user} >
+
+      </DialogShowPass>
+
     </Box >)
   );
 }

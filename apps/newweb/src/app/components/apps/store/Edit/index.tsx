@@ -33,7 +33,7 @@ import { format, isValid } from "date-fns";
 import CustomFormLabel from "@/app/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "@/app/components/forms/theme-elements/CustomSelect";
 import CustomTextField from "@/app/components/forms/theme-elements/CustomTextField";
-import { IconChevronDown, IconEdit, IconEye, IconPlus, IconSquareRoundedPlus, IconTrash } from "@tabler/icons-react";
+import { IconChevronDown, IconDatabaseImport, IconEdit, IconEye, IconPlus, IconSquareRoundedPlus, IconTrash } from "@tabler/icons-react";
 import { UpdateStoreContext } from "@/app/context/UpdateStoreContext";
 import { useFormik } from "formik";
 import * as yup from 'yup';
@@ -47,9 +47,12 @@ import DialogLocation from "./DialogLocation";
 import { Product } from "@/@types/product-props";
 import { LocationInfo } from "@/@types/location-props";
 import DialogProduct from "./DialogProduct";
+import toast from "react-hot-toast";
+import DialogImport from "./DialogImport";
+import { CategoryInfo } from "@/@types/category-props";
 
 const EditStorePage = () => {
-  const { data, categories, locations, products, loading } = useContext(UpdateStoreContext);
+  const { data, categories, locations, products, loading, fetchData } = useContext(UpdateStoreContext);
   const [showAlert, setShowAlert] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [editing, setEditing] = useState(false);
@@ -65,6 +68,7 @@ const EditStorePage = () => {
   const [isOpenEditStore, setIsOpenEditStore] = useState(false);
   const [isOpenShowPassStore, setIsOpenShowPassStore] = useState(false);
   const [isOpenProduct, setIsOpenProduct] = useState(false);
+  const [isOpenImport, setIsOpenImport] = useState(false);
   const [isOpenLocation, setIsOpenLocation] = useState(false);
   const [productSelected, setProductSelected] = useState<Product | null>(null);
   const [locationSelected, setLocationSelected] = useState<LocationInfo | null>(null);
@@ -112,6 +116,8 @@ const EditStorePage = () => {
       formik.setFieldValue('phone', data?.phone);
       formik.setFieldValue('email', data?.email);
       formik.setFieldValue('category', data?.category);
+      formik.setFieldValue('website', data?.website);
+      formik.setFieldValue('type', data?.type);
     }
   }, [data]);
 
@@ -126,7 +132,8 @@ const EditStorePage = () => {
       password: '',
       pw: '',
       category: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      website: "",
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -136,7 +143,8 @@ const EditStorePage = () => {
         password: values.password,
         email: values.email,
         isActive: true,
-        categoryId: values.category
+        categoryId: values.category,
+        website: values.website
       };
 
     },
@@ -180,6 +188,18 @@ const EditStorePage = () => {
           sx={{
             paddingTop: 0,
             paddingBottom: 0,
+            marginBottom: 0,
+            height: '40px',
+            minHeight: '40px',
+            '& .MuiAccordionSummary-content': {
+              marginBottom: 0, // remove inner content margin
+              marginTop: 0,
+            },
+            '& .Mui-expanded': {
+              marginBottom: 0, // remove inner content margin
+              marginTop: 0,
+              minHeight: '40px'
+            }
           }}
         // sx={{
         //   borderBottom: "1px solid #e5eaef", // Thêm border
@@ -216,7 +236,7 @@ const EditStorePage = () => {
           </Box>
         </AccordionSummary>
         <AccordionDetails sx={{ paddingTop: 0, paddingBottom: 0 }}>
-          <Grid container rowSpacing={0} spacing={2} mb={4} marginTop={0} sx={{ paddingTop: 0 }} columns={5}>
+          <Grid container rowSpacing={0} spacing={2} mb={2} marginTop={0} sx={{ paddingTop: 0 }} columns={6}>
             {/* <Grid size={5} sx={{ paddingTop: 0, marginTop: 0 }}>
               <Divider></Divider>
             </Grid> */}
@@ -233,33 +253,23 @@ const EditStorePage = () => {
             </Grid>
             <Grid size={1} >
               <CustomFormLabel htmlFor="bill-from">Category</CustomFormLabel>
-              {/* <CustomSelect
-                disabled
-                labelId="category"
-                id="category"
-                name="category"
-                value={formik.values.category}
-                onChange={formik.handleChange}
-                fullWidth
-              >
-                {categories.map((item: Category) =>
-                  <MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>
-                )
-                }
-              </CustomSelect> */}
+
               <CustomFormText
                 fullWidth
               >{categories.find((category: any) => category.id == data.category)?.name}</CustomFormText>
             </Grid >
+            <Grid size={1} >
+              <CustomFormLabel htmlFor="bill-from">Type</CustomFormLabel>
+
+              <CustomFormText
+                fullWidth
+                sx={{ textTransform: 'capitalize' }}
+              >{data?.type.toLowerCase()}</CustomFormText>
+            </Grid >
             <Grid size={1}>
               <CustomFormLabel
                 htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
+
               >
                 Phone Number
               </CustomFormLabel>
@@ -270,12 +280,7 @@ const EditStorePage = () => {
             <Grid size={1}>
               <CustomFormLabel
                 htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
+
               >
                 Email
               </CustomFormLabel>
@@ -286,12 +291,7 @@ const EditStorePage = () => {
             <Grid size={1}>
               <CustomFormLabel
                 htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
+
               >
                 Website
               </CustomFormLabel>
@@ -337,7 +337,7 @@ const EditStorePage = () => {
           </Grid> */}
 
           <Grid spacing={3} mb={4} size={12} sx={{ width: '100%' }}>
-            <LocationTable data={locations} onEditLocation={(location) => {
+            <LocationTable categories={categories.filter((category: CategoryInfo) => category.id == data.category)} data={locations} onEditLocation={(location) => {
               setLocationSelected(location);
               setIsOpenLocation(true);
             }}></LocationTable>
@@ -372,6 +372,11 @@ const EditStorePage = () => {
                 <IconPlus width={14}></IconPlus>
               </Fab>
             </Tooltip>
+            <Tooltip title="Import Product">
+              <Fab color="primary" aria-label="send" size="small" onClick={() => { setIsOpenImport(true) }}>
+                <IconDatabaseImport width={14}></IconDatabaseImport>
+              </Fab>
+            </Tooltip>
             {/* <Tooltip title="Bell">
               <IconButton color="secondary" aria-label="secondary-bell">
                 <IconBell width={18} />
@@ -395,19 +400,42 @@ const EditStorePage = () => {
             </Button>
           </Stack> */}
           <Grid spacing={3} mb={4} size={12}>
-            <ProductTable data={products} onEditProduct={(product) => {
+            <ProductTable data={products} categories={categories.filter((category: CategoryInfo) => category.id == data.category)} onEditProduct={(product) => {
               setProductSelected(product);
               setIsOpenProduct(true);
+
             }}></ProductTable>
           </Grid >
         </AccordionDetails>
       </Accordion>
 
-      <DialogEditStore store={data} categories={categories} state={isOpenEditStore} handleCloseDialog={() => { setIsOpenEditStore(false) }}>
+      <DialogEditStore store={data} categories={categories} state={isOpenEditStore} handleCloseDialog={(refresh?: Boolean) => {
+        if (refresh) {
+          fetchData();
+        }
+        setIsOpenEditStore(false)
+      }}>
       </DialogEditStore>
       <DialogShowPass store={data} state={isOpenShowPassStore} handleCloseDialog={() => { setIsOpenShowPassStore(false) }}></DialogShowPass>
-      <DialogLocation store={data} location={locationSelected} state={isOpenLocation} handleCloseDialog={() => { setIsOpenLocation(false) }} ></DialogLocation>
-      <DialogProduct store={data} product={productSelected} state={isOpenProduct} handleCloseDialog={() => { setIsOpenProduct(false) }} ></DialogProduct>
+      <DialogLocation store={data} categories={categories} location={locationSelected} state={isOpenLocation} handleCloseDialog={(refresh?: Boolean) => {
+        if (refresh) {
+          fetchData();
+        }
+        setIsOpenLocation(false)
+      }} ></DialogLocation>
+      <DialogProduct categories={categories} store={data} product={productSelected} state={isOpenProduct} handleCloseDialog={(refresh?: Boolean) => {
+        if (refresh) {
+          fetchData();
+        }
+        setIsOpenProduct(false)
+      }} ></DialogProduct>
+
+      <DialogImport store={data} state={isOpenImport} handleCloseDialog={(refresh?: Boolean) => {
+        if (refresh) {
+          fetchData();
+        }
+        setIsOpenImport(false)
+      }}></DialogImport>
 
       {
         showAlert && (
@@ -419,6 +447,7 @@ const EditStorePage = () => {
           </Alert>
         )
       }
+
     </Box >
   );
 };

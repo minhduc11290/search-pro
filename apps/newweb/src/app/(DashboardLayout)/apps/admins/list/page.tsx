@@ -19,8 +19,8 @@ const BCrumb = [
 const InvoiceListing = () => {
   return (
     <AdminProvider>
-      <PageContainer title="Admin List" description="this is Admin List">
-        <Breadcrumb title="Admin List" items={BCrumb} />
+      <PageContainer title="Admin Management" description="this is Admin List">
+        <Breadcrumb title="Admin Management" items={BCrumb} />
         <BlankCard>
           <CardContent>
             <AdminList />

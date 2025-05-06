@@ -11,6 +11,7 @@ export interface UserInfo {
     status: Status;
     role?: string;
     id?: string;
+    pw?: string;
 }
 
 export interface UserLogin {

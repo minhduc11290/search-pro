@@ -70,7 +70,7 @@ export default function RootLayout({
         {/* {customizer.isHorizontal ? <Navigation /> : ""} */}
         <Container
           sx={{
-            pt: '30px',
+            pt: '15px',
             maxWidth: customizer.isLayout === "boxed" ? "lg" : "100%!important",
           }}
         >

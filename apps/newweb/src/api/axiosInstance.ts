@@ -8,7 +8,7 @@ const axiosInstance = axios.create({
     baseURL: endpoint,
     // baseURL: "http://localhost:6868/",
     // baseURL: "https://dsa-api.devforce.one/", // Thay bằng URL API của bạn
-    timeout: 10000, // Thời gian chờ tối đa
+    timeout: 600000, // Thời gian chờ tối đa
     headers: {
         "Content-Type": "application/json",
     },

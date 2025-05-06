@@ -13,24 +13,26 @@ import { getLink } from "@/utils/image";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
 import TabPanel from "@mui/lab/TabPanel";
-import { Autocomplete, Box, Chip, Divider, FormHelperText, IconButton, MenuItem, Tab, TextField, Tooltip, Typography, useTheme } from "@mui/material";
+import { Autocomplete, Box, Chip, Divider, Fab, FormHelperText, IconButton, MenuItem, Switch, Tab, TextField, Tooltip, Typography, useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Grid from "@mui/material/Grid2";
-import { IconPlus, IconX } from "@tabler/icons-react";
+import { IconPlus, IconTrash, IconX } from "@tabler/icons-react";
 
 import { Formik, FormikErrors, useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
+import toast from "react-hot-toast";
 import * as yup from 'yup';
 
 interface DialogProductProps {
     product?: Product | null;
     state: boolean;
     store: Store;
+    categories: Category[];
     handleCloseDialog: (refresh?: boolean) => void;
 }
 
@@ -110,10 +112,11 @@ const DialogProduct = (props: DialogProductProps) => {
 
 
         if (result) {
+            toast.success("Product have been update successfully.");
             props.handleCloseDialog(true);
             // close(true);
         } else {
-
+            toast.error(errorMessage);
         }
     }
 
@@ -147,10 +150,12 @@ const DialogProduct = (props: DialogProductProps) => {
         });
 
         if (result) {
+            toast.success("Product have been created successfully.");
             props.handleCloseDialog(true);
+            formik.resetForm();
         } else {
             if (statusCode != 409) {
-
+                toast.error(errorMessage);
             } else {
                 formik.setFieldError('sku', errorMessage);
             }
@@ -160,7 +165,12 @@ const DialogProduct = (props: DialogProductProps) => {
 
     useEffect(() => {
         setOpenDialog(props.state);
+
         _getLocation();
+        // if (!props.state) {
+        //     formik.resetForm();
+        // }
+
     }, [props.state]);
 
     const _getLocation = async () => {
@@ -200,6 +210,8 @@ const DialogProduct = (props: DialogProductProps) => {
 
     const theme = useTheme();
 
+    const [pressed, setPressed] = useState(false);
+
     const formik = useFormik<{
         sku: string,
         name: string,
@@ -228,13 +240,15 @@ const DialogProduct = (props: DialogProductProps) => {
             //     isActive: true,
             //     categoryId: values.category
             // };
+            setPressed(true);
             if (props.product) {
                 _updateProduct();
             } else {
                 _addProduct();
 
             }
-            props.handleCloseDialog(true);
+            setPressed(false);
+            // props.handleCloseDialog(true);
 
         },
     });
@@ -267,6 +281,7 @@ const DialogProduct = (props: DialogProductProps) => {
         const _locations = formik.values.locations
         _locations.push({
             locationID: '',
+            status: 'ADD'
         });
         formik.setFieldValue("locations", _locations)
     }
@@ -274,7 +289,11 @@ const DialogProduct = (props: DialogProductProps) => {
     const [images, setImages] = useState<Attachment[]>([]);
 
 
+
     useEffect(() => {
+
+        setAttachments([]);
+        setImages([]);
         formik.resetForm();
         if (props.product) {
 
@@ -287,6 +306,7 @@ const DialogProduct = (props: DialogProductProps) => {
             formik.setFieldValue('locations', props.product.locationInfo);
             setAttachments(props.product.attachments);
         } else {
+
         }
 
     }, [props.product])
@@ -324,7 +344,7 @@ const DialogProduct = (props: DialogProductProps) => {
             key={i}
             position="relative"
         >
-            <Box sx={{ position: 'relative', background: 'red', width: '100%', }}>
+            <Box sx={{ position: 'relative', width: '100%', }}>
                 <IconButton aria-label="close" onClick={() => {
                     let _images = formik.values.images;
                     _images.splice(i, 1);
@@ -358,7 +378,7 @@ const DialogProduct = (props: DialogProductProps) => {
             key={i}
             position="relative"
         >
-            <Box sx={{ position: 'relative', background: 'red', width: '100%', }}>
+            <Box sx={{ position: 'relative', width: '100%', }}>
                 <IconButton aria-label="close" onClick={() => {
                     setImageDelete([...imageDelete, file.id!]);
                     attachments.splice(i, 1);
@@ -381,31 +401,50 @@ const DialogProduct = (props: DialogProductProps) => {
             </Box>
         </Grid>
     ));
-    return <Dialog open={openDialog} onClose={() => props.handleCloseDialog(false)} maxWidth="lg" fullWidth>
-        <DialogTitle>{props.product ? 'Edit' : 'Add'} Product</DialogTitle>
-        <DialogContent>
-            <Grid container rowSpacing={0} spacing={2} mb={4}>
+    return <Dialog open={openDialog} onClose={() => { props.handleCloseDialog(false); formik.resetForm(); }
+    } maxWidth="lg" fullWidth sx={{ minHeight: 350 }}>
+        {/* <DialogTitle>{props.product ? 'Edit' : 'Add'} Product</DialogTitle> */}
+        <Box flex="1" display="flex" alignItems="center" justifyContent="space-between">
+            <DialogTitle>{props.product ? 'Edit' : 'Add'} Product</DialogTitle>
+            <Box paddingRight={3} display="flex" gap={2}>
+                <Button color="primary"
+                    variant="outlined" onClick={() => { props.handleCloseDialog(false); formik.resetForm(); }}>
+                    Cancel
+                </Button>
+                <Button
+                    variant="contained"
+                    disabled={pressed}
+                    onClick={() => { formik.submitForm() }}
+                >
+                    Save
+                </Button>
+            </Box>
+        </Box>
+        <DialogContent sx={{ paddingTop: 0, paddingBottom: 0 }}>
+            <Grid container rowSpacing={0} mb={4}>
                 <Grid size={12} sx={{ paddingTop: 0, marginTop: 0 }}>
-                    <Divider></Divider>
+                    <Divider sx={{ my: 0 }}></Divider>
                 </Grid>
                 <Grid size={12} mt={2}>
                     <Grid container spacing={3}>
                         <Grid size={8}>
                             <BlankCard>
-                                <Box p={3}>
-                                    <Typography variant="h5">General Information</Typography>
-                                    <Grid container mt={3} gap={1}>
+                                <Box px={2} py={1}>
+                                    <Box display="flex" flex="1" justifyContent="space-between" flexDirection="row">
+                                        <Typography variant="h5">General Information</Typography>
+                                        <Switch color="success" name="status" checked={formik.values.status} onChange={formik.handleChange} sx={{ marginLeft: 0 }} />
+                                    </Box>
+                                    <Divider sx={{ marginBottom: 0 }}></Divider>
+                                    <Grid container mt={1} spacing={1}>
                                         {/* 1 */}
-                                        <Grid display="flex" alignItems="center" size={12}>
+                                        <Grid size={12}>
                                             <CustomFormLabel htmlFor="addressLine1" sx={{ mt: 0 }}>
                                                 Product Name{" "}
                                                 <Typography color="error.main" component="span">
                                                     *
                                                 </Typography>
                                             </CustomFormLabel>
-                                        </Grid>
-                                        <Grid size={12}>
-                                            <CustomTextField id='productname' variant='outlined' fullWidth
+                                            <CustomTextField id='productname' variant='outlined' fullWidth placeholder="Enter product name"
                                                 name="name"
                                                 value={formik.values.name}
                                                 onChange={formik.handleChange}
@@ -414,36 +453,121 @@ const DialogProduct = (props: DialogProductProps) => {
 
                                             />
                                         </Grid>
-                                        <Grid display="flex" alignItems="center" size={12}>
+                                        <Grid size={12}>
                                             <CustomFormLabel htmlFor="addressLine1" sx={{ mt: 0 }}>
-                                                Description{" "}
+                                                SKU{" "}
                                                 <Typography color="error.main" component="span">
                                                     *
                                                 </Typography>
                                             </CustomFormLabel>
+                                            <CustomTextField id='productname' variant='outlined' fullWidth name="sku"
+                                                value={formik.values.sku}
+                                                onChange={formik.handleChange}
+                                                helperText={formik.touched.sku && formik.errors.sku}
+                                                error={formik.touched.sku && Boolean(formik.errors.sku)}
+                                            />
                                         </Grid>
                                         <Grid size={12}>
+                                            <Box display="flex" flex="1" justifyContent="space-between" flexDirection="row">
+                                                <Typography variant="h5">Price Information</Typography>
+                                                <Fab color="primary" aria-label="send" size="small" onClick={() => addPrice()}>
+                                                    <IconPlus width={14}></IconPlus>
+                                                </Fab>
+                                            </Box>
+                                            <Divider sx={{ my: 1 }}></Divider>
+                                            {
+                                                formik.values.locations.map((price, index) => {
+
+                                                    return (<Grid container spacing={3} mb={2}>
+                                                        <Grid size={6}>
+                                                            <CustomSelect
+                                                                id="locationID"
+                                                                // value={age}
+                                                                // onChange={handleChange}
+                                                                value={price.locationID}
+                                                                name={`locations.${index}.locationID`}
+                                                                placeholder="Select a location"
+                                                                onChange={formik.handleChange}
+                                                                fullWidth
+                                                                displayEmpty
+                                                            >
+                                                                {/* <MenuItem value={0}>Address 1</MenuItem>
+                                                        <MenuItem value={0}>Address 2</MenuItem>s
+                                                        <MenuItem value={0}>Address 3</MenuItem> */}
+                                                                <MenuItem value="">
+                                                                    <em>Select a location</em>
+                                                                </MenuItem>
+                                                                {
+
+                                                                    locations.map((location: LocationInfo) => {
+                                                                        return <MenuItem value={location.locationID} >{location.address}</MenuItem>
+                                                                    })
+                                                                }
+                                                            </CustomSelect>
+                                                            {formik.touched.locations && formik.errors.locations && (
+                                                                <FormHelperText sx={{ color: theme.palette.error.main }}>{(formik.errors.locations[index] as FormikErrors<{ locationID: string }> | undefined)?.locationID}</FormHelperText>
+                                                            )}
+                                                        </Grid>
+                                                        <Grid size={5}>
+                                                            <CustomTextField placeholder="Price" fullWidth
+                                                                name={`locations.${index}.price`}
+                                                                onChange={formik.handleChange}
+                                                                value={price.price}
+                                                                helperText={formik.errors.locations && formik.touched.locations && (formik.errors.locations[index] as FormikErrors<{ price: string }> | undefined)?.price}
+                                                                error={formik.errors.locations && formik.touched.locations && Boolean((formik.errors.locations[index] as FormikErrors<{ price: string }> | undefined)?.price)}
+                                                            />
+                                                        </Grid>
+                                                        <Grid size={1} alignItems="center" display="flex">
+                                                            <Tooltip title="Delete">
+                                                                {/* <Button color="error" aria-label="delete">
+                                                                    <IconX size={21} onClick={() => { removeLocationPrice(index); }} />
+                                                                </Button> */}
+                                                                <IconButton size="large" color="error" onClick={() => { removeLocationPrice(index); }}>
+                                                                    <IconTrash size={18}></IconTrash>
+                                                                </IconButton>
+                                                            </Tooltip>
+                                                        </Grid>
+                                                    </Grid>)
+                                                })
+                                            }
+                                            {/* <Button variant="text" startIcon={<IconPlus size={18} />} onClick={() => { addPrice() }}>
+                                                Add another price
+                                            </Button> */}
+                                        </Grid>
+                                        <Grid display="flex" alignItems="center" size={12}>
+                                            {/* <CustomFormLabel htmlFor="addressLine1" sx={{ mt: 0 }}>
+                                                Description{" "}
+                                            </CustomFormLabel> */}
+                                            <Typography variant="h5">Description</Typography>
+                                        </Grid>
+                                        <Grid size={12}>
+                                            <Divider sx={{ my: 1, mt: 0 }}></Divider>
                                             <CustomTextField
                                                 id="txt-message"
                                                 multiline
                                                 rows={4}
                                                 variant="outlined"
-                                                placeholder="Write your description here..."
+                                                placeholder="Enter product description"
                                                 fullWidth
                                                 name="description"
-
+                                                sx={{
+                                                    '& .MuiInputBase-inputMultiline': {
+                                                        paddingTop: '0', // Điều chỉnh khoảng cách từ trên xuống
+                                                        paddingLeft: '0', // Điều chỉnh khoảng cách từ trái
+                                                    },
+                                                }}
                                                 value={formik.values.description}
                                                 onChange={formik.handleChange}
                                                 helperText={formik.touched.description && formik.errors.description}
                                                 error={formik.touched.description && Boolean(formik.errors.description)}
                                             />
                                         </Grid>
-                                        <Grid display="flex" alignItems="center" size={12}>
+                                        {/* <Grid display="flex" alignItems="center" size={12}>
                                             <CustomFormLabel htmlFor="addressLine1" sx={{ mt: 0 }}>
                                                 Keywords{" "}
                                             </CustomFormLabel>
-                                        </Grid>
-                                        <Grid size={12}>
+                                        </Grid> */}
+                                        {/* <Grid size={12}>
                                             <Autocomplete
                                                 multiple
                                                 freeSolo
@@ -460,84 +584,19 @@ const DialogProduct = (props: DialogProductProps) => {
                                                 }
                                                 renderInput={(params) => <TextField {...params} />}
                                             />
-                                        </Grid>
+                                        </Grid> */}
 
-                                        <Grid display="flex" alignItems="center" size={12}>
-                                            <CustomFormLabel htmlFor="addressLine1" sx={{ mt: 0 }}>
-                                                SKU{" "}
-                                                <Typography color="error.main" component="span">
-                                                    *
-                                                </Typography>
-                                            </CustomFormLabel>
-                                        </Grid>
-                                        <Grid size={12}>
-                                            <CustomTextField id='productname' variant='outlined' fullWidth name="sku"
-                                                value={formik.values.sku}
-                                                onChange={formik.handleChange}
-                                                helperText={formik.touched.sku && formik.errors.sku}
-                                                error={formik.touched.sku && Boolean(formik.errors.sku)}
-                                            />
-                                        </Grid>
+
                                     </Grid>
                                 </Box>
                             </BlankCard>
                             <Box p={1}>
                             </Box>
-                            <BlankCard>
+                            {/* <BlankCard>
                                 <Box p={3}>
-                                    <Typography variant="h5">Price</Typography>
-                                    {
-                                        formik.values.locations.map((price, index) => {
-                                            console.log(`error_${index}`, formik.errors);
-                                            console.log(`error_${index}`, formik.touched.locations);
-                                            return (<Grid container spacing={3} mb={2}>
-                                                <Grid size={4}>
-                                                    <CustomSelect
-                                                        id="locationID"
-                                                        // value={age}
-                                                        // onChange={handleChange}
-                                                        value={price.locationID}
-                                                        name={`locations.${index}.locationID`}
-                                                        onChange={formik.handleChange}
-                                                        fullWidth
-                                                    >
-                                                        {/* <MenuItem value={0}>Address 1</MenuItem>
-                                                        <MenuItem value={0}>Address 2</MenuItem>s
-                                                        <MenuItem value={0}>Address 3</MenuItem> */}
-                                                        {
-                                                            locations.map((location: LocationInfo) => {
-                                                                return <MenuItem value={location.locationID} >{location.address}</MenuItem>
-                                                            })
-                                                        }
-                                                    </CustomSelect>
-                                                    {formik.touched.locations && formik.errors.locations && (
-                                                        <FormHelperText sx={{ color: theme.palette.error.main }}>{(formik.errors.locations[index] as FormikErrors<{ locationID: string }> | undefined)?.locationID}</FormHelperText>
-                                                    )}
-                                                </Grid>
-                                                <Grid size={4}>
-                                                    <CustomTextField placeholder="Price" fullWidth
-                                                        name={`locations.${index}.price`}
-                                                        onChange={formik.handleChange}
-                                                        value={price.price}
-                                                        helperText={formik.errors.locations && formik.touched.locations && (formik.errors.locations[index] as FormikErrors<{ price: string }> | undefined)?.price}
-                                                        error={formik.errors.locations && formik.touched.locations && Boolean((formik.errors.locations[index] as FormikErrors<{ price: string }> | undefined)?.price)}
-                                                    />
-                                                </Grid>
-                                                <Grid size={4} alignItems="center" display="flex">
-                                                    <Tooltip title="Delete">
-                                                        <Button color="error" aria-label="delete">
-                                                            <IconX size={21} onClick={() => { removeLocationPrice(index); }} />
-                                                        </Button>
-                                                    </Tooltip>
-                                                </Grid>
-                                            </Grid>)
-                                        })
-                                    }
-                                    <Button variant="text" startIcon={<IconPlus size={18} />} onClick={() => { addPrice() }}>
-                                        Add another price
-                                    </Button>
+                                    
                                 </Box>
-                            </BlankCard>
+                            </BlankCard> */}
                         </Grid>
                         <Grid size={4} rowGap={2}>
                             <BlankCard>
@@ -561,7 +620,7 @@ const DialogProduct = (props: DialogProductProps) => {
                                     </Box>
                                     <Typography variant="body2" textAlign="center" mt={1}>
                                         Set the product thumbnail image. Only *.png, *.jpg and *.jpeg image
-                                        files are accepted.
+                                        files are accepted. Please upload images with a width greater than 300px and a ratio of 1/1
                                     </Typography>
                                     <Box mt={2}>
                                         <Typography variant="h6" fontSize="15px">
@@ -573,31 +632,14 @@ const DialogProduct = (props: DialogProductProps) => {
                                     </Box>
                                 </Box>
                             </BlankCard>
-                            <Box p={1}>
-                            </Box>
-                            <BlankCard>
-                                <Box p={3}>
-                                    <Typography variant="h5">Status</Typography>
-                                    <CustomSwitch name="status" checked={formik.values.status} onChange={formik.handleChange} sx={{ marginLeft: 0 }} />
-                                </Box>
-                            </BlankCard>
                         </Grid>
                     </Grid >
                 </Grid>
             </Grid>
         </DialogContent>
-        <DialogActions>
-            <Button color="primary"
-                variant="outlined" onClick={() => props.handleCloseDialog(false)}>
-                Cancel
-            </Button>
-            <Button
-                variant="contained"
-                onClick={() => { formik.submitForm() }}
-            >
-                Save
-            </Button>
-        </DialogActions>
+        {/* <DialogActions>
+            
+        </DialogActions> */}
     </Dialog >
 }
 

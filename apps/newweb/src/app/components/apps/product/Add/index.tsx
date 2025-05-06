@@ -120,7 +120,8 @@ const CreateProductApp = () => {
         password: values.password,
         email: values.email,
         isActive: true,
-        categoryId: values.category
+        categoryId: values.category,
+        website: ''
       };
       let result = await addStore(store);
       setShowAlert(true);

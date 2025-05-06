@@ -18,6 +18,7 @@ export class ProductResponseMapper extends BaseMapper<
       store: {
         id: source.store.id,
         name: source.store.name,
+        website: source.store.website,
       },
       attachments: source.attachments?.map((attachment) => ({
         id: attachment.id,

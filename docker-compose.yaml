@@ -55,18 +55,18 @@ services:
     volumes:
       - ./apps/api:/app
       - /app/node_modules
-  # web:
-  #   container_name: search_pro_web
-  #   build: ./apps/web
-  #   environment:
-  #     - PORT=4173
-  #   ports:
-  #     - "4173:4173"
-  #   volumes:
-  #     - ./apps/web:/app
-  #     - /app/node_modules
-  #   networks:
-  #     - search-pro-network
+  newweb:
+    container_name: search_pro_newweb
+    build: ./apps/newweb
+    environment:
+      - PORT=4173
+    ports:
+      - "4173:4173"
+    volumes:
+      - ./apps/newweb/src:/app/src
+      - /app/node_modules
+    networks:
+      - search-pro-network
 networks:
   search-pro-network:
     driver: bridge

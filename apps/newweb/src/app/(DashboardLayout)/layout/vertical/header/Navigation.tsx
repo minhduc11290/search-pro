@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Menu, Typography, Button, Divider, Grid } from "@mui/material";
 import Link from "next/link";
-import { IconBuildingStore, IconUsers, IconUserShield } from "@tabler/icons-react";
+import { IconBuildingStore, IconCategory, IconUsers, IconUserShield } from "@tabler/icons-react";
 import AppLinks from "./AppLinks";
 import QuickLinks from "./QuickLinks";
 import NavItem from "../sidebar/NavItem";
 import { MenuitemsType } from "../sidebar/MenuItems";
 import { uniqueId } from "lodash";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import useAuth from "@/hooks/auth";
 
 const AppDD = () => {
   // const [anchorEl2, setAnchorEl2] = useState('');
@@ -25,6 +26,24 @@ const AppDD = () => {
   console.log("pathName", pathname);
   console.log("pathDirect", pathWithoutLastPart);
 
+  const { getProfile } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    _getProfile();
+  }, []);
+  const router = useRouter();
+
+  const _getProfile = async () => {
+    const user = await getProfile();
+    if (user?.role == "baed5b1d-19e9-40f9-8d95-f2222f479944") {
+      setIsAdmin(true);
+    } else {
+      if (pathname.startsWith("/apps/users/") || pathname.startsWith("/apps/admins/")) {
+
+        router.push("/apps/stores/list");
+      }
+    }
+  }
 
 
   // const Menuitems: MenuitemsType[] = [
@@ -78,7 +97,7 @@ const AppDD = () => {
       >
         STORE
       </Button>
-      <Button
+      {isAdmin && <Button
         color="inherit"
         // sx={{ color: (theme) => theme.palette.text.secondary }}
         variant="text"
@@ -99,8 +118,8 @@ const AppDD = () => {
         }
       >
         USER
-      </Button>
-      <Button
+      </Button>}
+      {isAdmin && <Button
         color="inherit"
         // sx={{ color: (theme) => theme.palette.text.secondary }}
         variant="text"
@@ -120,7 +139,28 @@ const AppDD = () => {
         }
       >
         ADMIN
-      </Button>
+      </Button>}
+      {isAdmin && <Button
+        color="inherit"
+        // sx={{ color: (theme) => theme.palette.text.secondary }}
+        variant="text"
+        href="/apps/categories/list"
+        sx={{
+
+          bgcolor: pathname.startsWith("/apps/categories/") ? "primary.main" : "",
+          color: pathname.startsWith("/apps/categories/")
+            ? "white"
+            : (theme) => theme.palette.text.secondary,
+        }}
+        component={Link}
+        startIcon={
+          <IconCategory size="15"
+          //     style={{ marginLeft: "-5px", marginTop: "2px" }}
+          />
+        }
+      >
+        CATEGORIES
+      </Button>}
     </Box>
   );
 };

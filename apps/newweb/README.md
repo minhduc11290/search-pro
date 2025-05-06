@@ -35,3 +35,14 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 
 testing
+
+
+
+Here is a root >> d@2024!Bs
+
+You can use port 21 192.241.159.48
+
+use port 22 for SSH
+
+
+ssh root@192.241.159.48

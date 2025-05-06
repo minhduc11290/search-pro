@@ -1,5 +1,6 @@
 import { Status } from "./enum/status";
 import { Attachment } from "./product-props";
+import { SearchableCities } from "./searchable-cities";
 
 export interface LocationInfo {
     no: number;
@@ -49,6 +50,8 @@ export interface LocationInfo {
 
     latitude: number,
     longitude: number,
+    cities?: string[];
+
 }
 
 export interface LocationInfoRequest {
@@ -94,4 +97,5 @@ export interface LocationInfoRequest {
 
     latitude: number;
     longitude: number;
+    cities?: SearchableCities[];
 }

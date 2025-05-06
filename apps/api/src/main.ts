@@ -5,10 +5,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { BasicAuthMiddleware } from './middlewares/basic-auth.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  // const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule);
   app.use('/api-docs', new BasicAuthMiddleware().use);
   app.enableCors({
-    origin: 'http://localhost:3000',
+    origin: ['http://localhost:3000', 'https://dsa-admin.devforce.one', 'https://admin-us.dbssoftnet.com'],
     credentials: true, // Cho phép gửi cookie qua trình duyệt
   });
   const config = new DocumentBuilder()

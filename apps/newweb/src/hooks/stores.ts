@@ -32,7 +32,11 @@ const useStore = () => {
                         phone: item.primaryPhone,
                         email: item.email,
                         status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
-                        category: item.categoryId
+                        category: item.categoryId,
+                        website: item.website,
+                        createdAt: item.createdAt,
+                        createdBy: item.createdBy,
+                        type: item.type
                     }
                     return store;
                 });
@@ -64,7 +68,9 @@ const useStore = () => {
                     email: item.email,
                     status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive,
                     category: item.categoryId,
-                    pw: item.pw
+                    pw: item.pw,
+                    website: item.website,
+                    type: item.type,
                 }
                 return store;
 
@@ -91,6 +97,8 @@ const useStore = () => {
                     const store: Category = {
                         id: item.id,
                         name: item.name,
+                        productUrl: item.productUrl,
+                        url: item.url
                     }
                     return store;
                 });

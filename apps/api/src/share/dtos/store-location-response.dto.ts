@@ -160,4 +160,7 @@ export class StoreLocationResponseDto {
   longitude?: number;
 
 
+  @ApiProperty({ required: true, example: '12345' })
+  cities?: string[];
+
 }

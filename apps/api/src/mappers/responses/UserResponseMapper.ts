@@ -20,6 +20,7 @@ export class UserResponseMapper extends BaseMapper<
         id: source?.role.id,
         value: source?.role.role,
       },
+      pw: source.pw,
       stores: source?.stores?.map((store) => ({
         id: store.id,
         value: store.name,

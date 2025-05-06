@@ -55,7 +55,7 @@ const useStoreProducts = () => {
                                 steName: _location.steName
                             }
                         }) : [],
-                        image: Array.isArray(item.attachments) && item.attachments.length > 0 ? getLink(item.attachments[0]?.name) : getLink('no-image.png'), // toDo:
+                        image: Array.isArray(item.attachments) && item.attachments.length > 0 ? getLink(item.attachments[0]?.name) : "", // getLink('no-image.png'), // toDo:
                         attachments: item.attachments,
                         status: item.status == 'ACTIVE' ? Status.Active : Status.Deactive
                     }

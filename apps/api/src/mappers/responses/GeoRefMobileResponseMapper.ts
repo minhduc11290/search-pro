@@ -10,6 +10,8 @@ export class GeoRefMobileResponseMapper extends BaseMapper<
     const geoRefResponseDto = {
       zipCode: source.zipCode,
       steName: source.steName,
+      city: source.uspsCity,
+
     };
     return geoRefResponseDto;
   }

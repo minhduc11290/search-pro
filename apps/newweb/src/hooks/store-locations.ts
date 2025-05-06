@@ -6,6 +6,9 @@ import { Store } from "../@types/store-props";
 import { apiGetStoreById } from "../api/stores";
 import { AxiosError } from "axios";
 import { Attachment } from "../@types/product-props";
+import { SearchableCities } from "@/@types/searchable-cities";
+import { LocationSearchableRequest } from "@/@types/location-searchable-props";
+import { apiDeleteStoreLocationSearchable, apiGetStoreLocationsSearchable, apiPostStoreLocationSearchable, apiPutStoreLocationSearchable } from "@/api/store-locations-searchable";
 
 const useStoreLocations = () => {
 
@@ -58,7 +61,7 @@ const useStoreLocations = () => {
 
                         isOpenThu: item.isOpenThu,
                         openTimeThu: item.openTimeThu,
-                        closeTimeThu: item.openTimeThu,
+                        closeTimeThu: item.closeTimeThu,
 
                         isOpenFri: item.isOpenFri,
                         openTimeFri: item.openTimeFri,
@@ -73,7 +76,8 @@ const useStoreLocations = () => {
                         closeTimeSun: item.closeTimeSun,
 
                         latitude: item.latitude,
-                        longitude: item.longitude
+                        longitude: item.longitude,
+                        cities: item.cities,
                     }
                     return location;
                 });
@@ -91,11 +95,14 @@ const useStoreLocations = () => {
     const createLocation = useCallback(async (storeId: string, locationInfo: LocationInfoRequest) => {
         let result = false;
         let errorMessage = "";
+        let data = null;
         try {
             setIsLoading(true);
             const response = await apiPostStoreLocation(storeId, locationInfo);
             if (response.status == 201) {
                 result = true;
+                data = response.data;
+
             }
         } catch (ex) {
             if (ex instanceof AxiosError) {
@@ -108,7 +115,7 @@ const useStoreLocations = () => {
         } finally {
             setIsLoading(false);
         }
-        return { result, errorMessage };
+        return { data, result, errorMessage };
     }, []);
 
 
@@ -191,7 +198,107 @@ const useStoreLocations = () => {
     }, []);
 
 
-    return { isLoading, getStoreLocations, getStoreInfoById, createLocation, updateLocation, addLocationAttachment };
+    const getStoreLocationSearchable = useCallback(async (storeID: string): Promise<SearchableCities[]> => {
+        let locations: SearchableCities[] = [];
+        try {
+
+            setIsLoading(true);
+            const response = await apiGetStoreLocationsSearchable(storeID);
+
+            // localStorage.setItem('authToken', token);
+            if (Array.isArray(response.data)) {
+                locations = response.data.map((item, index) => {
+                    const location: SearchableCities = {
+                        id: item.id,
+                        state: item.state,
+                        city: item.cities
+                    }
+                    return location;
+                });
+            }
+
+        } catch (ex) {
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return locations;
+    }, []);
+
+
+    const createLocationSearchable = useCallback(async (storeId: string, locationInfo: LocationSearchableRequest) => {
+        let result = false;
+        let errorMessage = "";
+        try {
+            setIsLoading(true);
+            const response = await apiPostStoreLocationSearchable(storeId, locationInfo);
+            if (response.status == 201) {
+                result = true;
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage };
+    }, []);
+
+
+    const updateLocationSearchable = useCallback(async (storeId: string, locationId: string, locationInfo: LocationSearchableRequest) => {
+        let result = false;
+        let errorMessage = "";
+        try {
+            setIsLoading(true);
+            const response = await apiPutStoreLocationSearchable(storeId, locationId, locationInfo);
+            if (response.status == 200) {
+                result = true;
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage };
+    }, []);
+
+
+    const deleteLocationSearchable = useCallback(async (storeId: string, locationId: string) => {
+        let result = false;
+        let errorMessage = "";
+        try {
+            setIsLoading(true);
+            const response = await apiDeleteStoreLocationSearchable(storeId, locationId);
+            if (response.status == 200) {
+                result = true;
+            }
+        } catch (ex) {
+            if (ex instanceof AxiosError) {
+                errorMessage = ex.response?.data?.message ?? ex.message;
+            } else if ((ex instanceof Error)) {
+                errorMessage = ex.message;
+            }
+
+            console.log(ex);
+        } finally {
+            setIsLoading(false);
+        }
+        return { result, errorMessage };
+    }, []);
+
+
+    return { isLoading, getStoreLocations, getStoreInfoById, createLocation, updateLocation, addLocationAttachment, getStoreLocationSearchable, createLocationSearchable, updateLocationSearchable, deleteLocationSearchable };
 };
 
 export default useStoreLocations;

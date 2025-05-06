@@ -12,4 +12,7 @@ export class GeoRefResponseDto {
 
   @ApiProperty({ required: true, example: 'New Jersey' })
   steName!: string;
+
+  @ApiProperty({ required: true, example: 'New Jersey' })
+  city!: string;
 }

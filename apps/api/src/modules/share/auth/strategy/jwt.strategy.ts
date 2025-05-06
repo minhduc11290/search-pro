@@ -33,9 +33,14 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
         'You are not allowed to access this resource',
       );
     }
-    const user = await this.userService.findByEmail(payload.email);
-    if (!user?.isActive()) {
-      throw new UnauthorizedException('User not found');
+
+    //const user = await this.userService.findByEmail(payload.email);
+    const user = await this.userService.findByEmailAndRole(payload.email, payload.role);
+    console.log("JWT-validate", user);
+    if (!user?.isSuperAdmin()) {
+      if (!user?.isActive()) {
+        throw new UnauthorizedException('User not found');
+      }
     }
     return new UserResponseMapper().map(user);
   }

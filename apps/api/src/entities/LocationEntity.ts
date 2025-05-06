@@ -11,6 +11,7 @@ import { LocationStatus } from '~/share/consts/enums';
 import { AttachmentEntity, GeoRefEntity, StoreEntity } from '.';
 import { BaseEntity } from './BaseEntity';
 import { StoreSearchableLocationEntity } from './StoreSearchableLocationEntity';
+import { IsOptional } from 'class-validator';
 
 @Entity({ tableName: 'locations' })
 export class LocationEntity extends BaseEntity<LocationEntity> {
@@ -131,5 +132,7 @@ export class LocationEntity extends BaseEntity<LocationEntity> {
   @Property({ length: 1000, nullable: true })
   h3Index?: string;
 
-
+  @Property({ nullable: true, type: types.json })
+  @IsOptional()
+  cities?: string[];
 }

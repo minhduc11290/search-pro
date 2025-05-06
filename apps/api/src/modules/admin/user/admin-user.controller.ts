@@ -56,13 +56,14 @@ export class AdminUserController {
     //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
     //   sameSite: 'strict', // Chống CSRF
     // });
-    res.cookie('authToken', 'your-access-token', {
-      httpOnly: true, // Bảo vệ chống XSS
-      secure: false, // Ở localhost, dùng false. Production thì phải là true.
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
-      sameSite: 'lax', // Lax giúp cookie vẫn hoạt động trên domain khác
-    });
-    console.log("Vô đây lax");
+    // res.cookie('authToken', user.accessToken, {
+    //   httpOnly: true, // Bảo vệ chống XSS
+    //   secure: true, // Ở localhost, dùng false. Production thì phải là true.
+    //   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 ngày
+    //   sameSite: 'lax', // Lax giúp cookie vẫn hoạt động trên domain khác
+    //   domain: '.devforce.one'
+    // });
+    console.log("Vô đây lax .devforce.one");
     return res.json(user);
   }
 

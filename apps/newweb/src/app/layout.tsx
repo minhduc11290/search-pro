@@ -3,6 +3,7 @@ import { Providers } from "@/store/providers";
 import MyApp from "./app";
 import NextTopLoader from 'nextjs-toploader';
 import "./global.css";
+import 'leaflet/dist/leaflet.css';
 
 
 export const metadata = {

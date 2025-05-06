@@ -9,7 +9,7 @@ import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter';
 import { AppState } from "@/store/store";
 import "@/utils/i18n";
 import "@/app/api/index";
-
+import { Toaster } from "react-hot-toast";
 
 const MyApp = ({ children }: { children: React.ReactNode }) => {
     const theme = ThemeSettings();
@@ -17,6 +17,7 @@ const MyApp = ({ children }: { children: React.ReactNode }) => {
 
     return (
         <>
+            <Toaster position="top-right" />
             <AppRouterCacheProvider options={{ enableCssLayer: true }}>
                 <ThemeProvider theme={theme}>
                     <RTL direction={customizer.activeDir}>

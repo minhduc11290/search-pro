@@ -31,4 +31,9 @@ export class StoreOwnerCreationDto {
   @IsNotEmpty()
   @IsString()
   password!: string;
+
+  @ApiProperty({ required: true })
+  @IsNotEmpty()
+  @IsString()
+  type?: string;
 }

@@ -124,6 +124,7 @@ export class StoreLocationResponseMapper extends BaseMapper<
 
       latitude: source.latitude ?? 0,
       longitude: source.longitude ?? 0,
+      cities: source.cities ?? []
     };
     return storeLocationDto;
   }

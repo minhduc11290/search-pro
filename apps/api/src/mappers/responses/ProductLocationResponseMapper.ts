@@ -77,6 +77,7 @@ export class ProductLocationResponseMapper extends BaseMapper<
         id: source.location.store.id,
         name: source.location.store.name,
         phone: source.location.phone ?? source.location.store.primaryPhone,
+        website: source.location.store.website,
       },
 
       location: {

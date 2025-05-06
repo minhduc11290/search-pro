@@ -20,8 +20,8 @@ const Breadcrumb = ({ subtitle, items, title, children }: BreadCrumbType) => (
       backgroundColor: "primary.light",
       borderRadius: (theme: Theme) => theme.shape.borderRadius / 4,
       // p: "25px 25px 20px",
-      p: "15px 15px 20px",
-      marginBottom: "30px",
+      p: "10px 15px 10px",
+      marginBottom: "15px",
       position: "relative",
       overflow: "hidden",
     }}

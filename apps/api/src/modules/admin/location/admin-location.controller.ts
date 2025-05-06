@@ -40,6 +40,19 @@ export class AdminLocationController {
     private readonly geoService: GeoRefService
   ) { }
 
+  @Get('stores/:storeId/locations/demo')
+  @ApiOperation({ summary: 'Location list' })
+  @ApiResponse({ status: 200, type: [StoreLocationResponseDto] })
+  async getDemoLocations(
+    @Param('storeId') storeId: string,
+  ): Promise<StoreLocationResponseDto[]> {
+    const locations = await this.adminLocationService.findByCondition({
+      store: storeId,
+    });
+    console.log("locations", locations);
+    return new StoreLocationResponseMapper().mapArray(locations);
+  }
+
   @Get('stores/:storeId/locations')
   @ApiOperation({ summary: 'Location list' })
   @ApiResponse({ status: 200, type: [StoreLocationResponseDto] })
@@ -75,14 +88,28 @@ export class AdminLocationController {
     @CurrentUser() user: UserResponseDto,
     @Body() locationCreationDto: LocationCreationDto,
   ): Promise<StoreLocationResponseDto> {
+
+    const geoRefId = locationCreationDto.geoRefId;
+    const geo = await this.geoService.findById(geoRefId);
+
+    //const position = await this.adminLocationService.getLatLng(locationCreationDto.addressLine1 + " " + (locationCreationDto.addressLine2 ?? "") + " " + (geo?.steName ?? "") + " " + (geo?.zipCode ?? "") + " " + locationCreationDto.city);
+    const position = await this.adminLocationService.getLatLng(locationCreationDto.addressLine1 + " " + (locationCreationDto.addressLine2 ?? "") + " " + (geo?.zipCode ?? ""));
+
     const creationData = new LocationCreationEntityMapper().map(
-      locationCreationDto,
+      {
+        ...locationCreationDto,
+        latitude: position.lat,
+        longitude: position.lng,
+      },
       { storeId, createdBy: user.id },
     );
-    const h3Index = latLngToCell(creationData.latitude!, creationData.longitude!, 7);
+
+
+    const h3Index = latLngToCell(position.lat!, position.lng!, 7);
 
     const location = await this.adminLocationService.create({
       ...creationData,
+      cities: locationCreationDto.cities,
       h3Index: h3Index,
       createdBy: user.id,
     }, locationCreationDto.attachments);
@@ -112,7 +139,10 @@ export class AdminLocationController {
     if (!geo) {
       return null;
     }
-    const h3Index = latLngToCell(locationCreationDto.latitude!, locationCreationDto.longitude!, 7);
+    // const position = await this.adminLocationService.getLatLng(locationCreationDto.addressLine1 + " " + (locationCreationDto.addressLine2 ?? "") + " " + (geo?.steName ?? "") + " " + (geo?.zipCode ?? "") + " " + locationCreationDto.city);
+    const position = await this.adminLocationService.getLatLng(locationCreationDto.addressLine1 + " " + (locationCreationDto.addressLine2 ?? "") + " " + (geo?.zipCode ?? ""));
+
+    const h3Index = latLngToCell(position.lat!, position.lng!, 7);
     const location = await this.adminLocationService.update(locationId, {
       name: locationCreationDto.name ?? _location.name,
       address: locationCreationDto.address ?? _location.address,
@@ -155,11 +185,12 @@ export class AdminLocationController {
       closeTimeSun: locationCreationDto.closeTimeSun ?? _location.closeTimeSun,
 
       h3Index: h3Index,
-      latitude: locationCreationDto.latitude ?? _location.latitude,
-      longitude: locationCreationDto.longitude ?? _location.longitude,
+      latitude: position.lat ?? _location.latitude,
+      longitude: position.lng ?? _location.longitude,
+      cities: locationCreationDto.cities
     });
 
-    
+
 
     return new StoreLocationResponseMapper().map(location);
 

@@ -73,4 +73,13 @@ export class StoreResponseDto {
   @ApiProperty({ example: 'category' })
   categoryId?: string;
 
+  @ApiProperty({ example: '' })
+  createdBy?: string;
+
+  @ApiProperty({ example: '' })
+  createdAt?: string;
+
+  @ApiProperty({ example: '' })
+  type?: string;
+
 }

@@ -56,6 +56,9 @@ export class MinStoreDto {
 
   @ApiProperty({ required: true, example: '123-123' })
   phone?: string;
+
+  @ApiProperty({ required: true, example: 'http://google.com' })
+  website?: string;
 }
 
 export class MinAttachmentDto {

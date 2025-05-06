@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class ProductDetailFilterDto {
-  @ApiProperty({ required: true, example: '60540' })
+  @ApiProperty({ required: false, example: '60540' })
   @IsString()
-  zipCode!: string;
+  @IsOptional()
+  zipCode?: string;
 
-  @ApiProperty({ required: true, example: 'Illinois' })
+  @ApiProperty({ required: false, example: 'Illinois' })
   @IsString()
-  steName!: string;
+  @IsOptional()
+  steName?: string;
 }

@@ -15,6 +15,7 @@ export class AdminStoreService {
   public defaultPopulate: AutoPath<StoreEntity, any> = [
     'locations',
     'owners',
+    
   ] as never[];
   constructor(private readonly em: EntityManager) { }
 

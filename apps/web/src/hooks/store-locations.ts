@@ -58,7 +58,7 @@ const useStoreLocations = () => {
 
                         isOpenThu: item.isOpenThu,
                         openTimeThu: item.openTimeThu,
-                        closeTimeThu: item.openTimeThu,
+                        closeTimeThu: item.closeTimeThu,
 
                         isOpenFri: item.isOpenFri,
                         openTimeFri: item.openTimeFri,

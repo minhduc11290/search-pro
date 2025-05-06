@@ -18,6 +18,9 @@ import {
   Box,
   Stack,
   Divider,
+  RadioGroup,
+  useTheme,
+  FormControlLabel,
 
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -37,6 +40,7 @@ import { StoreCreateContext } from "@/app/context/StoreCreateContext";
 
 import * as yup from 'yup';
 import { useFormik } from "formik";
+import CustomRadio from "@/app/components/forms/theme-elements/CustomRadio";
 
 const CreateStore = () => {
   const { data, addStore } = useContext(StoreCreateContext);
@@ -49,13 +53,16 @@ const CreateStore = () => {
     ownerstore: yup
       .string()
       .min(2, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('ownerstore is Required'),
-    userName: yup
+      .max(255, 'Too Long! Only 255 character')
+      .required('Required information'),
+    password: yup
       .string()
       // .min(8, 'Password should be of minimum 8 characters length')
-      .required('Password is required'),
-    email: yup.string().email(),
+      .required('Required information'),
+    email: yup.string().email().required("Required information"),
+    confirmPassword: yup.string()
+      .oneOf([yup.ref('password'), null], 'Passwords must match').required("Required information"),
+    type: yup.string().required("Required information"),
   });
 
   const formik = useFormik({
@@ -68,7 +75,9 @@ const CreateStore = () => {
       password: '',
       pw: '',
       category: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      website: '',
+      type: 'RETAIL'
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -78,7 +87,9 @@ const CreateStore = () => {
         password: values.password,
         email: values.email,
         isActive: true,
-        categoryId: values.category
+        categoryId: values.category,
+        website: values.website,
+        type: values.type,
       };
       let result = await addStore(store);
       setShowAlert(true);
@@ -98,51 +109,16 @@ const CreateStore = () => {
     },
   });
 
-  const [formData, setFormData] = useState<Store>({
-    // id: 0,
-    // billFrom: "",
-    // billTo: "",
-    // totalCost: 0,
-    // status: "Pending",
-    // billFromAddress: "",
-    // billToAddress: "",
-    // orders: [{ itemName: "", unitPrice: "", units: "", unitTotalPrice: 0 }],
-    // vat: 0,
-    // grandTotal: 0,
-    // subtotal: 0,
-    // date: new Date().toISOString().split("T")[0],
-    no: 0,
-    id: '',
-    ownerstore: '',
-    userName: '',
-    phone: '',
-    email: '',
-    status: Status.Active,
-    password: '',
-    pw: '',
-    category: '',
-  });
+
+  const theme = useTheme();
 
 
 
-
-  const handleChange = (e: { target: { name: any; value: any } }) => {
-    const { name, value } = e.target;
-    console.log("handleChange");
-    setFormData((prevData) => {
-      const newFormData = { ...prevData, [name]: value };
-      // const totals = calculateTotals(newFormData.orders);
-      console.log("newFormData", newFormData);
-      return {
-        ...newFormData,
-        // ...totals,
-      };
-    });
-  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    formik.submitForm();
     // try {
     //   await addInvoice(formData);
     //   setFormData({
@@ -175,176 +151,259 @@ const CreateStore = () => {
   const parsedDate = new Date();
   const formattedOrderDate = format(parsedDate, "EEEE, MMMM dd, yyyy");
 
+
   return (
     <>
-      <form onSubmit={handleSubmit}>
-        <Box>
-          <Stack
-            direction="row"
-            spacing={{ xs: 1, sm: 2, md: 4 }}
-            justifyContent="space-between"
-            mb={3}
-          >
-            {/* <Typography variant="h5"># {formData.id}</Typography> */}
-            <Typography variant="h5"></Typography>
-            <Box display="flex" gap={1}>
-              <Button
-                variant="outlined"
-                color="error"
-                onClick={() => {
-                  router.push("/apps/stores/list");
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Create Store
-              </Button>
-            </Box>
-          </Stack>
-          <Divider></Divider>
+      {/* <form onSubmit={handleSubmit}> */}
+      <Box>
+        <Stack
+          direction="row"
+          spacing={{ xs: 1, sm: 2, md: 4 }}
+          justifyContent="space-between"
+          mb={3}
+        >
+          {/* <Typography variant="h5"># {formData.id}</Typography> */}
+          <Typography variant="h5"></Typography>
+          <Box display="flex" gap={1}>
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => {
+                router.push("/apps/stores/list");
+              }}
+            >
+              Cancel
+            </Button>
+            <Button variant="contained" color="primary" onClick={() => { formik.submitForm() }}>
+              Create Store
+            </Button>
+          </Box>
+        </Stack>
+        <Divider></Divider>
 
-          <Grid container spacing={3} mb={4} rowSpacing={0}>
-            <Grid size={6}>
-              <CustomFormLabel htmlFor="bill-from">Store Name</CustomFormLabel>
-              <CustomTextField
-                id="ownerstore"
-                name="ownerstore"
-                value={formData.ownerstore}
-                onChange={formik.handleChange}
-                fullWidth
-                helperText={formik.touched.ownerstore && formik.errors.ownerstore}
-                error={formik.touched.ownerstore && Boolean(formik.errors.ownerstore)}
-              />
-            </Grid>
-            <Grid size={6}>
-              <CustomFormLabel htmlFor="bill-from">Category</CustomFormLabel>
-              <CustomSelect
-                labelId="category"
-                id="category"
-                name="category"
-                value={formik.values.category}
-                onChange={formik.handleChange}
-                fullWidth
-              >
-                {data.map((item: Category) =>
-                  <MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>
-                )
-                }
-                {/* <MenuItem value={1}>One</MenuItem>
+        <Grid container spacing={3} mb={4} rowSpacing={0}>
+          <Grid size={6}>
+            <CustomFormLabel htmlFor="bill-from">Store Name <Typography color="error.main" component="span">
+              *
+            </Typography></CustomFormLabel>
+            <CustomTextField
+              id="ownerstore"
+              name="ownerstore"
+              value={formik.values.ownerstore}
+              onChange={formik.handleChange}
+              fullWidth
+              helperText={formik.touched.ownerstore && formik.errors.ownerstore}
+              error={formik.touched.ownerstore && Boolean(formik.errors.ownerstore)}
+            />
+          </Grid>
+          <Grid size={6} pt={0}>
+            <CustomFormLabel
+              htmlFor="bill-to"
+
+            >
+              Email  <Typography color="error.main" component="span">
+                *
+              </Typography>
+            </CustomFormLabel>
+            <CustomTextField
+              name="email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              helperText={formik.touched.email && formik.errors.email}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              fullWidth
+            />
+          </Grid>
+          <Grid size={6}>
+            <CustomFormLabel htmlFor="bill-from">Category</CustomFormLabel>
+            <CustomSelect
+              labelId="category"
+              id="category"
+              name="category"
+              value={formik.values.category}
+              onChange={formik.handleChange}
+              fullWidth
+              displayEmpty
+            >
+              <MenuItem value="">Select Category</MenuItem>
+              {data.map((item: Category) =>
+                <MenuItem value={item.id} key={item.id}>{item.name}</MenuItem>
+              )
+              }
+              {/* <MenuItem value={1}>One</MenuItem>
                 <MenuItem value={2}>Two</MenuItem>
                 <MenuItem value={3}>Three</MenuItem> */}
-              </CustomSelect>
-            </Grid>
-            <Grid size={6} pt={0}>
-              <CustomFormLabel
-                htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
-              >
-                Phone Number
-              </CustomFormLabel>
-              <CustomTextField
-                name="phone"
-                value={formData.phone}
-                onChange={formik.handleChange}
-                helperText={formik.touched.phone && formik.errors.phone}
-                error={formik.touched.phone && Boolean(formik.errors.phone)}
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6} pt={0}>
-              <CustomFormLabel
-                htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
-              >
-                Email
-              </CustomFormLabel>
-              <CustomTextField
-                name="email"
-                value={formData.email}
-                onChange={formik.handleChange}
+            </CustomSelect>
+          </Grid>
+          <Grid size={6} pt={0}>
+            <CustomFormLabel
+              htmlFor="bill-to"
 
-                fullWidth
-              />
-            </Grid>
-            <Grid size={6} pt={0}>
-              <CustomFormLabel
-                htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
-              >
-                Password
-              </CustomFormLabel>
-              <CustomTextField
-                id="password"
-                type="password"
-                variant="outlined"
-                fullWidth
-                name="password"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                error={formik.touched.password && Boolean(formik.errors.password)}
-                helperText={formik.touched.password && formik.errors.password}
-
-              />
-            </Grid>
-            <Grid size={6} pt={0}>
-              <CustomFormLabel
-                htmlFor="bill-to"
-                sx={{
-                  mt: {
-                    xs: 0,
-                    sm: 3,
-                  },
-                }}
-              >
-                Confirm Password
-              </CustomFormLabel>
-              <CustomTextField
-                id="password"
-                type="password"
-                variant="outlined"
-                fullWidth
-                name="password"
-                value={formik.values.confirmPassword}
-                onChange={formik.handleChange}
-                error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
-                helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-
-              />
-            </Grid>
+            >
+              Phone Number
+            </CustomFormLabel>
+            <CustomTextField
+              name="phone"
+              value={formik.values.phone}
+              onChange={formik.handleChange}
+              helperText={formik.touched.phone && formik.errors.phone}
+              error={formik.touched.phone && Boolean(formik.errors.phone)}
+              fullWidth
+            />
           </Grid>
 
-
-
-          {showAlert && (
-            <Alert
-              // severity="success"
-              severity={typeMessage == 'success' ? 'success' : 'error'}
-              sx={{ position: "fixed", top: 16, right: 16 }}
+          <Grid size={6} pt={0}>
+            <CustomFormLabel
+              htmlFor="bill-to"
+              sx={{
+                mt: {
+                  xs: 0,
+                  sm: 3,
+                },
+              }}
             >
-              {message}
-              {/* Store added successfully. */}
-            </Alert>
-          )}
+              Password  <Typography color="error.main" component="span">
+                *
+              </Typography>
+            </CustomFormLabel>
+            <CustomTextField
+              id="password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              name="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
+
+            />
+          </Grid>
+          <Grid size={6} pt={0}>
+            <CustomFormLabel
+              htmlFor="bill-to"
+              sx={{
+                mt: {
+                  xs: 0,
+                  sm: 3,
+                },
+              }}
+            >
+              Confirm Password  <Typography color="error.main" component="span">
+                *
+              </Typography>
+            </CustomFormLabel>
+            <CustomTextField
+              id="password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              name="confirmPassword"
+              value={formik.values.confirmPassword}
+              onChange={formik.handleChange}
+              error={formik.touched.confirmPassword && Boolean(formik.errors.confirmPassword)}
+              helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
+
+            />
+          </Grid>
+          <Grid size={12}>
+            <CustomFormLabel
+              htmlFor="bill-to"
+              sx={{
+                mt: {
+                  xs: 0,
+                  sm: 3,
+                },
+              }}
+            >
+              Store Type
+            </CustomFormLabel>
+            <RadioGroup
+              row
+              aria-labelledby="demo-form-control-label-placement"
+              name="type"
+              value={formik.values.type}
+              onChange={formik.handleChange}
+            >
+              <Stack
+                direction="row"
+                spacing={3}
+                width="100%"
+                useFlexGap
+                flexWrap="wrap"
+              >
+
+                <Box
+                  px={2}
+                  py={1}
+                  flexGrow={1}
+                  sx={{
+                    border: `1px dashed ${theme.palette.divider}`,
+                    textAlign: "center",
+                  }}
+                >
+                  <FormControlLabel
+                    value="RETAIL"
+                    control={<CustomRadio />}
+                    label="Retail"
+                  />
+                </Box>
+                <Box
+                  px={2}
+                  py={1}
+                  flexGrow={1}
+                  sx={{
+                    border: `1px dashed ${theme.palette.divider}`,
+                    textAlign: "center",
+                  }}
+                >
+                  <FormControlLabel
+                    value="SERVICE"
+                    control={<CustomRadio />}
+                    label="Service"
+                  />
+                </Box>
+              </Stack>
+            </RadioGroup>
+          </Grid>
+          <Grid size={12}>
+            <CustomFormLabel
+              htmlFor="bill-to"
+              sx={{
+                mt: {
+                  xs: 0,
+                  sm: 3,
+                },
+              }}
+            >
+              Website
+            </CustomFormLabel>
+            <CustomTextField
+              name="website"
+              value={formik.values.website}
+              onChange={formik.handleChange}
+              fullWidth
+
+            />
+          </Grid>
+        </Grid>
 
 
-        </Box>
-      </form>
+
+        {showAlert && (
+          <Alert
+            // severity="success"
+            severity={typeMessage == 'success' ? 'success' : 'error'}
+            sx={{ position: "fixed", top: 16, right: 16 }}
+          >
+            {message}
+            {/* Store added successfully. */}
+          </Alert>
+        )}
+
+
+      </Box >
+      {/* </form> */}
     </>
   );
 };

@@ -32,4 +32,14 @@ export class StoreUpdatingDto {
     @IsOptional()
     @IsString()
     categoryId?: string;
+
+    @ApiProperty({ example: 'store@example.com', required: true })
+    @IsOptional()
+    @IsString()
+    website?: string;
+
+    @ApiProperty({ example: '' })
+    @IsOptional()
+    @IsString()
+    type?: string;
 }

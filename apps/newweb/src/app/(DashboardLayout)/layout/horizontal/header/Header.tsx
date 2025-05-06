@@ -22,6 +22,7 @@ import Navigation from "../../vertical/header/Navigation";
 import Logo from "../../shared/logo/Logo";
 import { AppState } from "@/store/store";
 import { PATH } from "@/constants/paths";
+import useAuth from "@/hooks/auth";
 
 const Header = () => {
   const lgDown = useMediaQuery((theme: Theme) => theme.breakpoints.down("lg"));
@@ -45,6 +46,10 @@ const Header = () => {
     width: "100%",
     color: `${theme.palette.text.secondary} !important`,
   }));
+
+  
+
+
 
   return (
     <AppBarStyled position="sticky" color="default" elevation={8}>

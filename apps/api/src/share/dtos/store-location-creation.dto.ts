@@ -35,7 +35,7 @@ export class LocationCreationDto {
   phone?: string;
 
 
-  @ApiProperty({ required: true, type: [AttachmentDto] })
+  @ApiProperty({ type: [AttachmentDto] })
   @IsArray()
   @Type(() => AttachmentDto)
   attachments?: AttachmentDto[];
@@ -171,5 +171,9 @@ export class LocationCreationDto {
   @ApiProperty({ required: true, example: '12345' })
   @IsNumber()
   longitude!: number;
+
+  @ApiProperty({ required: false, example: ['keyword1', 'keyword2'] })
+  @IsOptional()
+  cities?: string[];
 
 }

@@ -70,7 +70,7 @@ export class UserEntity extends BaseEntity<UserEntity> {
   status?: UserStatus = UserStatus.ACTIVE;
 
   public getFullName() {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.firstName ?? ''} ${this.lastName}`;
   }
 
   public isActive() {

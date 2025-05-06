@@ -70,7 +70,7 @@ export class FileController {
         fileSize: 5 * 1024 * 1024, // Giới hạn 5MB cho mỗi file
       },
       fileFilter: (req, file, callback) => {
-        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif', 'image/webp'];
         if (allowedMimeTypes.includes(file.mimetype)) {
           callback(null, true);
         } else {

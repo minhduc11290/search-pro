@@ -11,10 +11,12 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import BlankCard from "../../shared/BlankCard";
+import { CategoryInfo } from "@/@types/category-props";
 
 interface LocationTableProps {
     data: LocationInfo[];
-    onEditLocation: (location: LocationInfo) => void
+    onEditLocation: (location: LocationInfo) => void,
+    categories: CategoryInfo[];
 }
 
 const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
@@ -22,7 +24,7 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
     const [dataFiltered, setDataFiltered] = useState<LocationInfo[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [totalPage, setTotalPage] = useState<number>(0);
-    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentPage, setCurrentPage] = useState<number>(0);
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { value } = event.currentTarget;
         setSearchTerm(value);
@@ -45,7 +47,7 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
     const [rowsPerPage, setRowsPerPage] = useState(PAGINATION.ITEMPERPAGE);
     const handleChangeRowsPerPage = (event: any) => {
         setRowsPerPage(parseInt(event.target.value, PAGINATION.ITEMPERPAGE));
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
 
     useEffect(() => {
@@ -57,7 +59,7 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
             getDataDisplay();
         } else {
             setTotalPage(0);
-            setCurrentPage(1);
+            setCurrentPage(0);
             setDataDisplay([]);
         }
     }, [dataFiltered]);
@@ -66,7 +68,8 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
         console.log("currentPage", currentPage);
         if (dataFiltered && dataFiltered.length > 0) {
             // const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
-            const start = (currentPage - 1) * rowsPerPage;
+            // const start = (currentPage - 1) * rowsPerPage;
+            const start = (currentPage) * rowsPerPage;
 
             const end = dataFiltered.length > (start + rowsPerPage) ? start + rowsPerPage : dataFiltered.length;
             const _data = [...dataFiltered];
@@ -91,7 +94,7 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
     return <Box sx={{ overflowX: "auto", width: '100%' }}>
         <BlankCard>
             <TableContainer>
-                <Table sx={{ whiteSpace: { xs: "nowrap", md: "unset" } }}>
+                <Table sx={{ whiteSpace: { xs: "nowrap", md: "unset" } }} size="small">
                     <TableHead>
                         <TableRow>
                             <TableCell>
@@ -149,13 +152,13 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
               </TableCell> */}
                                     <TableCell>
                                         <Typography variant="h6" fontSize="14px">
-                                            {index + 1}
+                                            {(rowsPerPage * currentPage) + (index + 1)}
                                         </Typography>
                                     </TableCell>
 
                                     <TableCell>
                                         <Typography variant="h6" fontSize="14px">
-                                            {(location.addressLine1 ?? '') + " " + (location.addressLine2 ?? '') + " " + (location.city ?? '') + "," + (location.state) + " " + location.zipCode}
+                                            {(location.addressLine1 ?? '') + " " + (location.addressLine2 ?? '') + "," + (location.city ?? '') + "," + (location.state) + " " + location.zipCode}
                                         </Typography>
                                     </TableCell>
                                     {/* <TableCell>
@@ -204,14 +207,14 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
                             )
                         )}
                     </TableBody>
-                    <TableFooter>
+                    {/* <TableFooter>
                         <TableRow>
                             <TablePagination
                                 rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
                                 colSpan={6}
                                 count={dataFiltered.length}
                                 rowsPerPage={rowsPerPage}
-                                page={currentPage - 1}
+                                page={currentPage}
                                 SelectProps={{
                                     native: true,
                                 }}
@@ -220,7 +223,7 @@ const LocationTable = ({ data, onEditLocation }: LocationTableProps) => {
                                 ActionsComponent={TablePaginationActions}
                             />
                         </TableRow>
-                    </TableFooter>
+                    </TableFooter> */}
                 </Table>
             </TableContainer>
         </BlankCard>

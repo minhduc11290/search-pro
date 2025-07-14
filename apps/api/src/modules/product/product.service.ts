@@ -1,6 +1,6 @@
 import { AutoPath, EntityManager, FilterQuery } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
-import { ProductLocationEntity, LocationEntity, LocationSearchableEntity } from '~/entities';
+import { ProductLocationEntity, LocationEntity, LocationSearchableEntity, CategoryEntity } from '~/entities';
 
 @Injectable()
 export class ProductService {
@@ -93,6 +93,13 @@ export class ProductService {
       steName: steName,
       cities: { $contains: [city] }
     });
+  }
+
+  async findAllCategory() {
+    return await this.em.find(
+      CategoryEntity,
+      {}
+    );
   }
 
 

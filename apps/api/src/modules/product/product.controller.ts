@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { ProductLocationEntity } from '~/entities';
+import { AttachmentEntity, ProductLocationEntity } from '~/entities';
 import { ProductLocationResponseMapper } from '~/mappers/responses/ProductLocationResponseMapper';
 import { PaginationResponseData, ProductFilterDto } from '~/share/dtos';
 import { ProductLocationResponseDto } from '~/share/dtos/product-location-response.dto';
@@ -64,6 +64,20 @@ export class ProductController {
       conditions
       // { page, limit },
     );
+    const categories = await this.productService.findAllCategory()
+    productLocations.map((product) => {
+      if (product.product.attachments.length == 0) {
+        let cate = categories.find((cat) => cat.id == product.product.store.categoryId);
+        if (cate) {
+          product.product.attachments.add({
+            id: cate.id,
+            name: cate.productUrl ?? "",
+            type: cate.productUrl ?? "",
+            url: cate.productUrl ?? "",
+          });
+        }
+      }
+    })
 
     console.log("productLocations", productLocations)
     const data = new ProductLocationResponseMapper().mapArray(productLocations);
@@ -213,6 +227,20 @@ export class ProductController {
         conditions
         // { page, limit },
       );
+      const categories = await this.productService.findAllCategory()
+      productLocations.map((product) => {
+        if (product.product.attachments.length == 0) {
+          let cate = categories.find((cat) => cat.id == product.product.store.categoryId);
+          if (cate) {
+            const attachment = new AttachmentEntity();
+            attachment.id = cate.id; // gán thủ công, chú ý nếu id là UUID cần chính xác
+            attachment.name = cate.productUrl ?? "no-image.png";
+            attachment.type = cate.productUrl ?? "no-image.png";
+            attachment.url = cate.productUrl ?? "no-image.png";
+            product.product.attachments.add(attachment);
+          }
+        }
+      })
 
       const data = new ProductLocationResponseMapper().mapArray(productLocations);
 
@@ -240,11 +268,26 @@ export class ProductController {
       // },
       id: productLocationId,
     };
-    const store = await this.productService.findByProductLocationId(conditions);
-    if (!store) {
+    const product = await this.productService.findByProductLocationId(conditions);
+    if (!product) {
       throw new NotFoundException('Product not found');
     }
-    return new ProductLocationResponseMapper().map(store);
+
+    const categories = await this.productService.findAllCategory()
+
+    if (product.product.attachments.length == 0) {
+      let cate = categories.find((cat) => cat.id == product.product.store.categoryId);
+      if (cate) {
+        const attachment = new AttachmentEntity();
+        attachment.id = cate.id; // gán thủ công, chú ý nếu id là UUID cần chính xác
+        attachment.name = cate.productUrl ?? "no-image.png";
+        attachment.type = cate.productUrl ?? "no-image.png";
+        attachment.url = cate.productUrl ?? "no-image.png";
+        product.product.attachments.add(attachment);
+      }
+    }
+
+    return new ProductLocationResponseMapper().map(product);
   }
 
 

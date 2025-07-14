@@ -5,7 +5,7 @@ import {
   QueryOrder,
 } from '@mikro-orm/core';
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ContactEntity, ProductLocationEntity, QuoteEntity } from '~/entities';
+import { CategoryEntity, ContactEntity, ProductLocationEntity, QuoteEntity } from '~/entities';
 import { QuoteStatus } from '~/share/consts/enums';
 import { QuoteCreationDto } from '~/share/dtos';
 
@@ -60,6 +60,11 @@ export class QuoteService {
       note: data.note,
     });
 
+
+    const category = await this.em.findOneOrFail(CategoryEntity, {
+      id: productLocation.product.store.categoryId
+    });
+
     const quote = this.em.create(QuoteEntity, {
       productLocation: data.productLocationId,
       store: productLocation.location.store,
@@ -77,8 +82,8 @@ export class QuoteService {
       openTime: productLocation.location.openTime,
       closeTime: productLocation.location.closeTime,
       // image: (productLocation.location?.attachments ?? []).length > 0 ? productLocation.location.attachments[0].name : '',
-      image: (productLocation.product?.attachments ?? []).length > 0 ? productLocation.product.attachments[0].name : '',
-      banner: (productLocation.location?.attachments ?? []).length > 0 ? productLocation.location.attachments[0].name : '',
+      image: (productLocation.product?.attachments ?? []).length > 0 ? productLocation.product.attachments[0].name : (category ? (category.productUrl ?? 'no-image.png') : 'no-image.png'),
+      banner: (productLocation.location?.attachments ?? []).length > 0 ? productLocation.location.attachments[0].name : (category ? (category.url ?? 'no-image.png') : 'no-image.png'),
     });
     console.log("quote", quote);
     await this.em.persistAndFlush(quote);

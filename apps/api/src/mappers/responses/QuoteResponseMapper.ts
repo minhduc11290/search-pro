@@ -77,8 +77,8 @@ export class QuoteResponseMapper extends BaseMapper<
         price: source.price,
         attachments: [{
           id: "",
-          name: source.image ?? "",
-          url: source.image ?? "",
+          name: (source.image ?? "no-image.png").length > 0 ? (source.image ?? "no-image.png") : "no-image.png",
+          url: (source.image ?? "no-image.png").length > 0 ? (source.image ?? "no-image.png") : "no-image.png",
           type: "",
         }],
         // attachments: source.productLocation?.product?.attachments?.map((attachment) => {

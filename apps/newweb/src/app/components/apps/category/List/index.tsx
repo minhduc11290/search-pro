@@ -79,7 +79,7 @@ function CategoryList() {
   const [dataFiltered, setDataFiltered] = useState<CategoryInfo[]>([]);
   const [dataDisplay, setDataDisplay] = useState<CategoryInfo[]>([]);
   const [totalPage, setTotalPage] = useState<number>(0);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(0);
   // const { updateAdmin } = useAdmin();
 
   useEffect(() => {
@@ -91,7 +91,7 @@ function CategoryList() {
       getDataDisplay();
     } else {
       setTotalPage(0);
-      setCurrentPage(1);
+      setCurrentPage(0);
       setDataDisplay([]);
     }
   }, [dataFiltered]);
@@ -100,7 +100,7 @@ function CategoryList() {
     console.log("currentPage", currentPage);
     if (dataFiltered && dataFiltered.length > 0) {
       // const start = (currentPage - 1) * PAGINATION.ITEMPERPAGE;
-      const start = (currentPage - 1) * rowsPerPage;
+      const start = (currentPage) * rowsPerPage;
       const end = dataFiltered.length > (start + rowsPerPage) ? start + rowsPerPage : dataFiltered.length;
       const _data = [...dataFiltered];
       setDataDisplay(_data.slice(start, end));
@@ -316,7 +316,7 @@ function CategoryList() {
                     colSpan={6}
                     count={dataFiltered.length}
                     rowsPerPage={rowsPerPage}
-                    page={currentPage - 1}
+                    page={currentPage}
                     SelectProps={{
                       native: true,
                     }}

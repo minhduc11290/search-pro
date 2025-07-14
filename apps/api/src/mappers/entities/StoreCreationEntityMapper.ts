@@ -29,7 +29,7 @@ export class StoreCreationEntityMapper extends CreateEntityMapper<
       locations: [],
       owners: options ? [options.owner] : [],
       createdBy: options?.owner,
-      categoryId: source.categoryId,
+      categoryId: (source.categoryId ?? "")?.length > 0 ? source.categoryId : null,
       type: source.type
     };
   }
